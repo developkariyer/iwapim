@@ -292,74 +292,152 @@ class CiceksepetiListingHandler
         EOD;
     }
 
-    public function fillAttributeData($data)
+    /**
+     * Fill attribute data for products with category-specific attributes
+     *
+     * @param array $data Product data from Gemini
+     * @return array The product data with filled attributes
+     */
+    public function fillAttributeData(array $data): array
     {
-        $categorySql = "SELECT category_name FROM iwa_ciceksepeti_categories WHERE id = :categoryId";
-        $attributeColorSql = "SELECT attribute_id, attribute_name from iwa_ciceksepeti_category_attributes 
-                             WHERE category_id = :categoryId 
-                             AND type = 'Variant Özelliği' 
-                             AND attribute_name = 'Renk' 
-                             LIMIT 1";
-        $attributeSizeSql = "SELECT attribute_id, attribute_name from iwa_ciceksepeti_category_attributes 
-                            WHERE category_id = :categoryId 
-                            AND type = 'Variant Özelliği' 
-                            AND (attribute_name = 'Ebat' OR attribute_name = 'Boyut' OR attribute_name = 'Beden') 
-                            LIMIT 1";
+        if (empty($data)) {
+            $this->logger->error("❌ [Empty Data] No product data provided to fill attributes");
+            return [];
+        }
         foreach ($data as $sku => &$product) {
             $this->logger->info("🔵 [Product Processing] IWASKU: {$product['stockCode']}");
-            $categoryId = $product['categoryId'];
-            $categoryName = Utility::fetchFromSql($categorySql, ['categoryId' => $categoryId])[0]['category_name'] ?? null;
-            if (!$categoryName) {
-                $this->logger->error("❌ [Category Error] Category name not found for categoryId: {$categoryId}");
+            if (empty($product['categoryId'])) {
+                $this->logger->error("❌ [Missing CategoryId] Product {$product['stockCode']} has no category ID");
                 continue;
             }
-            $this->logger->info("Category Name for categoryId {$categoryId}: {$categoryName}");
-            $attributeColorSqlResult = Utility::fetchFromSql($attributeColorSql, ['categoryId' => $categoryId]);
-            $attributeColorId = $attributeColorSqlResult[0]['attribute_id'] ?? null;
-            $attributeColorName = $attributeColorSqlResult[0]['attribute_name'] ?? null;
-
-            $attributeSizeSqlResult = Utility::fetchFromSql($attributeSizeSql, ['categoryId' => $categoryId]);
-            $attributeSizeId = $attributeSizeSqlResult[0]['attribute_id'] ?? null;
-            $attributeSizeName = $attributeSizeSqlResult[0]['attribute_name'] ?? null;
-
-            $this->logger->info("Color Attribute ID: {$attributeColorId}, Color Attribute Name: {$attributeColorName}, Size Attribute ID: {$attributeSizeId}, Size Attribute Name: {$attributeSizeName}");
-            if (!$attributeColorId || !$attributeColorName || !$attributeSizeId || !$attributeSizeName) {
-                $this->logger->error("❌ [Attribute Error] Missing color or size attribute in database for categoryId: {$categoryId}");
+            $categoryInfo = $this->getCategoryInfo($product['categoryId']);
+            if (!$categoryInfo) {
                 continue;
             }
-
-            $attributes = [];
-            $hasColor = isset($product['renk']) && !empty(trim($product['renk']));
-            $hasSize = isset($product['ebat']) && !empty(trim($product['ebat']));
-            if ($hasColor && $hasSize) {
-                $colorValue = trim($product['renk']);
-                $bestColorMatch = $this->findBestAttributeMatch($attributeColorId, $colorValue, 0);
-
-                $sizeValue = trim($product['ebat']);
-                $bestSizeMatch = $this->findBestAttributeMatch($attributeSizeId, $sizeValue, 1);
-
-                if ($bestColorMatch && $bestSizeMatch) {
-                    $attributes[] = [
-                        'id' => $attributeColorId,
-                        'ValueId' => $bestColorMatch['attribute_value_id'],
-                        "TextLength" => 0
-                    ];
-                    $attributes[] = [
-                        'id' => $attributeSizeId,
-                        'ValueId' => $bestSizeMatch['attribute_value_id'],
-                        "TextLength" => 0
-                    ];
-                    $this->logger->info("✅ [Match Found] Best Color Match: {$bestColorMatch['name']} - ID: {$bestColorMatch['attribute_value_id']}, Best Size Match: {$bestSizeMatch['name']} - ID: {$bestSizeMatch['attribute_value_id']}");
-                }
-                else {
-                    $this->logger->error("❌ [Match Error] Best color match not found for color value: {$colorValue}");
-                    $this->logger->error("❌ [Match Error] Best size match not found for size value: {$sizeValue}");
-                    continue;
-                }
+            $variantAttributes = $this->getVariantAttributes($product['categoryId']);
+            if (empty($variantAttributes['color']) && empty($variantAttributes['size'])) {
+                continue;
             }
-            $product['Attributes'] = $attributes;
+            $product['Attributes'] = $this->buildProductAttributes(
+                $product,
+                $variantAttributes
+            );
         }
         return $data;
+    }
+
+    /**
+     * Get category information by ID
+     *
+     * @param int $categoryId The category ID
+     * @return array|null Category data or null if not found
+     */
+    private function getCategoryInfo(int $categoryId): ?array
+    {
+        $categorySql = "SELECT category_name FROM iwa_ciceksepeti_categories WHERE id = :categoryId";
+        $categoryData = Utility::fetchFromSql($categorySql, ['categoryId' => $categoryId]);
+        if (empty($categoryData)) {
+            $this->logger->error("❌ [Category Error] Category not found for categoryId: {$categoryId}");
+            return null;
+        }
+        $categoryName = $categoryData[0]['category_name'] ?? null;
+        $this->logger->info("✅ [Category Found] CategoryId: {$categoryId}, Name: {$categoryName}");
+        return [
+            'id' => $categoryId,
+            'name' => $categoryName
+        ];
+    }
+
+    /**
+     * Get variant attributes (color and size) for a category
+     *
+     * @param int $categoryId The category ID
+     * @return array Array with color and size attribute information
+     */
+    private function getVariantAttributes(int $categoryId): array
+    {
+        $result = [
+            'color' => null,
+            'size' => null
+        ];
+        $attributeColorSql = "SELECT attribute_id, attribute_name FROM iwa_ciceksepeti_category_attributes 
+                          WHERE category_id = :categoryId 
+                          AND type = 'Variant Özelliği' 
+                          AND attribute_name = 'Renk' 
+                          LIMIT 1";
+        $colorData = Utility::fetchFromSql($attributeColorSql, ['categoryId' => $categoryId]);
+        if (!empty($colorData)) {
+            $result['color'] = [
+                'id' => $colorData[0]['attribute_id'],
+                'name' => $colorData[0]['attribute_name']
+            ];
+            $this->logger->info("✅ [Color Attribute] Found: ID: {$result['color']['id']}, Name: {$result['color']['name']}");
+        } else {
+            $this->logger->error("❌ [Color Attribute] Not found for categoryId: {$categoryId}");
+        }
+        $attributeSizeSql = "SELECT attribute_id, attribute_name FROM iwa_ciceksepeti_category_attributes 
+                         WHERE category_id = :categoryId 
+                         AND type = 'Variant Özelliği' 
+                         AND (attribute_name = 'Ebat' OR attribute_name = 'Boyut' OR attribute_name = 'Beden') 
+                         LIMIT 1";
+        $sizeData = Utility::fetchFromSql($attributeSizeSql, ['categoryId' => $categoryId]);
+        if (!empty($sizeData)) {
+            $result['size'] = [
+                'id' => $sizeData[0]['attribute_id'],
+                'name' => $sizeData[0]['attribute_name']
+            ];
+            $this->logger->info("✅ [Size Attribute] Found: ID: {$result['size']['id']}, Name: {$result['size']['name']}");
+        } else {
+            $this->logger->error("❌ [Size Attribute] Not found for categoryId: {$categoryId}");
+        }
+        return $result;
+    }
+
+    /**
+     * Build product attributes array from variant data
+     *
+     * @param array $product Product data
+     * @param array $variantAttributes Available variant attributes
+     * @return array Array of product attributes
+     */
+    private function buildProductAttributes(array $product, array $variantAttributes): array
+    {
+        $attributes = [];
+        if (!empty($variantAttributes['color']) && isset($product['renk']) && !empty(trim($product['renk']))) {
+            $colorAttrId = $variantAttributes['color']['id'];
+            $colorValue = trim($product['renk']);
+            $bestColorMatch = $this->findBestAttributeMatch($colorAttrId, $colorValue, false);
+            if ($bestColorMatch) {
+                $attributes[] = [
+                    'id' => $colorAttrId,
+                    'ValueId' => $bestColorMatch['attribute_value_id'],
+                    'TextLength' => 0
+                ];
+                $this->logger->info("✅ [Color Match] Found: {$bestColorMatch['name']} (ID: {$bestColorMatch['attribute_value_id']})");
+            } else {
+                $this->logger->error("❌ [Color Match] Not found for value: {$colorValue}");
+            }
+        }
+        if (!empty($variantAttributes['size']) && isset($product['ebat']) && !empty(trim($product['ebat']))) {
+            $sizeAttrId = $variantAttributes['size']['id'];
+            $sizeValue = trim($product['ebat']);
+            $bestSizeMatch = $this->findBestAttributeMatch($sizeAttrId, $sizeValue, true);
+
+            if ($bestSizeMatch) {
+                $attributes[] = [
+                    'id' => $sizeAttrId,
+                    'ValueId' => $bestSizeMatch['attribute_value_id'],
+                    'TextLength' => 0
+                ];
+                $this->logger->info("✅ [Size Match] Found: {$bestSizeMatch['name']} (ID: {$bestSizeMatch['attribute_value_id']})");
+            } else {
+                $this->logger->error("❌ [Size Match] Not found for value: {$sizeValue}");
+            }
+        }
+        if (empty($attributes)) {
+            $this->logger->warning("⚠️ [No Attributes] No attributes could be added for product: {$product['stockCode']}");
+        }
+        return $attributes;
     }
 
     private function parseDimensions($value): ?array
