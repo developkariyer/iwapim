@@ -133,12 +133,12 @@ class CiceksepetiListingHandler
             }
         }
         $this->logger->info("✅ [Filled Attributes Data] All attributes data processed: " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-//        $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
-//        print_r($formattedData);
-//        $this->logger->info("filled attributes data: " . $formattedData);
+        $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
+        print_r($formattedData);
+        $this->logger->info("✅ [Formatted Data]: " . $formattedData);
 //        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
 //        $result = $ciceksepetiConnector->createListing($formattedData);
-//        $this->logger->info("ciceksepetiConnector result batch id: " . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+//        $this->logger->info("✅ [CiceksepetiConnector] Result batch:\n" . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 //        print_r($result);
     }
 
@@ -153,8 +153,25 @@ class CiceksepetiListingHandler
             $salesPrice = $product['salesPrice'] ?? 0;
             $attributes = $product['Attributes'] ?? null;
             $description = $product['description'];
-            if (empty($httpsImages) || $salesPrice === 0 || $salesPrice === "0" || $attributes === null || mb_strlen($description) < 30) {
-                $this->logger->error("Missing data for sku: {$product['stockCode']}");
+            $stockCode = $product['stockCode'] ?? 'UNKNOWN';
+            $hasImages = !empty($httpsImages);
+            $hasValidPrice = $salesPrice !== 0 && $salesPrice !== "0";
+            $hasAttributes = $attributes !== null;
+            $hasValidDescription = mb_strlen($description) >= 30;
+            if (!$hasImages) {
+                $this->logger->error("❌ [Validation Error] Missing or invalid images for SKU: {$stockCode}");
+            }
+            if (!$hasValidPrice) {
+                $this->logger->error("❌ [Validation Error] Invalid or missing sales price for SKU: {$stockCode}");
+            }
+            if (!$hasAttributes) {
+                $this->logger->error("❌ [Validation Error] Missing attributes for SKU: {$stockCode}");
+            }
+            if (!$hasValidDescription) {
+                $this->logger->error("❌ [Validation Error] Description too short (<30 chars) for SKU: {$stockCode}");
+            }
+
+            if (!$hasImages || !$hasValidPrice || !$hasAttributes || !$hasValidDescription) {
                 continue;
             }
             $description = str_replace("\n", "<br>", $description);
@@ -163,12 +180,12 @@ class CiceksepetiListingHandler
                 return mb_convert_encoding(pack('H*', $matches[1]), 'UTF-8', 'UTF-16BE');
             }, $description);
             $description = html_entity_decode($description, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-            $formattedData['products'][] = [
+            $formattedProduct = [
                 'productName' => mb_strlen($product['productName']) > 255
                     ? mb_substr($product['productName'], 0, 255)
                     : $product['productName'],
                 'mainProductCode' => $product['mainProductCode'],
-                'stockCode' => $product['stockCode'],
+                'stockCode' => $stockCode,
                 'categoryId' => $product['categoryId'],
                 'description' => mb_strlen($description) > 20000
                     ? mb_substr($description, 0, 20000)
@@ -180,9 +197,19 @@ class CiceksepetiListingHandler
                 'images' => $httpsImages,
                 'Attributes' => $attributes,
             ];
+
+            $formattedData['products'][] = $formattedProduct;
+            $this->logger->info("✅ [Formatted] Product ready for listing ➜ SKU: {$stockCode}");
         }
-        return json_encode($formattedData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        $result = json_encode($formattedData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        if ($result === false) {
+            $this->logger->error("❌ [JSON Encode Error] Failed to encode formatted listing data.");
+            return false;
+        }
+        $this->logger->info("📦 [Listing Data Ready] " . count($formattedData['products']) . " product(s) formatted for Çiçeksepeti listing.");
+        return $result;
     }
+
 
     private function removeCommonAttributes($data): array
     {
