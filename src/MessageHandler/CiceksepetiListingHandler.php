@@ -471,19 +471,15 @@ class CiceksepetiListingHandler
     {
         $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
         $searchDims = $isSize ? $this->parseDimensions($searchValueNormalized) : null;
-
         $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
             WHERE attribute_id = :attribute_id";
         $allValues = Utility::fetchFromSql($sql, ['attribute_id' => $attributeId]);
-
         if (empty($allValues)) {
             $this->logger->warning("⚠️ [AttributeMatch] No attribute values found in DB for attributeId: {$attributeId}");
             return null;
         }
-
         $bestMatch = null;
         $smallestDiff = PHP_INT_MAX;
-
         foreach ($allValues as $value) {
             $dbValueNormalized = $this->normalizeAttributeValue($value['name']);
 
@@ -509,13 +505,11 @@ class CiceksepetiListingHandler
                 }
             }
         }
-
         if ($bestMatch) {
             $this->logger->info("🔍 [AttributeMatch] Approximate match: '{$searchValue}' ➜ '{$bestMatch['name']}' (ID: {$bestMatch['attribute_value_id']})");
         } else {
             $this->logger->notice("❌ [AttributeMatch] No match found for: '{$searchValueNormalized}' (attributeId: {$attributeId})");
         }
-
         return $bestMatch;
     }
 
