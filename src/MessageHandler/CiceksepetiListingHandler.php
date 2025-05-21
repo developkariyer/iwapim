@@ -40,7 +40,7 @@ class CiceksepetiListingHandler
         $this->logger->info("✅ [Category Data] Ciceksepeti category details successfully retrieved.");
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
         $this->printProductInfoLogger($jsonString);
-//        $this->logger->info("Pim listings info complated");
+        $this->logger->info("✅ [PIM Listings] PIM listings information successfully completed.");
 //        $messageType = $message->getActionType();
 //        match ($messageType) {
 //            'list' => $this->processListingData($traceId, $jsonString, $categories),
@@ -54,14 +54,22 @@ class CiceksepetiListingHandler
         if (isset($jsonData['Ciceksepeti']) && is_array($jsonData['Ciceksepeti'])) {
             foreach ($jsonData['Ciceksepeti'] as $productId => $productData) {
                 $name = $productData['name'] ?? 'Unknown';
-                $skus = array_keys($productData['skus'] ?? []);
-                $skuList = implode(', ', $skus);
-                $this->logger->info("Product ID: {$productId}, Name: {$name}, SKUs: {$skuList}");
+                $this->logger->info("✅ [Product Info] Product ID: {$productId}, Product Name: {$name}");
+                if (isset($productData['skus']) && is_array($productData['skus'])) {
+                    foreach ($productData['skus'] as $iwasku => $variantProduct) {
+                        $size = $variantProduct['size'] ?? 'Unknown';
+                        $color = $variantProduct['color'] ?? 'Unknown';
+                        $this->logger->info("✅ [Variant Info] IWASKU: {$iwasku}, Size: {$size}, Color: {$color}");
+                    }
+                } else {
+                    $this->logger->error("❌ [SKUs Error] SKUs data is missing or invalid.");
+                }
             }
         } else {
-            $this->logger->error("Invalid or missing Ciceksepeti data in JSON");
+            $this->logger->error("❌ [PIM Data Error] PIM data is invalid or missing.");
         }
     }
+
 
     private function chunkSkus($data): array
     {
