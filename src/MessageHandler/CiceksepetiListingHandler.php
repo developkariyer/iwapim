@@ -210,7 +210,6 @@ class CiceksepetiListingHandler
         return $result;
     }
 
-
     private function removeCommonAttributes($data): array
     {
         $valueIdCount = [];
