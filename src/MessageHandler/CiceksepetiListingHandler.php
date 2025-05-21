@@ -470,42 +470,52 @@ class CiceksepetiListingHandler
     private function findBestAttributeMatch($attributeId, $searchValue, $isSize): ?array
     {
         $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
-        if ($isSize) {
-            $searchDims = $this->parseDimensions($searchValueNormalized);
-        }
+        $searchDims = $isSize ? $this->parseDimensions($searchValueNormalized) : null;
+
         $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
             WHERE attribute_id = :attribute_id";
         $allValues = Utility::fetchFromSql($sql, ['attribute_id' => $attributeId]);
+
         if (empty($allValues)) {
-            $this->logger->warning("⚠️ [Attribute DB] No attribute values found for attributeId: {$attributeId}");
+            $this->logger->warning("⚠️ [AttributeMatch] No attribute values found in DB for attributeId: {$attributeId}");
             return null;
         }
+
         $bestMatch = null;
         $smallestDiff = PHP_INT_MAX;
+
         foreach ($allValues as $value) {
-            $dbValueNormalized  = $this->normalizeAttributeValue($value['name']);
+            $dbValueNormalized = $this->normalizeAttributeValue($value['name']);
+
             if ($searchValueNormalized === $dbValueNormalized) {
-                $this->logger->info("✅ [Exact Match] '{$searchValue}' matched with '{$value['name']}' (ID: {$value['attribute_value_id']})");
+                $this->logger->info("✅ [AttributeMatch] Exact match: '{$searchValue}' ➜ '{$value['name']}' (ID: {$value['attribute_value_id']})");
                 return $value;
             }
-            if ($isSize) {
+
+            if ($isSize && $searchDims) {
                 $dbDims = $this->parseDimensions($dbValueNormalized);
-                if ($searchDims && $dbDims) {
+                if ($dbDims) {
                     $widthDiff = $searchDims['width'] - $dbDims['width'];
                     $heightDiff = $searchDims['height'] - $dbDims['height'];
                     $totalDiff = $widthDiff + $heightDiff;
-                    if ($widthDiff >= 0 && $widthDiff <= 25 && ($searchDims['height'] === 0 || ($heightDiff >= 0 && $heightDiff <= 25)) && $totalDiff < $smallestDiff) {
+
+                    $widthOk = $widthDiff >= 0 && $widthDiff <= 25;
+                    $heightOk = $searchDims['height'] === 0 || ($heightDiff >= 0 && $heightDiff <= 25);
+
+                    if ($widthOk && $heightOk && $totalDiff < $smallestDiff) {
                         $smallestDiff = $totalDiff;
                         $bestMatch = $value;
                     }
                 }
             }
         }
+
         if ($bestMatch) {
-            $this->logger->info("🔍 [Best Approx Match] '{$searchValue}' matched with '{$bestMatch['name']}' (ID: {$bestMatch['attribute_value_id']})");
+            $this->logger->info("🔍 [AttributeMatch] Approximate match: '{$searchValue}' ➜ '{$bestMatch['name']}' (ID: {$bestMatch['attribute_value_id']})");
         } else {
-            $this->logger->warning("❌ [No Match Found] No suitable match found for value: '{$searchValue}' (Normalized: '{$searchValueNormalized}')");
+            $this->logger->notice("❌ [AttributeMatch] No match found for: '{$searchValueNormalized}' (attributeId: {$attributeId})");
         }
+
         return $bestMatch;
     }
 
