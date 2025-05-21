@@ -41,11 +41,12 @@ class CiceksepetiListingHandler
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
         $this->printProductInfoLogger($jsonString);
         $this->logger->info("✅ [PIM Listings] PIM listings information successfully completed.");
-//        $messageType = $message->getActionType();
-//        match ($messageType) {
-//            'list' => $this->processListingData($traceId, $jsonString, $categories),
-//            default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
-//        };
+        $messageType = $message->getActionType();
+        $this->logger->info("📝 [Action Type] Processing action of type: {$messageType}");
+        match ($messageType) {
+            'list' => $this->processListingData($jsonString, $categories),
+            default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
+        };
     }
 
     private function printProductInfoLogger($jsonString): void
@@ -89,20 +90,21 @@ class CiceksepetiListingHandler
         return $chunks;
     }
 
-    private function processListingData($traceId, $jsonString, $categories)
+    private function processListingData($jsonString, $categories)
     {
         $fullData = json_decode($jsonString, true);
         if (!$fullData || !isset($fullData['Ciceksepeti'])) {
-            $this->logger->error("Invalid JSON data: " . $jsonString);
-            throw new Exception("Invalid JSON data:");
+            $this->logger->error("❌ [Invalid JSON] Invalid JSON data received: " . $jsonString);
+            throw new Exception("❌ [Invalid JSON] Invalid JSON data");
         }
         $chunks = $this->chunkSkus($fullData['Ciceksepeti']);
         $mergedResults = [];
         $totalChunks = count($chunks);
+        $this->logger->info("✅ [Chunks Processed] Total chunks to process: {$totalChunks}");
         foreach ($chunks as $index => $chunkData) {
             $chunkNumber = $index + 1;
+            $this->logger->info("🔄 [Chunk Processing] Processing chunk {$chunkNumber} / {$totalChunks}...");
             echo "\n🔄 Chunk {$chunkNumber} / {$totalChunks} processing...\n";
-            $this->logger->info("Chunk {$chunkNumber} / {$totalChunks} processing...");
             $chunkJsonString = json_encode(['Ciceksepeti' => $chunkData], JSON_UNESCAPED_UNICODE);
             $prompt = $this->generateListingPrompt($chunkJsonString, $categories);
             $result = GeminiConnector::chat($prompt, 'ciceksepeti');
@@ -114,23 +116,25 @@ class CiceksepetiListingHandler
             }
             $mergedResults = array_merge_recursive($mergedResults, $parsedResult);
             echo "✅ Gemini result success. Chunk {$chunkNumber} complated.\n";
-            $this->logger->info("Gemini chat result success. Chunk {$chunkNumber} complated.");
+            $this->logger->info("✅ [Gemini Success] Gemini result success. Chunk {$chunkNumber} completed.");
             sleep(5);
         }
         $this->logger->info("Gemini chat result : " . json_encode($mergedResults, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
         $data = $this->fillAttributeData($mergedResults);
-        foreach ($data as $sku => $product) {
-            if (isset($product['Attributes']) && empty($product['Attributes'])) {
-                $this->logger->info("Attributes is empty for sku: {$sku}");
-            }
-        }
-        $this->logger->info("filled attributes data: " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
         if (empty($data)) {
-            $this->logger->error("No products found in data");
+            $this->logger->error("❌ [No Data] No products found in the data array.");
             return [];
         }
-        $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
-        print_r($formattedData);
+        foreach ($data as $sku => $product) {
+            if (isset($product['Attributes']) && empty($product['Attributes'])) {
+                $this->logger->info("❌ [Attributes Empty] Attributes is empty for SKU: {$sku}");
+            } else {
+                $this->logger->info("✔️ [Attributes Found] Attributes filled for SKU: {$sku}");
+            }
+        }
+        $this->logger->info("✅ [Filled Attributes Data] All attributes data processed: " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+//        $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
+//        print_r($formattedData);
 //        $this->logger->info("filled attributes data: " . $formattedData);
 //        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
 //        $result = $ciceksepetiConnector->createListing($formattedData);
@@ -302,14 +306,14 @@ class CiceksepetiListingHandler
                             AND (attribute_name = 'Ebat' OR attribute_name = 'Boyut' OR attribute_name = 'Beden') 
                             LIMIT 1";
         foreach ($data as $sku => &$product) {
-            $this->logger->info("iwasku: " . $product['stockCode']);
+            $this->logger->info("🔵 [Product Processing] IWASKU: {$product['stockCode']}");
             $categoryId = $product['categoryId'];
             $categoryName = Utility::fetchFromSql($categorySql, ['categoryId' => $categoryId])[0]['category_name'] ?? null;
             if (!$categoryName) {
-                $this->logger->error("categoryName not found for categoryId: " . $categoryId);
+                $this->logger->error("❌ [Category Error] Category name not found for categoryId: {$categoryId}");
                 continue;
             }
-
+            $this->logger->info("Category Name for categoryId {$categoryId}: {$categoryName}");
             $attributeColorSqlResult = Utility::fetchFromSql($attributeColorSql, ['categoryId' => $categoryId]);
             $attributeColorId = $attributeColorSqlResult[0]['attribute_id'] ?? null;
             $attributeColorName = $attributeColorSqlResult[0]['attribute_name'] ?? null;
@@ -318,10 +322,9 @@ class CiceksepetiListingHandler
             $attributeSizeId = $attributeSizeSqlResult[0]['attribute_id'] ?? null;
             $attributeSizeName = $attributeSizeSqlResult[0]['attribute_name'] ?? null;
 
-            $this->logger->info("categoryName: " . $categoryName . " attributeColorId: " . $attributeColorId  .
-                " attributeColorName: " . $attributeColorName . " attributeSizeId: " . $attributeSizeId . " attributeName: " . $attributeSizeName);
+            $this->logger->info("Color Attribute ID: {$attributeColorId}, Color Attribute Name: {$attributeColorName}, Size Attribute ID: {$attributeSizeId}, Size Attribute Name: {$attributeSizeName}");
             if (!$attributeColorId || !$attributeColorName || !$attributeSizeId || !$attributeSizeName) {
-                $this->logger->error("attribute color or size not found in DB");
+                $this->logger->error("❌ [Attribute Error] Missing color or size attribute in database for categoryId: {$categoryId}");
                 continue;
             }
 
@@ -346,12 +349,11 @@ class CiceksepetiListingHandler
                         'ValueId' => $bestSizeMatch['attribute_value_id'],
                         "TextLength" => 0
                     ];
-                    $this->logger->info("best color match: {$bestColorMatch['name']}:{$bestColorMatch['attribute_value_id']}");
-                    $this->logger->info("best size match: {$bestSizeMatch['name']}:{$bestSizeMatch['attribute_value_id']}");
+                    $this->logger->info("✅ [Match Found] Best Color Match: {$bestColorMatch['name']} - ID: {$bestColorMatch['attribute_value_id']}, Best Size Match: {$bestSizeMatch['name']} - ID: {$bestSizeMatch['attribute_value_id']}");
                 }
                 else {
-                    $this->logger->error("best color match not found: {$colorValue}");
-                    $this->logger->error("best size match not found: {$sizeValue}");
+                    $this->logger->error("❌ [Match Error] Best color match not found for color value: {$colorValue}");
+                    $this->logger->error("❌ [Match Error] Best size match not found for size value: {$sizeValue}");
                     continue;
                 }
             }
@@ -392,11 +394,13 @@ class CiceksepetiListingHandler
         $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
         if ($isSize) {
             $searchDims = $this->parseDimensions($searchValueNormalized);
+            $this->logger->info("Parsing size dimensions: {$searchValueNormalized} -> Width: {$searchDims['width']}, Height: {$searchDims['height']}");
         }
         $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
             WHERE attribute_id = :attribute_id";
         $allValues = Utility::fetchFromSql($sql, ['attribute_id' => $attributeId]);
         if (empty($allValues)) {
+            $this->logger->info("No attribute values found for attributeId: {$attributeId}");
             return null;
         }
         $bestMatch = null;
@@ -405,7 +409,7 @@ class CiceksepetiListingHandler
         foreach ($allValues as $value) {
             $dbValueNormalized  = $this->normalizeAttributeValue($value['name']);
             if ($searchValueNormalized === $dbValueNormalized) {
-                $this->logger->info("fully matched Pim Value -> Ciceksepeti DB Value : {$searchValueNormalized} -> {$dbValueNormalized}");
+                $this->logger->info("✅ Fully matched: Search Value: {$searchValueNormalized} -> DB Value: {$dbValueNormalized}");
                 return $value;
             }
             if ($isSize) {
@@ -417,6 +421,7 @@ class CiceksepetiListingHandler
                     if ($widthDiff >= 0 && $widthDiff <= 25 && ($searchDims['height'] === 0 || ($heightDiff >= 0 && $heightDiff <= 25)) && $totalDiff < $smallestDiff) {
                         $smallestDiff = $totalDiff;
                         $bestMatch = $value;
+                        $this->logger->info("✔️ Size match found with width diff: {$widthDiff} and height diff: {$heightDiff}");
                     }
                 }
             }
@@ -427,14 +432,14 @@ class CiceksepetiListingHandler
                 if ($similarity >= $threshold && $similarity > $highestSimilarity) {
                     $highestSimilarity = $similarity;
                     $bestMatch = $value;
+                    $this->logger->info("✔️ Similarity found: {$similarity}% for Search: {$searchValueNormalized} -> DB: {$dbValueNormalized}");
                 }
             }
         }
         if ($bestMatch) {
-            $this->logger->info("best match Pim Value -> Ciceksepeti DB Value : {$searchValueNormalized} -> {$bestMatch['attribute_value_id']}:{$bestMatch['name']}");
-        }
-        else {
-            $this->logger->info("best match null");
+            $this->logger->info("✅ Best match found: Search Value: {$searchValueNormalized} -> DB Value: {$bestMatch['attribute_value_id']}:{$bestMatch['name']}");
+        } else {
+            $this->logger->info("❌ No match found for Search Value: {$searchValueNormalized}");
         }
         return $bestMatch;
     }
