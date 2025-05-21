@@ -70,7 +70,6 @@ class CiceksepetiListingHandler
         }
     }
 
-
     private function chunkSkus($data): array
     {
         $chunks = [];
