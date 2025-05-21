@@ -170,7 +170,6 @@ class CiceksepetiListingHandler
             if (!$hasValidDescription) {
                 $this->logger->error("❌ [Validation Error] Description too short (<30 chars) for SKU: {$stockCode}");
             }
-
             if (!$hasImages || !$hasValidPrice || !$hasAttributes || !$hasValidDescription) {
                 continue;
             }
@@ -197,7 +196,6 @@ class CiceksepetiListingHandler
                 'images' => $httpsImages,
                 'Attributes' => $attributes,
             ];
-
             $formattedData['products'][] = $formattedProduct;
             $this->logger->info("✅ [Formatted] Product ready for listing ➜ SKU: {$stockCode}");
         }
@@ -508,22 +506,18 @@ class CiceksepetiListingHandler
         $smallestDiff = PHP_INT_MAX;
         foreach ($allValues as $value) {
             $dbValueNormalized = $this->normalizeAttributeValue($value['name']);
-
             if ($searchValueNormalized === $dbValueNormalized) {
                 $this->logger->info("✅ [AttributeMatch] Exact match: '{$searchValue}' ➜ '{$value['name']}' (ID: {$value['attribute_value_id']})");
                 return $value;
             }
-
             if ($isSize && $searchDims) {
                 $dbDims = $this->parseDimensions($dbValueNormalized);
                 if ($dbDims) {
                     $widthDiff = $searchDims['width'] - $dbDims['width'];
                     $heightDiff = $searchDims['height'] - $dbDims['height'];
                     $totalDiff = $widthDiff + $heightDiff;
-
                     $widthOk = $widthDiff >= 0 && $widthDiff <= 25;
                     $heightOk = $searchDims['height'] === 0 || ($heightDiff >= 0 && $heightDiff <= 25);
-
                     if ($widthOk && $heightOk && $totalDiff < $smallestDiff) {
                         $smallestDiff = $totalDiff;
                         $bestMatch = $value;
