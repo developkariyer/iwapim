@@ -178,7 +178,7 @@ class AutoListingCommand extends AbstractCommand
             ]
         ];
         $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
-        $ciceksepetiConnector->updateProduct($data);
+        $ciceksepetiConnector->updateProduct(json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     }
 
     private function searchProductAndReturnIds($productIdentifier)
