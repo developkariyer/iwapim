@@ -180,9 +180,7 @@ class AutoListingCommand extends AbstractCommand
 
     private function sendToCiceksepeti($productList)
     {
-        $data = [
-            'products' => $productList
-        ];
+        $data['products'] = $productList;
         $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
         $ciceksepetiConnector->updateProduct($json);
