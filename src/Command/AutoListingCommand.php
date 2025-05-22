@@ -105,7 +105,7 @@ class AutoListingCommand extends AbstractCommand
                 $iwasku = $mainProduct->getIwasku();
                 $ciceksepetiProductsId = Utility::fetchFromSql($ciceksepetiSql, ['seller_sku' => $iwasku, 'marketplace_id' => $ciceksepetiMarketplaceId]);
                 if (!is_array($ciceksepetiProductsId) || empty($ciceksepetiProductsId)) {
-                    echo "Ciceksepeti product not found for: $iwasku \n";
+                    continue;
                 }
                 else {
                     $ciceksepetiProductId = $ciceksepetiProductsId[0];
