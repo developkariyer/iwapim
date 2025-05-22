@@ -173,8 +173,8 @@ class AutoListingCommand extends AbstractCommand
             'isActive' => $parentApiJsonShopify['status'] === 'ACTIVE' ? 1 : 0,
             'images' => $images
         ];
-        print_r($data);
-
+        $dataJson = json_encode($data);
+        print_r($dataJson);
     }
 
     private function searchProductAndReturnIds($productIdentifier)
