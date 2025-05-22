@@ -37,13 +37,13 @@ class AutoListingCommand extends AbstractCommand
         'ciceksepeti' => ['marketplace_id' => 265384]
     ];
 
-    protected function configure(): void
-    {
-        $this
-            ->setDescription('Auto product listing to specified marketplace')
-            ->addOption('marketplace', null, InputOption::VALUE_REQUIRED, 'Marketplace key (e.g., ciceksepeti, trendyol)')
-            ->addArgument('productCodes', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'One or more product codes to search and list.');
-    }
+//    protected function configure(): void
+//    {
+//        $this
+//            ->setDescription('Auto product listing to specified marketplace')
+//            ->addOption('marketplace', null, InputOption::VALUE_REQUIRED, 'Marketplace key (e.g., ciceksepeti, trendyol)')
+//            ->addArgument('productCodes', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'One or more product codes to search and list.');
+//    }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
