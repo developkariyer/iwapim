@@ -39,7 +39,7 @@ class HelloWorldCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $shopifycfwtr = 84124;
-        $cfwTrSql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace_id = :marketplace_id";;
+        $cfwTrSql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";;
         $cfwTrVariantProductsId = Utility::fetchFromSql($cfwTrSql, ['marketplace_id' => $shopifycfwtr]);
         print_r($cfwTrVariantProductsId);
 
