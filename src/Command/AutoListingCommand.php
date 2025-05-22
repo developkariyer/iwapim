@@ -163,18 +163,20 @@ class AutoListingCommand extends AbstractCommand
         $images = array_slice($images, 0, 10);
         $data = [
             'products' => [
-                'productName' => $productName,
-                'mainProductCode' => $apiJsonCiceksepeti['mainProductCode'],
-                'stockCode' => $iwasku,
-                'categoryId' => $apiJsonCiceksepeti['categoryId'],
-                'description' => $description,
-                'deliveryMessageType' => $apiJsonCiceksepeti['deliveryMessageType'],
-                'deliveryType' => $apiJsonCiceksepeti['deliveryType'],
-                'stockQuantity' => $apiJsonShopify['inventoryQuantity'],
-                'salesPrice' => $apiJsonShopify['price'] * 1.5,
-                'attributes' => $cleanAttributes,
-                'isActive' => $parentApiJsonShopify['status'] === 'ACTIVE' ? 1 : 0,
-                'images' => $images
+                [
+                    'productName' => $productName,
+                    'mainProductCode' => $apiJsonCiceksepeti['mainProductCode'],
+                    'stockCode' => $iwasku,
+                    'categoryId' => $apiJsonCiceksepeti['categoryId'],
+                    'description' => $description,
+                    'deliveryMessageType' => $apiJsonCiceksepeti['deliveryMessageType'],
+                    'deliveryType' => $apiJsonCiceksepeti['deliveryType'],
+                    'stockQuantity' => $apiJsonShopify['inventoryQuantity'],
+                    'salesPrice' => $apiJsonShopify['price'] * 1.5,
+                    'attributes' => $cleanAttributes,
+                    'isActive' => $parentApiJsonShopify['status'] === 'ACTIVE' ? 1 : 0,
+                    'images' => $images
+                ]
             ]
         ];
         $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
