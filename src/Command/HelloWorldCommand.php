@@ -40,7 +40,7 @@ class HelloWorldCommand extends AbstractCommand
     {
         $shopifycfwtr = 84124;
         $marketplace = Marketplace::getById($shopifycfwtr);
-        $variantIds = $marketplace->getVariantProductIds();
+        $variantIds = $marketplace->getVariantIds();
         foreach ($variantIds as $variantId) {
             $variantProduct = VariantProduct::getById($variantId);
             echo $variantProduct->getName() . "\n";
