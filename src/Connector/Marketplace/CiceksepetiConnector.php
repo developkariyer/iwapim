@@ -525,8 +525,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             'result' => $responseData,
             'batchRequestResult' => $this->getBatchRequestResult($responseData['batchId'])
         ];
-        print_r($combinedData);
-        echo "Product Update \n";
+        echo "Product Updated \n";
         $filename = "UPDATE_LISTING_{$responseData['batchId']}.json";
         $this->putToCache($filename, ['request'=>$data, 'response'=>$combinedData]);
     }
