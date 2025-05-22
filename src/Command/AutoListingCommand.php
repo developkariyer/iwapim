@@ -175,9 +175,8 @@ class AutoListingCommand extends AbstractCommand
             'isActive' => $parentApiJsonShopify['status'] === 'ACTIVE' ? 1 : 0,
             'images' => $images
         ];
-        $dataJson = json_encode($data, JSON_UNESCAPED_UNICODE);
         $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
-        $ciceksepetiConnector->updateProduct($dataJson);
+        $ciceksepetiConnector->updateProduct($data);
     }
 
     private function searchProductAndReturnIds($productIdentifier)
