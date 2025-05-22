@@ -89,7 +89,7 @@ class AutoListingCommand extends AbstractCommand
         $shopifyMarketplaceId = 84124;
         $ciceksepetiMarketplaceId = 265384;
         $cfwTrSql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";
-        $ciceksepetiSql = "SELECT oo_id FROM object_query_varyantproduct WHERE sellerSku = :seller_sku";
+        $ciceksepetiSql = "SELECT oo_id FROM object_query_varyantproduct WHERE sellerSku = :seller_sku AND marketplace__id = :marketplace_id";
         $cfwTrVariantProductsIds = Utility::fetchFromSql($cfwTrSql, ['marketplace_id' => $shopifyMarketplaceId]);
         foreach ($cfwTrVariantProductsIds as $cfwTrVariantProductsId) {
             $variantProduct = VariantProduct::getById($cfwTrVariantProductsId['oo_id']);
@@ -100,7 +100,7 @@ class AutoListingCommand extends AbstractCommand
             $mainProduct = $mainProducts[0];
             if ($mainProduct instanceof Product) {
                 $iwasku = $mainProduct->getIwasku();
-                $ciceksepetiProductsId = Utility::fetchFromSql($ciceksepetiSql, ['seller_sku' => $iwasku]);
+                $ciceksepetiProductsId = Utility::fetchFromSql($ciceksepetiSql, ['seller_sku' => $iwasku, 'marketplace_id' => $ciceksepetiMarketplaceId]);;
                 if (!is_array($ciceksepetiProductsId) || empty($ciceksepetiProductsId)) {
                     echo "Ciceksepeti product not found for: $iwasku \n";
                 }
