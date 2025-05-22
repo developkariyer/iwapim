@@ -86,15 +86,30 @@ class AutoListingCommand extends AbstractCommand
 
     private function syncShopifyCiceksepeti()
     {
-        $shopifycfwtr = 84124;
-        $cfwTrSql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";;
-        $cfwTrVariantProductsIds = Utility::fetchFromSql($cfwTrSql, ['marketplace_id' => $shopifycfwtr]);
+        $shopifyMarketplaceId = 84124;
+        $ciceksepetiMarketplaceId = 265384;
+        $cfwTrSql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";
+        $ciceksepetiSql = "SELECT oo_id FROM object_query_varyantproduct WHERE sellerSku = :seller_sku";
+        $cfwTrVariantProductsIds = Utility::fetchFromSql($cfwTrSql, ['marketplace_id' => $shopifyMarketplaceId]);
         foreach ($cfwTrVariantProductsIds as $cfwTrVariantProductsId) {
             $variantProduct = VariantProduct::getById($cfwTrVariantProductsId['oo_id']);
-            $mainProduct = $variantProduct->getMainProduct()[0];
+            $mainProducts = $variantProduct->getMainProduct();
+            if (!is_array($mainProducts) || empty($mainProducts)) {
+                continue;
+            }
+            $mainProduct = $mainProducts[0];
             if ($mainProduct instanceof Product) {
                 $iwasku = $mainProduct->getIwasku();
-                echo $iwasku . "\n";
+                $ciceksepetiProductsId = Utility::fetchFromSql($ciceksepetiSql, ['seller_sku' => $iwasku]);
+                if (!is_array($ciceksepetiProductsId) || empty($ciceksepetiProductsId)) {
+                    echo "Ciceksepeti product not found for: $iwasku \n";
+                }
+                else {
+                    $ciceksepetiProductId = $ciceksepetiProductsId[0];
+                    $ciceksepetiProduct = VariantProduct::getById($ciceksepetiProductId['oo_id']);
+                    echo "Ciceksepeti product found for: $iwasku \n";
+                    echo $ciceksepetiProduct->getTitle() . "\n";
+                }
             }
         }
     }
