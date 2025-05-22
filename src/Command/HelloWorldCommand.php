@@ -40,8 +40,11 @@ class HelloWorldCommand extends AbstractCommand
     {
         $shopifycfwtr = 84124;
         $cfwTrSql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";;
-        $cfwTrVariantProductsId = Utility::fetchFromSql($cfwTrSql, ['marketplace_id' => $shopifycfwtr]);
-        print_r($cfwTrVariantProductsId);
+        $cfwTrVariantProductsIds = Utility::fetchFromSql($cfwTrSql, ['marketplace_id' => $shopifycfwtr]);
+        foreach ($cfwTrVariantProductsIds as $cfwTrVariantProductsId) {
+            $variantProduct = VariantProduct::getById($cfwTrVariantProductsId['oo_id']);
+            echo $variantProduct->getTitle() . "\n";
+        }
 
 
 
