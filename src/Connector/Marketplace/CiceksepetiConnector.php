@@ -518,7 +518,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 'Content-Type' => 'application/json',
                 'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
             ],
-            'body' => $data
+            'json' => $data
         ]);
         print_r($response->toArray());
         $statusCode = $response->getStatusCode();
