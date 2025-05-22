@@ -109,9 +109,7 @@ class AutoListingCommand extends AbstractCommand
                     $ciceksepetiProduct = VariantProduct::getById($ciceksepetiProductId['oo_id']);
                     echo "Ciceksepeti product found for: $iwasku \n";
                     echo $ciceksepetiProduct->getTitle() . "\n";
-                    print_r($ciceksepetiProduct);
                     $this->updateCiceksepetiProduct($ciceksepetiProduct, $shopifyProduct, $iwasku);
-                    break;
                 }
             }
         }
