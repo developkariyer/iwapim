@@ -44,7 +44,7 @@ class HelloWorldCommand extends AbstractCommand
         foreach ($cfwTrVariantProductsIds as $cfwTrVariantProductsId) {
             $variantProduct = VariantProduct::getById($cfwTrVariantProductsId['oo_id']);
             $mainProduct = $variantProduct->getMainProduct();
-            print_r($mainProduct);
+            print_r($mainProduct->getTitle());
             break;
         }
 
