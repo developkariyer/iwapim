@@ -132,8 +132,9 @@ class AutoListingCommand extends AbstractCommand
 
     private function createListingCiceksepeti($mainProduct, $shopifyProduct)
     {
-        echo $mainProduct->getIdentifier() . '\n';
-//
+        $parentProduct = $mainProduct->getParentProduct();
+        echo $parentProduct->getIdentifier() . "\n";
+
 //        $parentApiJsonShopify = json_decode($shopifyProduct->jsonRead('parentResponseJson'), true);
 //        $apiJsonShopify = json_decode($shopifyProduct->jsonRead('apiResponseJson'), true);
 //        $images = $this->getShopifyImages($parentApiJsonShopify);
