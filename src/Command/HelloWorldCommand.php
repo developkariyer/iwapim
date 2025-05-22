@@ -47,7 +47,6 @@ class HelloWorldCommand extends AbstractCommand
             if ($mainProduct instanceof Product) {
                 print_r($mainProduct->getIwasku());
             }
-            break;
         }
 
 
