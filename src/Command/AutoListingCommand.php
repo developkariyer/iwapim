@@ -100,7 +100,7 @@ class AutoListingCommand extends AbstractCommand
             $mainProduct = $mainProducts[0];
             if ($mainProduct instanceof Product) {
                 $iwasku = $mainProduct->getIwasku();
-                $ciceksepetiProductsId = Utility::fetchFromSql($ciceksepetiSql, ['seller_sku' => $iwasku, 'marketplace_id' => $ciceksepetiMarketplaceId]);;
+                $ciceksepetiProductsId = Utility::fetchFromSql($ciceksepetiSql, ['seller_sku' => $iwasku, 'marketplace_id' => $ciceksepetiMarketplaceId]);
                 if (!is_array($ciceksepetiProductsId) || empty($ciceksepetiProductsId)) {
                     echo "Ciceksepeti product not found for: $iwasku \n";
                 }
@@ -109,6 +109,8 @@ class AutoListingCommand extends AbstractCommand
                     $ciceksepetiProduct = VariantProduct::getById($ciceksepetiProductId['oo_id']);
                     echo "Ciceksepeti product found for: $iwasku \n";
                     echo $ciceksepetiProduct->getTitle() . "\n";
+                    $apiJsonCiceksepeti = json_decode($ciceksepetiProduct->jsonRead('responseJson'), true);
+                    print_r($apiJsonCiceksepeti);
                     $this->updateCiceksepetiProduct($ciceksepetiProduct, $shopifyProduct, $iwasku);
                     break;
                 }
