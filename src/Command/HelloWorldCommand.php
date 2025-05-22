@@ -38,8 +38,14 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $marketplace = Marketplace::getById(265384);
-        print_r($marketplace->getCurrency());
+        $shopifycfwtr = 84124;
+        $marketplace = Marketplace::getById($shopifycfwtr);
+        $variantIds = $marketplace->getVariantProductIds();
+        foreach ($variantIds as $variantId) {
+            $variantProduct = VariantProduct::getById($variantId);
+            echo $variantProduct->getName() . "\n";
+        }
+
         return Command::SUCCESS;
     }
 
