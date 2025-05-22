@@ -519,6 +519,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             ],
             'json' => $data
         ]);
+        print_r($response->toArray());
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
