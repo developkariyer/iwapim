@@ -160,7 +160,7 @@ class AutoListingCommand extends AbstractCommand
         }
         $productName = mb_substr($shopifyProduct->getTitle(), 0, 255);
         $description = mb_substr($parentApiJsonShopify['descriptionHtml'], 0, 20000);
-        $images = array_slice($images, 0, 10);
+        $images = array_slice($images, 0, 5);
         $data = [
             'products' => [
                 [
