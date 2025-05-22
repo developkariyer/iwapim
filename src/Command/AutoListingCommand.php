@@ -119,45 +119,44 @@ class AutoListingCommand extends AbstractCommand
     private function updateCiceksepetiProduct(VariantProduct $ciceksepetiProduct, VariantProduct $shopifyProduct, $iwasku)
     {
         $parentApiJsonShopify = json_decode($shopifyProduct->jsonRead('parentResponseJson'), true);
-        $apiJsonShopify = json_decode($shopifyProduct->jsonRead('responseJson'), true);
-        $apiJsonCiceksepeti = $ciceksepetiProduct->jsonRead('responseJson');
-        print_r($apiJsonCiceksepeti);
+        $apiJsonShopify = json_decode($shopifyProduct->jsonRead('apiResponseJson'), true);
+        $apiJsonCiceksepeti = json_decode($ciceksepetiProduct->jsonRead('apiResponseJson'), true);
 
-//        $images = [];
-//        $widthThreshold = 4000;
-//        $heightThreshold = 4000;
-//        if (isset($parentApiJsonShopify['media']['nodes'])) {
-//            foreach ($parentApiJsonShopify['media']['nodes'] as $node) {
-//                if (
-//                    isset($node['mediaContentType']) &&
-//                    $node['mediaContentType'] === 'IMAGE' &&
-//                    isset($node['preview']['image']['url']) &&
-//                    isset($node['preview']['image']['width']) &&
-//                    isset($node['preview']['image']['height']) &&
-//                    (
-//                        $node['preview']['image']['width'] < $widthThreshold ||
-//                        $node['preview']['image']['height'] < $heightThreshold
-//                    )
-//                ) {
-//                    $images[] = $node['preview']['image']['url'];
-//                }
-//            }
-//        }
-//        $data = [
-//            'productName' => $shopifyProduct->getTitle(),
-//            'mainProductCode' => $apiJsonCiceksepeti['mainProductCode'],
-//            'stockCode' => $iwasku,
-//            'categoryId' => $apiJsonCiceksepeti['categoryId'],
-//            'description' => $parentApiJsonShopify['descriptionHtml'],
-//            'deliveryMessageType' => $apiJsonCiceksepeti['deliveryMessageType'],
-//            'deliveryType' => $apiJsonCiceksepeti['deliveryType'],
-//            'stockQuantity' => $apiJsonShopify['inventoryQuantity'],
-//            'salesPrice' => $apiJsonShopify['price'] * 1.5,
-//            'attributes' => $apiJsonCiceksepeti['attributes'],
-//            'isActive' => $parentApiJsonShopify['status'] === 'ACTIVE' ? 1 : 0,
-//            'images' => $images
-//        ];
-//        print_r($data);
+        $images = [];
+        $widthThreshold = 4000;
+        $heightThreshold = 4000;
+        if (isset($parentApiJsonShopify['media']['nodes'])) {
+            foreach ($parentApiJsonShopify['media']['nodes'] as $node) {
+                if (
+                    isset($node['mediaContentType']) &&
+                    $node['mediaContentType'] === 'IMAGE' &&
+                    isset($node['preview']['image']['url']) &&
+                    isset($node['preview']['image']['width']) &&
+                    isset($node['preview']['image']['height']) &&
+                    (
+                        $node['preview']['image']['width'] < $widthThreshold ||
+                        $node['preview']['image']['height'] < $heightThreshold
+                    )
+                ) {
+                    $images[] = $node['preview']['image']['url'];
+                }
+            }
+        }
+        $data = [
+            'productName' => $shopifyProduct->getTitle(),
+            'mainProductCode' => $apiJsonCiceksepeti['mainProductCode'],
+            'stockCode' => $iwasku,
+            'categoryId' => $apiJsonCiceksepeti['categoryId'],
+            'description' => $parentApiJsonShopify['descriptionHtml'],
+            'deliveryMessageType' => $apiJsonCiceksepeti['deliveryMessageType'],
+            'deliveryType' => $apiJsonCiceksepeti['deliveryType'],
+            'stockQuantity' => $apiJsonShopify['inventoryQuantity'],
+            'salesPrice' => $apiJsonShopify['price'] * 1.5,
+            'attributes' => $apiJsonCiceksepeti['attributes'],
+            'isActive' => $parentApiJsonShopify['status'] === 'ACTIVE' ? 1 : 0,
+            'images' => $images
+        ];
+        print_r($data);
 
     }
 
