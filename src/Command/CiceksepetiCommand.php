@@ -4,12 +4,10 @@ namespace App\Command;
 
 use App\Connector\Gemini\GeminiConnector;
 use App\Message\CiceksepetiCategoryUpdateMessage;
-use App\Message\TestMessage;
 use App\Model\DataObject\Marketplace;
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Doctrine\DBAL\Exception;
-use phpseclib3\File\ASN1\Maps\AttributeValue;
 use Pimcore\Console\AbstractCommand;
 use Pimcore\Db;
 use Pimcore\Model\Asset;
@@ -26,10 +24,10 @@ use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 use Symfony\Component\HttpClient\HttpClient;
 
 #[AsCommand(
-    name: 'app:hello-world',
-    description: 'Outputs Hello, World!'
+    name: 'app:ciceksepet',
+    description: 'ciceksepeti auto process'
 )]
-class HelloWorldCommand extends AbstractCommand
+class CiceksepetiCommand extends AbstractCommand
 {
     public function __construct(private MessageBusInterface $bus)
     {
@@ -45,7 +43,7 @@ class HelloWorldCommand extends AbstractCommand
             $variantProduct = VariantProduct::getById($cfwTrVariantProductsId['oo_id']);
             $mainProduct = $variantProduct->getMainProduct()[0];
             if ($mainProduct instanceof Product) {
-                 $iwasku = $mainProduct->getIwasku();
+                $iwasku = $mainProduct->getIwasku();
 
 
             }
