@@ -2,12 +2,14 @@
 
 namespace App\Command;
 
+use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Doctrine\DBAL\Exception;
 use Pimcore\Console\AbstractCommand;
 use Pimcore\Db;
 use Pimcore\Model\Asset;
 use Pimcore\Model\DataObject\AbstractObject;
+use Pimcore\Model\DataObject\Product;
 use Pimcore\Model\Element\DuplicateFullPathException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -45,39 +47,56 @@ class AutoListingCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $marketplace = $input->getOption('marketplace');
-        if (!isset($this->marketplaceConfig[$marketplace])) {
-            $output->writeln("<error>Unsupported marketplace: $marketplace</error>");
-            return Command::FAILURE;
-        }
-        $marketplaceId = $this->marketplaceConfig[$marketplace]['marketplace_id'];
-        $productCodes = $input->getArgument('productCodes');
-        $output->writeln("Marketplace: $marketplace (Channel ID: $marketplaceId)");
-        $output->writeln("Product Codes: " . implode(', ', $productCodes));
-        foreach ($productCodes as $productCode) {
-            $output->writeln("Started process: $productCode");
-            $productData = $this->searchProductAndReturnIds($productCode);
-            if (!$productData) {
-                $output->writeln("<comment>Product not found for code: $productCode</comment>");
-                continue;
-            }
-            $productId = $productData['product_id'];
-            $variantIds = $productData['variantIds'];
-            $message = new ProductListingMessage(
-                'list',
-                $productId,
-                $marketplaceId,
-                'admin',
-                $variantIds,
-                [],
-                1,
-                'test'
-            );
-            $stamps = [new TransportNamesStamp([$marketplace])];
-            $this->bus->dispatch($message, $stamps);
-            $output->writeln("Dispatched to queue for: $productCode");
-        }
+
+        $this->syncShopifyCiceksepeti();
+//        $marketplace = $input->getOption('marketplace');
+//        if (!isset($this->marketplaceConfig[$marketplace])) {
+//            $output->writeln("<error>Unsupported marketplace: $marketplace</error>");
+//            return Command::FAILURE;
+//        }
+//        $marketplaceId = $this->marketplaceConfig[$marketplace]['marketplace_id'];
+//        $productCodes = $input->getArgument('productCodes');
+//        $output->writeln("Marketplace: $marketplace (Channel ID: $marketplaceId)");
+//        $output->writeln("Product Codes: " . implode(', ', $productCodes));
+//        foreach ($productCodes as $productCode) {
+//            $output->writeln("Started process: $productCode");
+//            $productData = $this->searchProductAndReturnIds($productCode);
+//            if (!$productData) {
+//                $output->writeln("<comment>Product not found for code: $productCode</comment>");
+//                continue;
+//            }
+//            $productId = $productData['product_id'];
+//            $variantIds = $productData['variantIds'];
+//            $message = new ProductListingMessage(
+//                'list',
+//                $productId,
+//                $marketplaceId,
+//                'admin',
+//                $variantIds,
+//                [],
+//                1,
+//                'test'
+//            );
+//            $stamps = [new TransportNamesStamp([$marketplace])];
+//            $this->bus->dispatch($message, $stamps);
+//            $output->writeln("Dispatched to queue for: $productCode");
+//        }
         return Command::SUCCESS;
+    }
+
+    private function syncShopifyCiceksepeti()
+    {
+        $shopifycfwtr = 84124;
+        $cfwTrSql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";;
+        $cfwTrVariantProductsIds = Utility::fetchFromSql($cfwTrSql, ['marketplace_id' => $shopifycfwtr]);
+        foreach ($cfwTrVariantProductsIds as $cfwTrVariantProductsId) {
+            $variantProduct = VariantProduct::getById($cfwTrVariantProductsId['oo_id']);
+            $mainProduct = $variantProduct->getMainProduct()[0];
+            if ($mainProduct instanceof Product) {
+                $iwasku = $mainProduct->getIwasku();
+                echo $iwasku . "\n";
+            }
+        }
     }
 
     private function searchProductAndReturnIds($productIdentifier)
