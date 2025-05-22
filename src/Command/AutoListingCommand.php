@@ -93,6 +93,7 @@ class AutoListingCommand extends AbstractCommand
         $cfwTrSql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";
         $ciceksepetiSql = "SELECT oo_id FROM object_query_varyantproduct WHERE sellerSku = :seller_sku AND marketplace__id = :marketplace_id";
         $cfwTrVariantProductsIds = Utility::fetchFromSql($cfwTrSql, ['marketplace_id' => $shopifyMarketplaceId]);
+        $productList = [];
         foreach ($cfwTrVariantProductsIds as $cfwTrVariantProductsId) {
             $shopifyProduct = VariantProduct::getById($cfwTrVariantProductsId['oo_id']);
             $mainProducts = $shopifyProduct->getMainProduct();
@@ -110,14 +111,23 @@ class AutoListingCommand extends AbstractCommand
                     $ciceksepetiProductId = $ciceksepetiProductsId[0];
                     $ciceksepetiProduct = VariantProduct::getById($ciceksepetiProductId['oo_id']);
                     echo "Ciceksepeti product found for: $iwasku \n";
-                    echo $ciceksepetiProduct->getUniqueMarketplaceId() . "\n";
-                    $this->updateCiceksepetiProduct($ciceksepetiProduct, $shopifyProduct, $iwasku);
+                    $preparedProduct = $this->prepareCiceksepetiProduct($ciceksepetiProduct, $shopifyProduct, $iwasku);
+                    if ($preparedProduct) {
+                        $productList[] = $preparedProduct;
+                    }
+                    if (count($productList) >= 200) {
+                        $this->sendToCiceksepeti($productList);
+                        $productList = [];
+                    }
                 }
             }
         }
+        if (!empty($productList)) {
+            $this->sendToCiceksepeti($productList);
+        }
     }
 
-    private function updateCiceksepetiProduct(VariantProduct $ciceksepetiProduct, VariantProduct $shopifyProduct, $iwasku)
+    private function prepareCiceksepetiProduct(VariantProduct $ciceksepetiProduct, VariantProduct $shopifyProduct, $iwasku)
     {
         $parentApiJsonShopify = json_decode($shopifyProduct->jsonRead('parentResponseJson'), true);
         $apiJsonShopify = json_decode($shopifyProduct->jsonRead('apiResponseJson'), true);
@@ -128,22 +138,16 @@ class AutoListingCommand extends AbstractCommand
         if (isset($parentApiJsonShopify['media']['nodes'])) {
             foreach ($parentApiJsonShopify['media']['nodes'] as $node) {
                 if (
-                    isset($node['mediaContentType']) &&
+                    isset($node['mediaContentType'], $node['preview']['image']['url'], $node['preview']['image']['width'], $node['preview']['image']['height']) &&
                     $node['mediaContentType'] === 'IMAGE' &&
-                    isset($node['preview']['image']['url']) &&
-                    isset($node['preview']['image']['width']) &&
-                    isset($node['preview']['image']['height']) &&
-                    (
-                        $node['preview']['image']['width'] < $widthThreshold ||
-                        $node['preview']['image']['height'] < $heightThreshold
-                    )
+                    ($node['preview']['image']['width'] < $widthThreshold || $node['preview']['image']['height'] < $heightThreshold)
                 ) {
                     $images[] = $node['preview']['image']['url'];
                 }
             }
         }
         if (empty($images)) {
-            $images = $apiJsonCiceksepeti['images'];
+            $images = $apiJsonCiceksepeti['images'] ?? [];
         }
         $cleanAttributes = [];
         if (isset($apiJsonCiceksepeti['attributes']) && is_array($apiJsonCiceksepeti['attributes'])) {
@@ -152,34 +156,36 @@ class AutoListingCommand extends AbstractCommand
                     $cleanAttributes[] = [
                         'ValueId' => $attr['id'],
                         'Id' => $attr['parentId'],
-                        'textLength' => $attr['textLength']
+                        'textLength' => 0
                     ];
                 }
             }
         }
-        $productName = mb_substr($shopifyProduct->getTitle(), 0, 255);
-        $description = mb_substr($parentApiJsonShopify['descriptionHtml'], 0, 20000);
-        $images = array_slice($images, 0, 5);
-        $data = [
-            'products' => [
-                [
-                    'productName' => $productName,
-                    'mainProductCode' => $apiJsonCiceksepeti['mainProductCode'],
-                    'stockCode' => $iwasku,
-                    'categoryId' => $apiJsonCiceksepeti['categoryId'],
-                    'description' => $description,
-                    'deliveryMessageType' => $apiJsonCiceksepeti['deliveryMessageType'],
-                    'deliveryType' => $apiJsonCiceksepeti['deliveryType'],
-                    'stockQuantity' => $apiJsonShopify['inventoryQuantity'],
-                    'salesPrice' => $apiJsonShopify['price'] * 1.5,
-                    'attributes' => $cleanAttributes,
-                    'isActive' => $parentApiJsonShopify['status'] === 'ACTIVE' ? 1 : 0,
-                    'images' => $images
-                ]
-            ]
+        return [
+            'productName' => mb_substr($shopifyProduct->getTitle(), 0, 255),
+            'mainProductCode' => $apiJsonCiceksepeti['mainProductCode'],
+            'stockCode' => $iwasku,
+            'categoryId' => $apiJsonCiceksepeti['categoryId'],
+            'description' => mb_substr($parentApiJsonShopify['descriptionHtml'], 0, 20000),
+            'deliveryMessageType' => $apiJsonCiceksepeti['deliveryMessageType'],
+            'deliveryType' => $apiJsonCiceksepeti['deliveryType'],
+            'stockQuantity' => $apiJsonShopify['inventoryQuantity'],
+            'salesPrice' => $apiJsonShopify['price'] * 1.5,
+            'attributes' => $cleanAttributes,
+            'isActive' => $parentApiJsonShopify['status'] === 'ACTIVE' ? 1 : 0,
+            'images' => array_slice($images, 0, 5)
         ];
+    }
+
+    private function sendToCiceksepeti(array $productList)
+    {
+        $data = [
+            'products' => $productList
+        ];
+        $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
-        $ciceksepetiConnector->updateProduct(json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        $ciceksepetiConnector->updateProduct($json);
+        echo "Sent " . count($productList) . " products to Ciceksepeti.\n";
     }
 
     private function searchProductAndReturnIds($productIdentifier)
