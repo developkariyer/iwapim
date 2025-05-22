@@ -110,22 +110,24 @@ class AutoListingCommand extends AbstractCommand
                 else {
                     $ciceksepetiProductId = $ciceksepetiProductsId[0];
                     $ciceksepetiProduct = VariantProduct::getById($ciceksepetiProductId['oo_id']);
+                    if (!$ciceksepetiProduct instanceof VariantProduct) {
+                        continue;
+                    }
                     echo "Ciceksepeti product found for: $iwasku \n";
                     $preparedProduct = $this->prepareCiceksepetiProduct($ciceksepetiProduct, $shopifyProduct, $iwasku);
-                    $this->sendToCiceksepeti($preparedProduct);
-//                    if ($preparedProduct) {
-//                        $productList[] = $preparedProduct;
-//                    }
-//                    if (count($productList) >= 200) {
-//                        $this->sendToCiceksepeti($productList);
-//                        $productList = [];
-//                    }
+                    if ($preparedProduct) {
+                        $productList[] = $preparedProduct;
+                    }
+                    if (count($productList) >= 200) {
+                        $this->sendToCiceksepeti($productList);
+                        $productList = [];
+                    }
                 }
             }
         }
-//        if (!empty($productList)) {
-//            $this->sendToCiceksepeti($productList);
-//        }
+        if (!empty($productList)) {
+            $this->sendToCiceksepeti($productList);
+        }
     }
 
     private function prepareCiceksepetiProduct(VariantProduct $ciceksepetiProduct, VariantProduct $shopifyProduct, $iwasku)
@@ -133,6 +135,10 @@ class AutoListingCommand extends AbstractCommand
         $parentApiJsonShopify = json_decode($shopifyProduct->jsonRead('parentResponseJson'), true);
         $apiJsonShopify = json_decode($shopifyProduct->jsonRead('apiResponseJson'), true);
         $apiJsonCiceksepeti = json_decode($ciceksepetiProduct->jsonRead('apiResponseJson'), true);
+        $ciceksepetiIsActive =$apiJsonCiceksepeti['isActive'];
+        if (!$ciceksepetiIsActive) {
+            return null;
+        }
         $images = [];
         $widthThreshold = 2000;
         $heightThreshold = 2000;
