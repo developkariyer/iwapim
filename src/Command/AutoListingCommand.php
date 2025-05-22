@@ -94,6 +94,7 @@ class AutoListingCommand extends AbstractCommand
         $ciceksepetiSql = "SELECT oo_id FROM object_query_varyantproduct WHERE sellerSku = :seller_sku AND marketplace__id = :marketplace_id";
         $cfwTrVariantProductsIds = Utility::fetchFromSql($cfwTrSql, ['marketplace_id' => $shopifyMarketplaceId]);
         $productList = [];
+        $toBeListedProducts = [];
         foreach ($cfwTrVariantProductsIds as $cfwTrVariantProductsId) {
             $shopifyProduct = VariantProduct::getById($cfwTrVariantProductsId['oo_id']);
             $mainProducts = $shopifyProduct->getMainProduct();
@@ -105,7 +106,10 @@ class AutoListingCommand extends AbstractCommand
                 $iwasku = $mainProduct->getIwasku();
                 $ciceksepetiProductsId = Utility::fetchFromSql($ciceksepetiSql, ['seller_sku' => $iwasku, 'marketplace_id' => $ciceksepetiMarketplaceId]);
                 if (!is_array($ciceksepetiProductsId) || empty($ciceksepetiProductsId)) {
-                    $this->createListingCiceksepeti($mainProduct, $shopifyProduct);
+                    $newProduct = $this->preListingCiceksepeti($mainProduct, $shopifyProduct);
+                    if (!empty($newProduct)) {
+                        $toBeListedProducts[] = $newProduct;
+                    }
                 }
                 else {
                     $ciceksepetiProductId = $ciceksepetiProductsId[0];
@@ -128,33 +132,47 @@ class AutoListingCommand extends AbstractCommand
         if (!empty($productList)) {
             $this->sendToCiceksepeti($productList);
         }
+        if (!empty($toBeListedProducts)) {
+            $this->createListingProcess();
+
+        }
     }
 
-    private function createListingCiceksepeti($mainProduct, $shopifyProduct)
+    private function createListingProcess()
     {
-        echo $mainProduct->getProductIdentifier() . "\n";
+        // ciceksepeti messengere gönderilecek
+        // alınan ürün bilgileri filtrelenerek product id variant id ye indirilecek
+        // filtrelenen ürünler tek tek mesaj olarak gönderilecek
+        // önceden pim ürün bilgisi fonksiyonu burdaki göre düzenlenecek
+        // gemini promptu güncellenecek
+        // gemini artık sadece kategori belirleyebilecek ve size renk işleri yapılmış olacak
+        // sonuç shopify ile tam senkron ciceksepeti mağazası 🚀
+    }
 
-//        $parentApiJsonShopify = json_decode($shopifyProduct->jsonRead('parentResponseJson'), true);
-//        $apiJsonShopify = json_decode($shopifyProduct->jsonRead('apiResponseJson'), true);
-//        $images = $this->getShopifyImages($parentApiJsonShopify);
-//        if (empty($images)) {
-//            return [];
-//        }
-//        $attributes = [];
-//        return [
-//            'productName' => mb_substr($shopifyProduct->getTitle(), 0, 255),
-//            'mainProductCode' => $mainProduct->getIdentifier(),
-//            'stockCode' => $iwasku,
-//            'categoryId' => $apiJsonCiceksepeti['categoryId'],
-//            'description' => mb_substr($parentApiJsonShopify['descriptionHtml'], 0, 20000),
-//            'deliveryMessageType' => $apiJsonCiceksepeti['deliveryMessageType'],
-//            'deliveryType' => $apiJsonCiceksepeti['deliveryType'],
-//            'stockQuantity' => $apiJsonShopify['inventoryQuantity'],
-//            'salesPrice' => $apiJsonShopify['price'] * 1.5,
-//            'attributes' => $cleanAttributes,
-//            'isActive' => $parentApiJsonShopify['status'] === 'ACTIVE' ? 1 : 0,
-//            'images' => array_slice($images, 0, 5)
-//        ];
+    private function preListingCiceksepeti($mainProduct, $shopifyProduct)
+    {
+        $parentApiJsonShopify = json_decode($shopifyProduct->jsonRead('parentResponseJson'), true);
+        $apiJsonShopify = json_decode($shopifyProduct->jsonRead('apiResponseJson'), true);
+        $shopifyIsActive = $parentApiJsonShopify['status'] === 'ACTIVE';
+        $images = $this->getShopifyImages($parentApiJsonShopify);
+        if (empty($images) || !$shopifyIsActive) {
+            return [];
+        }
+        return [
+            'productName' => mb_substr($shopifyProduct->getTitle(), 0, 255),
+            'mainProductCode' => $mainProduct->getProductIdentifier(),
+            'stockCode' => $mainProduct->getIwasku(),
+            'categoryId' => null,
+            'description' => mb_substr($parentApiJsonShopify['descriptionHtml'], 0, 20000),
+            'deliveryMessageType' => 5,
+            'size' => $mainProduct->getVariationSize(),
+            'color' => $mainProduct->getVariationColor(),
+            'deliveryType' => 2,
+            'stockQuantity' => $apiJsonShopify['inventoryQuantity'],
+            'salesPrice' => $apiJsonShopify['price'] * 1.5,
+            'attributes' => [],
+            'images' => array_slice($images, 0, 5)
+        ];
     }
 
     private function getShopifyImages($parentApiJsonShopify)
