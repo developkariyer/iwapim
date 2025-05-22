@@ -135,8 +135,9 @@ class AutoListingCommand extends AbstractCommand
         $parentApiJsonShopify = json_decode($shopifyProduct->jsonRead('parentResponseJson'), true);
         $apiJsonShopify = json_decode($shopifyProduct->jsonRead('apiResponseJson'), true);
         $apiJsonCiceksepeti = json_decode($ciceksepetiProduct->jsonRead('apiResponseJson'), true);
-        $ciceksepetiIsActive =$apiJsonCiceksepeti['isActive'];
+        $ciceksepetiIsActive = $apiJsonCiceksepeti['isActive'];
         if (!$ciceksepetiIsActive) {
+            echo "Ciceksepeti product is not active: $iwasku \n";
             return null;
         }
         $images = [];
@@ -186,7 +187,9 @@ class AutoListingCommand extends AbstractCommand
 
     private function sendToCiceksepeti($productList)
     {
-        $data['products'] = [$productList];
+        $data = [
+            'products' => $productList,
+        ];
         $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
         $ciceksepetiConnector->updateProduct($json);
