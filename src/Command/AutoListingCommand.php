@@ -92,8 +92,8 @@ class AutoListingCommand extends AbstractCommand
         $ciceksepetiSql = "SELECT oo_id FROM object_query_varyantproduct WHERE sellerSku = :seller_sku AND marketplace__id = :marketplace_id";
         $cfwTrVariantProductsIds = Utility::fetchFromSql($cfwTrSql, ['marketplace_id' => $shopifyMarketplaceId]);
         foreach ($cfwTrVariantProductsIds as $cfwTrVariantProductsId) {
-            $variantProduct = VariantProduct::getById($cfwTrVariantProductsId['oo_id']);
-            $mainProducts = $variantProduct->getMainProduct();
+            $shopifyProduct = VariantProduct::getById($cfwTrVariantProductsId['oo_id']);
+            $mainProducts = $shopifyProduct->getMainProduct();
             if (!is_array($mainProducts) || empty($mainProducts)) {
                 continue;
             }
@@ -109,9 +109,55 @@ class AutoListingCommand extends AbstractCommand
                     $ciceksepetiProduct = VariantProduct::getById($ciceksepetiProductId['oo_id']);
                     echo "Ciceksepeti product found for: $iwasku \n";
                     echo $ciceksepetiProduct->getTitle() . "\n";
+                    $this->updateCiceksepetiProduct($ciceksepetiProduct, $shopifyProduct, $iwasku);
+                    break;
                 }
             }
         }
+    }
+
+    private function updateCiceksepetiProduct(VariantProduct $ciceksepetiProduct, VariantProduct $shopifyProduct, $iwasku)
+    {
+        $parentApiJsonShopify = json_decode($shopifyProduct->jsonRead('parentResponseJson'), true);
+        $apiJsonShopify = json_decode($shopifyProduct->jsonRead('responseJson'), true);
+        $apiJsonCiceksepeti = json_decode($ciceksepetiProduct->jsonRead('responseJson'), true);
+
+        $images = [];
+        $widthThreshold = 4000;
+        $heightThreshold = 4000;
+        if (isset($parentApiJsonShopify['media']['nodes'])) {
+            foreach ($parentApiJsonShopify['media']['nodes'] as $node) {
+                if (
+                    isset($node['mediaContentType']) &&
+                    $node['mediaContentType'] === 'IMAGE' &&
+                    isset($node['preview']['image']['url']) &&
+                    isset($node['preview']['image']['width']) &&
+                    isset($node['preview']['image']['height']) &&
+                    (
+                        $node['preview']['image']['width'] < $widthThreshold ||
+                        $node['preview']['image']['height'] < $heightThreshold
+                    )
+                ) {
+                    $images[] = $node['preview']['image']['url'];
+                }
+            }
+        }
+        $data = [
+            'productName' => $shopifyProduct->getTitle(),
+            'mainProductCode' => $apiJsonCiceksepeti['mainProductCode'],
+            'stockCode' => $iwasku,
+            'categoryId' => $apiJsonCiceksepeti['categoryId'],
+            'description' => $parentApiJsonShopify['descriptionHtml'],
+            'deliveryMessageType' => $apiJsonCiceksepeti['deliveryMessageType'],
+            'deliveryType' => $apiJsonCiceksepeti['deliveryType'],
+            'stockQuantity' => $apiJsonShopify['inventoryQuantity'],
+            'salesPrice' => $apiJsonShopify['price'] * 1.5,
+            'attributes' => $apiJsonCiceksepeti['attributes'],
+            'isActive' => $parentApiJsonShopify['status'] === 'ACTIVE' ? 1 : 0,
+            'images' => $images
+        ];
+        print_r($data);
+
     }
 
     private function searchProductAndReturnIds($productIdentifier)
