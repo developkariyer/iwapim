@@ -121,10 +121,9 @@ class AutoListingCommand extends AbstractCommand
         $parentApiJsonShopify = json_decode($shopifyProduct->jsonRead('parentResponseJson'), true);
         $apiJsonShopify = json_decode($shopifyProduct->jsonRead('apiResponseJson'), true);
         $apiJsonCiceksepeti = json_decode($ciceksepetiProduct->jsonRead('apiResponseJson'), true);
-
         $images = [];
-        $widthThreshold = 4000;
-        $heightThreshold = 4000;
+        $widthThreshold = 2000;
+        $heightThreshold = 2000;
         if (isset($parentApiJsonShopify['media']['nodes'])) {
             foreach ($parentApiJsonShopify['media']['nodes'] as $node) {
                 if (
@@ -142,17 +141,35 @@ class AutoListingCommand extends AbstractCommand
                 }
             }
         }
+        if (empty($images)) {
+            $images = $apiJsonCiceksepeti['images'];
+        }
+        $cleanAttributes = [];
+        if (isset($apiJsonCiceksepeti['attributes']) && is_array($apiJsonCiceksepeti['attributes'])) {
+            foreach ($apiJsonCiceksepeti['attributes'] as $attr) {
+                if (isset($attr['textLength']) && $attr['textLength'] == 0) {
+                    $cleanAttributes[] = [
+                        'ValueId' => $attr['id'],
+                        'Id' => $attr['parentId'],
+                        'textLength' => $attr['textLength']
+                    ];
+                }
+            }
+        }
+        $productName = mb_substr($shopifyProduct->getTitle(), 0, 255);
+        $description = mb_substr($parentApiJsonShopify['descriptionHtml'], 0, 20000);
+        $images = array_slice($images, 0, 10);
         $data = [
-            'productName' => $shopifyProduct->getTitle(),
+            'productName' => $productName,
             'mainProductCode' => $apiJsonCiceksepeti['mainProductCode'],
             'stockCode' => $iwasku,
             'categoryId' => $apiJsonCiceksepeti['categoryId'],
-            'description' => $parentApiJsonShopify['descriptionHtml'],
+            'description' => $description,
             'deliveryMessageType' => $apiJsonCiceksepeti['deliveryMessageType'],
             'deliveryType' => $apiJsonCiceksepeti['deliveryType'],
             'stockQuantity' => $apiJsonShopify['inventoryQuantity'],
             'salesPrice' => $apiJsonShopify['price'] * 1.5,
-            'attributes' => $apiJsonCiceksepeti['attributes'],
+            'attributes' => $cleanAttributes,
             'isActive' => $parentApiJsonShopify['status'] === 'ACTIVE' ? 1 : 0,
             'images' => $images
         ];
