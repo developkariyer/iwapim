@@ -237,7 +237,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         //2a1d1993-4b9d-4e6a-aac3-371468228bfc PROD CM-189
 
 
-        print_r($this->getBatchRequestResult("60d3179a-10bc-491e-a8b0-f1d78659e92f"));
+        print_r($this->getBatchRequestResult("d15702ea-5c2b-4e94-9dd2-edd80e99f858"));
 //        $ids = [
 //        ];
 //        foreach ($ids as $id) {
