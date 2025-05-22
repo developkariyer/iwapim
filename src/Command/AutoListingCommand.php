@@ -109,8 +109,7 @@ class AutoListingCommand extends AbstractCommand
                     $ciceksepetiProduct = VariantProduct::getById($ciceksepetiProductId['oo_id']);
                     echo "Ciceksepeti product found for: $iwasku \n";
                     echo $ciceksepetiProduct->getTitle() . "\n";
-                    $apiJsonCiceksepeti = json_decode($ciceksepetiProduct->jsonRead('responseJson'), true);
-                    print_r($apiJsonCiceksepeti);
+                    print_r($ciceksepetiProduct);
                     $this->updateCiceksepetiProduct($ciceksepetiProduct, $shopifyProduct, $iwasku);
                     break;
                 }
