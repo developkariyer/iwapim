@@ -112,19 +112,20 @@ class AutoListingCommand extends AbstractCommand
                     $ciceksepetiProduct = VariantProduct::getById($ciceksepetiProductId['oo_id']);
                     echo "Ciceksepeti product found for: $iwasku \n";
                     $preparedProduct = $this->prepareCiceksepetiProduct($ciceksepetiProduct, $shopifyProduct, $iwasku);
-                    if ($preparedProduct) {
-                        $productList[] = $preparedProduct;
-                    }
-                    if (count($productList) >= 200) {
-                        $this->sendToCiceksepeti($productList);
-                        $productList = [];
-                    }
+                    $this->sendToCiceksepeti($preparedProduct);
+//                    if ($preparedProduct) {
+//                        $productList[] = $preparedProduct;
+//                    }
+//                    if (count($productList) >= 200) {
+//                        $this->sendToCiceksepeti($productList);
+//                        $productList = [];
+//                    }
                 }
             }
         }
-        if (!empty($productList)) {
-            $this->sendToCiceksepeti($productList);
-        }
+//        if (!empty($productList)) {
+//            $this->sendToCiceksepeti($productList);
+//        }
     }
 
     private function prepareCiceksepetiProduct(VariantProduct $ciceksepetiProduct, VariantProduct $shopifyProduct, $iwasku)
@@ -177,14 +178,14 @@ class AutoListingCommand extends AbstractCommand
         ];
     }
 
-    private function sendToCiceksepeti(array $productList)
+    private function sendToCiceksepeti($productList)
     {
         $data = [
             'products' => $productList
         ];
         $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
-        $ciceksepetiConnector->updateProduct($data);
+        $ciceksepetiConnector->updateProduct($json);
         echo "Sent " . count($productList) . " products to Ciceksepeti.\n";
     }
 
