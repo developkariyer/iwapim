@@ -174,7 +174,8 @@ class AutoListingCommand extends AbstractCommand
             'images' => $images
         ];
         $dataJson = json_encode($data, JSON_UNESCAPED_UNICODE);
-        print_r($dataJson);
+        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
+        $ciceksepetiConnector->updateProduct($dataJson);
     }
 
     private function searchProductAndReturnIds($productIdentifier)

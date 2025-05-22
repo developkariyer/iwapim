@@ -511,68 +511,13 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         return $responseData['batchId'];
     }
 
-    /*public function updateProduct(VariantProduct $listing, string $sku)
+    public function updateProduct($data)
     {
-        if (!$listing instanceof VariantProduct) {
-            echo "Listing is not a VariantProduct\n";
-            return;
-        }
-        if ($sku === null) {
-            echo "Error: SKU cannot be null\n";
-            return;
-        }
-        $productName = json_decode($listing->jsonRead('apiResponseJson'), true)['productName'];
-        if (empty($productName) || $productName === null) {
-            echo "Failed to get product name for {$listing->getKey()}\n";
-            return;
-        }
-        $mainProductCode = json_decode($listing->jsonRead('apiResponseJson'), true)['mainProductCode'];
-        if (empty($mainProductCode) || $mainProductCode === null) {
-            echo "Failed to get main product code for {$listing->getKey()}\n";
-            return;
-        }
-        $stockCode = json_decode($listing->jsonRead('apiResponseJson'), true)['stockCode'];
-        if (empty($stockCode) || $stockCode === null) {
-            echo "Failed to get stock code for {$listing->getKey()}\n";
-            return;
-        }
-        $isActive = json_decode($listing->jsonRead('apiResponseJson'), true)['productStatusType'] === 'YAYINDA' ? 1 : 0;
-        $description = json_decode($listing->jsonRead('apiResponseJson'), true)['description'];
-        if (empty($description) || $description === null) {
-            echo "Failed to get description for {$listing->getKey()}\n";
-            return;
-        }
-        $images = json_decode($listing->jsonRead('apiResponseJson'), true)['images'];
-        if (empty($images) || $images === null) {
-            echo "Failed to get images for {$listing->getKey()}\n";
-            return;
-        }
-        $deliveryType = json_decode($listing->jsonRead('apiResponseJson'), true)['deliveryType'];
-        if (empty($deliveryType) || $deliveryType === null) {
-            echo "Failed to get delivery type for {$listing->getKey()}\n";
-            return;
-        }
-        $deliveryMessageType = json_decode($listing->jsonRead('apiResponseJson'), true)['deliveryMessageType'];
-        if (empty($deliveryMessageType) || $deliveryMessageType === null) {
-            echo "Failed to get delivery message type for {$listing->getKey()}\n";
-            return;
-        }
-        $attributes = json_decode($listing->jsonRead('apiResponseJson'), true)['attributes'];
         $response = $this->httpClient->request('PUT', static::$apiUrl['offers'], [
             'headers' => [
                 'x-api-key' => $this->marketplace->getCiceksepetiApiKey()
             ],
-            'json' => [
-                'productName' => $productName,
-                'mainProductCode' => $mainProductCode,
-                'stockCode' => $stockCode,
-                'isActive' => $isActive,
-                'description' => $description,
-                'images' => $images,
-                'deliveryType' => $deliveryType,
-                'deliveryMessageType' => $deliveryMessageType,
-                'attributes' => $attributes,
-            ]
+            'json' => $data
         ]);
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
@@ -580,15 +525,16 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             return;
         }
         $data = $response->toArray();
+        print_r($data);
         $combinedData = [
-            'price' => $data,
+            'result' => $data,
             'batchRequestResult' => $this->getBatchRequestResult($data['batchId'])
         ];
         echo "Product Update \n";
         $date = date('Y-m-d-H-i-s');
-        $filename = "{$stockCode}-$date.json";  
-        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()) . '/UpdateSku', json_encode($response));
-    }*/
+        $filename = "{$combinedData}-$date.json";
+        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($response));
+    }
 
     /**
      * @throws TransportExceptionInterface
