@@ -17,7 +17,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 class CiceksepetiConnector extends MarketplaceConnectorAbstract
 {
     private static array $apiUrl = [
-        'offers' => "Products/",
+        'offers' => "Products",
         'updateInventoryPrice' => "Products/price-and-stock/",
         'batchStatus' => "Products/batch-status/",
         'orders' => "Order/GetOrders/",
@@ -513,7 +513,6 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
     public function updateProduct($data)
     {
-        print_r($data);
         $response = $this->httpClient->request('PUT', static::$apiUrl['offers'], ['body' => json_encode($data, JSON_UNESCAPED_UNICODE)]);;
         print_r($response->toArray());
         $statusCode = $response->getStatusCode();
