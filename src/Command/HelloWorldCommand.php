@@ -43,7 +43,10 @@ class HelloWorldCommand extends AbstractCommand
         $cfwTrVariantProductsIds = Utility::fetchFromSql($cfwTrSql, ['marketplace_id' => $shopifycfwtr]);
         foreach ($cfwTrVariantProductsIds as $cfwTrVariantProductsId) {
             $variantProduct = VariantProduct::getById($cfwTrVariantProductsId['oo_id']);
-            echo $variantProduct->getTitle() . "\n";
+            $mainProduct = $variantProduct->getMainProduct();
+            if ($mainProduct instanceof Product) {
+                echo $mainProduct->getIwasku() . "\n";
+            }
         }
 
 
