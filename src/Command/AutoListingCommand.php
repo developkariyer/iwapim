@@ -21,6 +21,7 @@ use App\Message\ProductListingMessage;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Console\Input\InputOption;
+use App\Model\DataObject\Marketplace;
 use App\Connector\Marketplace\CiceksepetiConnector;
 
 #[AsCommand(
