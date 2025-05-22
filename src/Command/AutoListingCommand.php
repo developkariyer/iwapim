@@ -162,18 +162,20 @@ class AutoListingCommand extends AbstractCommand
         $description = mb_substr($parentApiJsonShopify['descriptionHtml'], 0, 20000);
         $images = array_slice($images, 0, 10);
         $data = [
-            'productName' => $productName,
-            'mainProductCode' => $apiJsonCiceksepeti['mainProductCode'],
-            'stockCode' => $iwasku,
-            'categoryId' => $apiJsonCiceksepeti['categoryId'],
-            'description' => $description,
-            'deliveryMessageType' => $apiJsonCiceksepeti['deliveryMessageType'],
-            'deliveryType' => $apiJsonCiceksepeti['deliveryType'],
-            'stockQuantity' => $apiJsonShopify['inventoryQuantity'],
-            'salesPrice' => $apiJsonShopify['price'] * 1.5,
-            'attributes' => $cleanAttributes,
-            'isActive' => $parentApiJsonShopify['status'] === 'ACTIVE' ? 1 : 0,
-            'images' => $images
+            'products' => [
+                'productName' => $productName,
+                'mainProductCode' => $apiJsonCiceksepeti['mainProductCode'],
+                'stockCode' => $iwasku,
+                'categoryId' => $apiJsonCiceksepeti['categoryId'],
+                'description' => $description,
+                'deliveryMessageType' => $apiJsonCiceksepeti['deliveryMessageType'],
+                'deliveryType' => $apiJsonCiceksepeti['deliveryType'],
+                'stockQuantity' => $apiJsonShopify['inventoryQuantity'],
+                'salesPrice' => $apiJsonShopify['price'] * 1.5,
+                'attributes' => $cleanAttributes,
+                'isActive' => $parentApiJsonShopify['status'] === 'ACTIVE' ? 1 : 0,
+                'images' => $images
+            ]
         ];
         $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
         $ciceksepetiConnector->updateProduct($data);
