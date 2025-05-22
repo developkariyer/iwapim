@@ -523,9 +523,22 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             return;
         }
         $responseData = $response->toArray();
+        sleep(5);
+        $batchResult = $this->getBatchRequestResult($responseData['batchId']);
+        $successCount = 0;
+        $failCount = 0;
+        foreach ($batchResult['items'] ?? [] as $item) {
+            if ($item['data']['status'] === 'Success') {
+                $successCount++;
+            } else {
+                $failCount++;
+            }
+        }
+        echo "✅ Success Product Count: $successCount\n";
+        echo "❌ Fail Product Count: $failCount\n";
         $combinedData = [
             'result' => $responseData,
-            'batchRequestResult' => $this->getBatchRequestResult($responseData['batchId'])
+            'batchRequestResult' => $batchResult
         ];
         echo "Product Updated \n";
         $filename = "UPDATE_LISTING_{$responseData['batchId']}.json";

@@ -105,7 +105,7 @@ class AutoListingCommand extends AbstractCommand
                 $iwasku = $mainProduct->getIwasku();
                 $ciceksepetiProductsId = Utility::fetchFromSql($ciceksepetiSql, ['seller_sku' => $iwasku, 'marketplace_id' => $ciceksepetiMarketplaceId]);
                 if (!is_array($ciceksepetiProductsId) || empty($ciceksepetiProductsId)) {
-                    continue;
+                    $this->createListingCiceksepeti($mainProduct, $shopifyProduct);
                 }
                 else {
                     $ciceksepetiProductId = $ciceksepetiProductsId[0];
@@ -130,16 +130,35 @@ class AutoListingCommand extends AbstractCommand
         }
     }
 
-    private function prepareCiceksepetiProduct(VariantProduct $ciceksepetiProduct, VariantProduct $shopifyProduct, $iwasku)
+    private function createListingCiceksepeti($mainProduct, $shopifyProduct)
     {
-        $parentApiJsonShopify = json_decode($shopifyProduct->jsonRead('parentResponseJson'), true);
-        $apiJsonShopify = json_decode($shopifyProduct->jsonRead('apiResponseJson'), true);
-        $apiJsonCiceksepeti = json_decode($ciceksepetiProduct->jsonRead('apiResponseJson'), true);
-        $ciceksepetiIsActive = $apiJsonCiceksepeti['isActive'];
-        if (!$ciceksepetiIsActive) {
-            echo "Ciceksepeti product is not active: $iwasku \n";
-            return null;
-        }
+        echo $mainProduct->getIdentifier() . '\n';
+//
+//        $parentApiJsonShopify = json_decode($shopifyProduct->jsonRead('parentResponseJson'), true);
+//        $apiJsonShopify = json_decode($shopifyProduct->jsonRead('apiResponseJson'), true);
+//        $images = $this->getShopifyImages($parentApiJsonShopify);
+//        if (empty($images)) {
+//            return [];
+//        }
+//        $attributes = [];
+//        return [
+//            'productName' => mb_substr($shopifyProduct->getTitle(), 0, 255),
+//            'mainProductCode' => $mainProduct->getIdentifier(),
+//            'stockCode' => $iwasku,
+//            'categoryId' => $apiJsonCiceksepeti['categoryId'],
+//            'description' => mb_substr($parentApiJsonShopify['descriptionHtml'], 0, 20000),
+//            'deliveryMessageType' => $apiJsonCiceksepeti['deliveryMessageType'],
+//            'deliveryType' => $apiJsonCiceksepeti['deliveryType'],
+//            'stockQuantity' => $apiJsonShopify['inventoryQuantity'],
+//            'salesPrice' => $apiJsonShopify['price'] * 1.5,
+//            'attributes' => $cleanAttributes,
+//            'isActive' => $parentApiJsonShopify['status'] === 'ACTIVE' ? 1 : 0,
+//            'images' => array_slice($images, 0, 5)
+//        ];
+    }
+
+    private function getShopifyImages($parentApiJsonShopify)
+    {
         $images = [];
         $widthThreshold = 2000;
         $heightThreshold = 2000;
@@ -154,6 +173,20 @@ class AutoListingCommand extends AbstractCommand
                 }
             }
         }
+        return $images;
+    }
+
+    private function prepareCiceksepetiProduct(VariantProduct $ciceksepetiProduct, VariantProduct $shopifyProduct, $iwasku)
+    {
+        $parentApiJsonShopify = json_decode($shopifyProduct->jsonRead('parentResponseJson'), true);
+        $apiJsonShopify = json_decode($shopifyProduct->jsonRead('apiResponseJson'), true);
+        $apiJsonCiceksepeti = json_decode($ciceksepetiProduct->jsonRead('apiResponseJson'), true);
+        $ciceksepetiIsActive = $apiJsonCiceksepeti['isActive'];
+        if (!$ciceksepetiIsActive) {
+            echo "Ciceksepeti product is not active: $iwasku \n";
+            return null;
+        }
+        $images = $this->getShopifyImages($parentApiJsonShopify);
         if (empty($images)) {
             $images = $apiJsonCiceksepeti['images'] ?? [];
         }
