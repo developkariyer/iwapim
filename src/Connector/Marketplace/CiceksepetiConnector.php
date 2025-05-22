@@ -513,7 +513,6 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
     public function updateProduct($data)
     {
-        print_r($data);
         $response = $this->httpClient->request('PUT', static::$apiUrl['offers'], ['body' => $data]);
         print_r($response->toArray());
         $statusCode = $response->getStatusCode();
@@ -521,16 +520,15 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
             echo "Error: $statusCode\n";
             return;
         }
-        $data = $response->toArray();
-        print_r($data);
+        $responseData = $response->toArray();
         $combinedData = [
-            'result' => $data,
-            'batchRequestResult' => $this->getBatchRequestResult($data['batchId'])
+            'result' => $responseData,
+            'batchRequestResult' => $this->getBatchRequestResult($responseData['batchId'])
         ];
+        print_r($combinedData);
         echo "Product Update \n";
-        $date = date('Y-m-d-H-i-s');
-        $filename = "{$combinedData}-$date.json";
-        Utility::setCustomCache($filename, PIMCORE_PROJECT_ROOT. "/tmp/marketplaces/".urlencode($this->marketplace->getKey()), json_encode($response));
+        $filename = "UPDATE_LISTING_{$responseData['batchId']}.json";
+        $this->putToCache($filename, ['request'=>$data, 'response'=>$combinedData]);
     }
 
     /**
