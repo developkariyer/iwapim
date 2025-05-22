@@ -112,7 +112,6 @@ class AutoListingCommand extends AbstractCommand
                     echo "Ciceksepeti product found for: $iwasku \n";
                     echo $ciceksepetiProduct->getUniqueMarketplaceId() . "\n";
                     $this->updateCiceksepetiProduct($ciceksepetiProduct, $shopifyProduct, $iwasku);
-                    break;
                 }
             }
         }
