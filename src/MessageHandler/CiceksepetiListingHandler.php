@@ -40,25 +40,25 @@ class CiceksepetiListingHandler
         $this->logger->info("✅ [Category Data] Ciceksepeti category details successfully retrieved.");
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
         print_r($jsonString);
-        $this->printProductInfoLogger($jsonString);
-        $this->logger->info("✅ [PIM Listings] PIM listings information successfully completed.");
-        $messageType = $message->getActionType();
-        $this->logger->info("📝 [Action Type] Processing action of type: {$messageType}");
-        match ($messageType) {
-            'list' => $this->processListingData($jsonString, $categories),
-            default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
-        };
+//        $this->printProductInfoLogger($jsonString);
+//        $this->logger->info("✅ [PIM Listings] PIM listings information successfully completed.");
+//        $messageType = $message->getActionType();
+//        $this->logger->info("📝 [Action Type] Processing action of type: {$messageType}");
+//        match ($messageType) {
+//            'list' => $this->processListingData($jsonString, $categories),
+//            default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
+//        };
     }
 
     private function printProductInfoLogger($jsonString): void
     {
         $jsonData = json_decode($jsonString, true);
-        if (isset($jsonData['Ciceksepeti']) && is_array($jsonData['Ciceksepeti'])) {
-            foreach ($jsonData['Ciceksepeti'] as $productId => $productData) {
+        if (isset($jsonData) && is_array($jsonData)) {
+            foreach ($jsonData as $productId => $productData) {
                 $name = $productData['name'] ?? 'Unknown';
                 $this->logger->info("✅ [Product Info] Product ID: {$productId}, Product Name: {$name}");
-                if (isset($productData['skus']) && is_array($productData['skus'])) {
-                    foreach ($productData['skus'] as $iwasku => $variantProduct) {
+                if (isset($productData) && is_array($productData['skus'])) {
+                    foreach ($productData as $iwasku => $variantProduct) {
                         $size = $variantProduct['size'] ?? 'Unknown';
                         $color = $variantProduct['color'] ?? 'Unknown';
                         $this->logger->info("✅ [Variant Info] IWASKU: {$iwasku}, Size: {$size}, Color: {$color}");
