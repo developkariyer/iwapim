@@ -49,7 +49,7 @@ class ListingHelperService
                 }
             }
         }
-        return $results;
+        return json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
     private function processVariant($mainProduct, $variantProduct)
