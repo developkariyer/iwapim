@@ -137,18 +137,34 @@ class AutoListingCommand extends AbstractCommand
 
     private function createListingProcess($toBeListedProducts)
     {
+        $groupedProducts = [];
         foreach ($toBeListedProducts as $mainProduct) {
             $parent = $mainProduct->getParent();
-            echo $parent->getId() . "\n";
-
+            if (!$parent) {
+                continue;
+            }
+            $parentId = $parent->getId();
+            $productId = $mainProduct->getId();
+            if (!isset($groupedProducts[$parentId])) {
+                $groupedProducts[$parentId] = [];
+            }
+            $groupedProducts[$parentId][] = $productId;
         }
-        // ciceksepeti messengere gönderilecek
-        // alınan ürün bilgileri filtrelenerek product id variant id ye indirilecek
-        // filtrelenen ürünler tek tek mesaj olarak gönderilecek
-        // önceden pim ürün bilgisi fonksiyonu burdaki göre düzenlenecek
-        // gemini promptu güncellenecek
-        // gemini artık sadece kategori belirleyebilecek ve size renk işleri yapılmış olacak
-        // sonuç shopify ile tam senkron ciceksepeti mağazası 🚀
+        print_r($groupedProducts);
+//        foreach ($groupedProducts as $parentId => $variantIds) {
+//            $message = new ProductListingMessage(
+//                'list',
+//                $parentId,
+//                $marketplaceId,
+//                'admin',
+//                $variantIds,
+//                [],
+//                1,
+//                'test'
+//            );
+//            $this->messageBus->dispatch($message);
+//            echo "Message created for parent ID: $parentId with variants: " . implode(', ', $variantIds) . "\n";
+//        }
     }
 
     private function preListingCiceksepeti($mainProduct, $shopifyProduct)
