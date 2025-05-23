@@ -11,7 +11,7 @@ use App\Utils\Utility;
 class ListingHelperService
 {
 
-    public function getPimListingsInfo(ProductListingMessage $message): false|string
+    public function getPimListingsInfo(ProductListingMessage $message)
     {
         $marketplace = Marketplace::getById($message->getMarketplaceId());
         if (!$marketplace instanceof Marketplace) {
@@ -21,25 +21,92 @@ class ListingHelperService
         if (!$product instanceof Product) {
             return false;
         }
-        $marketplaceName = $marketplace->getMarketplaceType();
         $variantIds = $message->getVariantIds();
         if (empty($variantIds)) {
             return false;
         }
-        $marketplaceCurrency = $marketplace->getCurrency();
-        $productIdentifier = $product->getProductIdentifier();
-        $data = [
-            $marketplaceName => [
-                $productIdentifier => [
-                    'category' => $product->getProductCategory(),
-                    'name' => $product->getName(),
-                    'skus' => $this->processVariantProduct($variantIds, $marketplaceCurrency)
-                ]
-            ]
-        ];
-        $data = $this->filterShopifyListingItems($data);
-        return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $results = [];
+        foreach ($variantIds as $variantId) {
+            $mainProduct = Product::getById($variantId);
+            if (!$mainProduct instanceof Product) {
+                continue;
+            }
+            $listingItems = $mainProduct->getListingItems();
+            if (empty($listingItems)) {
+                continue;
+            }
+            foreach ($listingItems as $listingItem) {
+                if (!$listingItem instanceof VariantProduct) {
+                    continue;
+                }
+                $marketplaceKey = $listingItem->getMarketplace()->getKey();
+                if ($marketplaceKey !== 'ShopifyCfwTr') {
+                    continue;
+                }
+                $processed = $this->processVariant($mainProduct, $listingItem);
+                if (!empty($processed)) {
+                    $results[] = $processed;
+                }
+            }
+        }
+        return $results;
     }
+
+    private function processVariant(Product $mainProduct, Product $variantProduct)
+    {
+        $parentApiJsonShopify = json_decode($variantProduct->jsonRead('parentResponseJson'), true);
+        $apiJsonShopify = json_decode($variantProduct->jsonRead('apiResponseJson'), true);
+        $shopifyIsActive = isset($parentApiJsonShopify['status']) && $parentApiJsonShopify['status'] === 'ACTIVE';
+        $images = $this->getShopifyImages($parentApiJsonShopify);
+        if (empty($images) || !$shopifyIsActive) {
+            return [];
+        }
+        return [
+            'productName' => mb_substr($variantProduct->getTitle(), 0, 255),
+            'mainProductCode' => $mainProduct->getProductIdentifier(),
+            'stockCode' => $mainProduct->getIwasku(),
+            'categoryId' => null,
+            'description' => mb_substr($parentApiJsonShopify['descriptionHtml'] ?? '', 0, 20000),
+            'deliveryMessageType' => 5,
+            'size' => $mainProduct->getVariationSize(),
+            'color' => $mainProduct->getVariationColor(),
+            'deliveryType' => 2,
+            'stockQuantity' => $apiJsonShopify['inventoryQuantity'] ?? 0,
+            'salesPrice' => ($apiJsonShopify['price'] ?? 0) * 1.5,
+            'attributes' => [],
+            'images' => array_slice($images, 0, 5)
+        ];
+    }
+
+//    public function getPimListingsInfo(ProductListingMessage $message): false|string
+//    {
+//        $marketplace = Marketplace::getById($message->getMarketplaceId());
+//        if (!$marketplace instanceof Marketplace) {
+//            return false;
+//        }
+//        $product = Product::getById($message->getProductId());
+//        if (!$product instanceof Product) {
+//            return false;
+//        }
+//        $marketplaceName = $marketplace->getMarketplaceType();
+//        $variantIds = $message->getVariantIds();
+//        if (empty($variantIds)) {
+//            return false;
+//        }
+//        $marketplaceCurrency = $marketplace->getCurrency();
+//        $productIdentifier = $product->getProductIdentifier();
+//        $data = [
+//            $marketplaceName => [
+//                $productIdentifier => [
+//                    'category' => $product->getProductCategory(),
+//                    'name' => $product->getName(),
+//                    'skus' => $this->processVariantProduct($variantIds, $marketplaceCurrency)
+//                ]
+//            ]
+//        ];
+//        $data = $this->filterShopifyListingItems($data);
+//        return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+//    }
 
     private function processVariantProduct($variantIds, $marketplaceCurrency):array
     {

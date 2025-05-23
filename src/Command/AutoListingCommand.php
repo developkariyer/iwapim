@@ -150,21 +150,20 @@ class AutoListingCommand extends AbstractCommand
             }
             $groupedProducts[$parentId][] = $productId;
         }
-        print_r($groupedProducts);
-//        foreach ($groupedProducts as $parentId => $variantIds) {
-//            $message = new ProductListingMessage(
-//                'list',
-//                $parentId,
-//                $marketplaceId,
-//                'admin',
-//                $variantIds,
-//                [],
-//                1,
-//                'test'
-//            );
-//            $this->messageBus->dispatch($message);
-//            echo "Message created for parent ID: $parentId with variants: " . implode(', ', $variantIds) . "\n";
-//        }
+        foreach ($groupedProducts as $parentId => $variantIds) {
+            $message = new ProductListingMessage(
+                'list',
+                $parentId,
+                265384,
+                'admin',
+                $variantIds,
+                [],
+                1,
+                'test'
+            );
+            $stamps = [new TransportNamesStamp(['ciceksepeti'])];
+            $this->bus->dispatch($message, $stamps);
+        }
     }
 
     private function preListingCiceksepeti($mainProduct, $shopifyProduct)
