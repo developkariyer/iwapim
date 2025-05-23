@@ -39,15 +39,14 @@ class CiceksepetiListingHandler
         echo "ciceksepeti categories fetched\n";
         $this->logger->info("✅ [Category Data] Ciceksepeti category details successfully retrieved.");
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
-        print_r($jsonString);
-//        $this->printProductInfoLogger($jsonString);
-//        $this->logger->info("✅ [PIM Listings] PIM listings information successfully completed.");
-//        $messageType = $message->getActionType();
-//        $this->logger->info("📝 [Action Type] Processing action of type: {$messageType}");
-//        match ($messageType) {
-//            'list' => $this->processListingData($jsonString, $categories),
-//            default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
-//        };
+        $this->printProductInfoLogger($jsonString);
+        $this->logger->info("✅ [PIM Listings] PIM listings information successfully completed.");
+        $messageType = $message->getActionType();
+        $this->logger->info("📝 [Action Type] Processing action of type: {$messageType}");
+        match ($messageType) {
+            'list' => $this->processListingData($jsonString, $categories),
+            default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
+        };
     }
 
     private function printProductInfoLogger(string $jsonString): void
