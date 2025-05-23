@@ -51,8 +51,8 @@ class AutoListingCommand extends AbstractCommand
         $cfwTrSql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";
         $ciceksepetiSql = "SELECT oo_id FROM object_query_varyantproduct WHERE sellerSku = :seller_sku AND marketplace__id = :marketplace_id";
         $cfwTrVariantProductsIds = Utility::fetchFromSql($cfwTrSql, ['marketplace_id' => $this->marketplaceConfig['shopifycfwtr']]);
-        $productList = [];
-        $toBeListedProducts = [];
+        $updateProductList = [];
+        $listProductList = [];
         foreach ($cfwTrVariantProductsIds as $cfwTrVariantProductsId) {
             $shopifyProduct = VariantProduct::getById($cfwTrVariantProductsId['oo_id']);
             $mainProducts = $shopifyProduct->getMainProduct();
@@ -62,9 +62,9 @@ class AutoListingCommand extends AbstractCommand
             $mainProduct = $mainProducts[0];
             if ($mainProduct instanceof Product) {
                 $iwasku = $mainProduct->getIwasku();
-                $ciceksepetiProductsId = Utility::fetchFromSql($ciceksepetiSql, ['seller_sku' => $iwasku, 'marketplace_id' => $ciceksepetiMarketplaceId]);
+                $ciceksepetiProductsId = Utility::fetchFromSql($ciceksepetiSql, ['seller_sku' => $iwasku, 'marketplace_id' => $this->marketplaceConfig['ciceksepeti']]);;
                 if (!is_array($ciceksepetiProductsId) || empty($ciceksepetiProductsId)) {
-                    $toBeListedProducts[] = $mainProduct;
+                    $listProductList[] = $mainProduct;
                 }
                 else {
                     $ciceksepetiProductId = $ciceksepetiProductsId[0];
@@ -75,11 +75,11 @@ class AutoListingCommand extends AbstractCommand
                     echo "Ciceksepeti product found for: $iwasku \n";
                     $preparedProduct = $this->prepareCiceksepetiProduct($ciceksepetiProduct, $shopifyProduct, $iwasku);
                     if ($preparedProduct) {
-                        $productList[] = $preparedProduct;
+                        $updateProductList[] = $preparedProduct;
                     }
-                    if (count($productList) >= 200) {
-                        $this->sendToCiceksepeti($productList);
-                        $productList = [];
+                    if (count($updateProductList) >= 200) {
+                        $this->sendToCiceksepeti($updateProductList);
+                        $updateProductList = [];
                     }
                 }
             }
@@ -87,15 +87,15 @@ class AutoListingCommand extends AbstractCommand
         if (!empty($productList)) {
             $this->sendToCiceksepeti($productList);
         }
-        if (!empty($toBeListedProducts)) {
-            $this->createListingProcess($toBeListedProducts);
+        if (!empty($listProductList)) {
+            $this->createListingProcess($listProductList);
         }
     }
 
-    private function createListingProcess($toBeListedProducts)
+    private function createListingProcess($listProductList)
     {
         $groupedProducts = [];
-        foreach ($toBeListedProducts as $mainProduct) {
+        foreach ($listProductList as $mainProduct) {
             $parent = $mainProduct->getParent();
             if (!$parent) {
                 continue;
@@ -193,35 +193,6 @@ class AutoListingCommand extends AbstractCommand
         $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
         $ciceksepetiConnector->updateProduct($json);
         echo "Sent " . count($productList) . " products to Ciceksepeti.\n";
-    }
-
-    private function searchProductAndReturnIds($productIdentifier)
-    {
-        $productSql = '
-        SELECT oo_id, name, productCategory from object_query_product
-        WHERE productIdentifier = :productIdentifier AND productLevel = 0
-        LIMIT 1';
-        $variantSql = '
-        SELECT oo_id, iwasku, variationSize, variationColor FROM object_query_product
-        WHERE productIdentifier = :productIdentifier AND productLevel = 1 AND listingItems IS NOT NULL';
-
-        $product = Utility::fetchFromSql($productSql, ['productIdentifier' => $productIdentifier]);
-        if (!is_array($product) || empty($product) || !isset($product[0]['oo_id'])) {
-            return [];
-        }
-        $variants = Utility::fetchFromSql($variantSql, ['productIdentifier' => $productIdentifier]);
-        if (!is_array($variants) || empty($variants)) {
-            return [];
-        }
-        $productData = [
-            'product_id' => $product[0]['oo_id']
-        ];
-        $variantData = [];
-        foreach ($variants as $variant) {
-            $variantData[] = $variant['oo_id'];
-        }
-        $productData['variantIds'] = $variantData;
-        return $productData;
     }
 
 }

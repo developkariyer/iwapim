@@ -72,25 +72,6 @@ class CiceksepetiListingHandler
         }
     }
 
-    private function chunkSkus($data): array
-    {
-        $chunks = [];
-        foreach ($data as $productCode => $productData) {
-            $skus = $productData['skus'];
-            $skuChunks = array_chunk($skus, 2, true);
-            foreach ($skuChunks as $chunk) {
-                $chunks[] = [
-                    $productCode => [
-                        'category' => $productData['category'],
-                        'name' => $productData['name'],
-                        'skus' => $chunk
-                    ]
-                ];
-            }
-        }
-        return $chunks;
-    }
-
     private function processListingData($jsonString, $categories)
     {
         $fullData = json_decode($jsonString, true);
@@ -153,77 +134,18 @@ class CiceksepetiListingHandler
         print_r($result);
     }
 
-//    private function processListingData($jsonString, $categories)
-//    {
-//        $fullData = json_decode($jsonString, true);
-//        if (!$fullData || !isset($fullData['Ciceksepeti'])) {
-//            $this->logger->error("❌ [Invalid JSON] Invalid JSON data received: " . $jsonString);
-//            throw new Exception("❌ [Invalid JSON] Invalid JSON data");
-//        }
-//        $chunks = $this->chunkSkus($fullData['Ciceksepeti']);
-//        $mergedResults = [];
-//        $totalChunks = count($chunks);
-//        $this->logger->info("✅ [Chunks Processed] Total chunks to process: {$totalChunks}");
-//        foreach ($chunks as $index => $chunkData) {
-//            $chunkNumber = $index + 1;
-//            $this->logger->info("🔄 [Chunk Processing] Processing chunk {$chunkNumber} / {$totalChunks}...");
-//            echo "\n🔄 Chunk {$chunkNumber} / {$totalChunks} processing...\n";
-//            $chunkJsonString = json_encode(['Ciceksepeti' => $chunkData], JSON_UNESCAPED_UNICODE);
-//            $prompt = $this->generateListingPrompt($chunkJsonString, $categories);
-//            $result = GeminiConnector::chat($prompt, 'ciceksepeti');
-//            $parsedResult = $this->parseGeminiResult($result);
-//            if (!$parsedResult) {
-//                $this->logger->error("Gemini result is empty or error gemini api");
-//                echo "⚠️ Error: Chunk {$chunkNumber} / {$totalChunks} result is empty or error gemini api \n";
-//                continue;
-//            }
-//            $mergedResults = array_merge_recursive($mergedResults, $parsedResult);
-//            echo "✅ Gemini result success. Chunk {$chunkNumber} complated.\n";
-//            $this->logger->info("✅ [Gemini Success] Gemini result success. Chunk {$chunkNumber} completed.");
-//            sleep(5);
-//        }
-//        $this->logger->info("Gemini chat result : " . json_encode($mergedResults, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-//        $data = $this->fillAttributeData($mergedResults);
-//        if (empty($data)) {
-//            $this->logger->error("❌ [No Data] No products found in the data array.");
-//            return [];
-//        }
-//        foreach ($data as $sku => $product) {
-//            if (isset($product['Attributes']) && empty($product['Attributes'])) {
-//                $this->logger->info("❌ [Attributes Empty] Attributes is empty for SKU: {$product['stockCode']}");
-//            } else {
-//                $this->logger->info("✔️ [Attributes Found] Attributes filled for SKU: {$product['stockCode']}");
-//            }
-//        }
-//        $this->logger->info("✅ [Filled Attributes Data] All attributes data processed: " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-//        $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
-//        print_r($formattedData);
-//        $this->logger->info("✅ [Formatted Data]: " . $formattedData);
-////        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
-////        $result = $ciceksepetiConnector->createListing($formattedData);
-////        $this->logger->info("✅ [CiceksepetiConnector] Result batch:\n" . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-////        print_r($result);
-//    }
-
     private function fillMissingListingDataAndFormattedCiceksepetiListing($data): false|string
     {
         $data = $this->removeCommonAttributes($data);
         $formattedData = [];
         foreach ($data as $sku => $product) {
-            $httpsImages = array_map(function($image) {
-                return preg_replace('/^http:/', 'https:', $image);
-            }, $product['images'] ?? []);
             $salesPrice = $product['salesPrice'] ?? 0;
             $attributes = $product['Attributes'] ?? null;
             $description = $product['description'];
             $stockCode = $product['stockCode'] ?? 'UNKNOWN';
-            $hasImages = !empty($httpsImages);
             $hasValidPrice = $salesPrice !== 0 && $salesPrice !== "0";
             $hasAttributes = $attributes !== null;
             $hasValidDescription = mb_strlen($description) >= 30;
-            if (!$hasImages) {
-                $this->logger->error("❌ [Validation Error] Missing or invalid images for SKU: {$stockCode}");
-            }
             if (!$hasValidPrice) {
                 $this->logger->error("❌ [Validation Error] Invalid or missing sales price for SKU: {$stockCode}");
             }
@@ -233,7 +155,7 @@ class CiceksepetiListingHandler
             if (!$hasValidDescription) {
                 $this->logger->error("❌ [Validation Error] Description too short (<30 chars) for SKU: {$stockCode}");
             }
-            if (!$hasImages || !$hasValidPrice || !$hasAttributes || !$hasValidDescription) {
+            if (!$hasValidPrice || !$hasAttributes || !$hasValidDescription) {
                 continue;
             }
             $description = str_replace("\n", "<br>", $description);
@@ -346,75 +268,6 @@ class CiceksepetiListingHandler
             Kategori Verisi: $categories
         EOD;
     }
-
-//    private function generateListingPrompt($jsonString, $categories): string
-//    {
-//        return <<<EOD
-//            Sen bir e-ticaret uzmanısın ve ÇiçekSepeti pazaryeri için ürün listeleri hazırlıyorsun.
-//            **Çıkış formatı**:
-//            Sadece aşağıdaki gibi bir JSON döndür:
-//            {
-//              "SKU1": {
-//                "productName": "Ürün adı",
-//                "mainProductCode": "Ana ürün kodu",
-//                "stockCode": "Stok kodu",
-//                "description": "Ürün açıklaması",
-//                "images": ["resim1", "resim2"],
-//                "price": "100",
-//                "categoryId": 1234,
-//                "renk": "Renk bilgisi",
-//                "ebat": "Ebat bilgisi"
-//              },
-//              "SKU2": {
-//                ...
-//              }
-//            }
-//            Hiçbir açıklama, kod bloğu, yorum ekleme.
-//            Sadece geçerli, düzgün bir JSON üret.
-//            Aşağıda bir ürün listeleme datası (JSON formatında) verilmiştir.
-//            Bu JSON'da bazı alanlar eksik veya hatalı olabilir.
-//            Gönderdiğim veride ana ürün kodu altında sku'lar ve bu skulara ait bilgiler yer almaktadır. Skuların altında "size" ve "color" bilgisi yer alacaktır.
-//            ListingItems alanında bu ürüne ait farklı pazaryerlerine yapılmış listingler yer alır. Bunlara benzer ÇiçekSepeti özgün hale getireceğiz.
-//
-//            **Uyarı**: Lütfen yalnızca gönderdiğim **JSON verisini** kullanarak işlem yapınız ve dışarı çıkmayınız. Verilen verinin dışında başka veri kullanımı yapılmamalıdır.
-//
-//            Gönderdiğim veriye göre çıkarılması gereken ve ÇiçekSepeti listing formatında istenen alanlar skus dizisi altındaki tüm skulara ayrı olacak şekilde:
-//            - **productName**: Gönderilen verideki **title** alanlarından alınır. Bu başlıklardan Türkçe olanları, ÇiçekSepeti'ne uygun şekilde güncellenmelidir. Bu alan her SKU için aynı olacak. Size ve renk bilgisi olmasın.
-//            - **mainProductCode**: Gönderilen verideki ÇiçekSepeti altındaki **field** genelde 3 haneli ve sayı içeriyor. Örnek: ABC-12. Bu alan her SKU için aynı olacak.
-//            - **stockCode**: Ürün SKU bilgisi gönderdiğim verideki skus altındaki verilerdir. Bu her SKU'ya özel olacak.
-//            - **description**:
-//                Açıklama (description) sadece ve sadece aşağıdaki şekilde oluşturulacak:
-//                1. Türkçe açıklama: Türkçe açıklama verisi varsa, hiçbir değişiklik yapılmadan olduğu gibi kopyalanacak ve link ya da iletişim bilgileri çıkarılacaktır.
-//                2. İngilizce açıklama: İngilizce açıklama verisi varsa, yalnızca doğru ve doğrudan çeviri yapılacak. Cümle yapısı, kelime sırası ve anlam korunacaktır. Yeniden yazma, özgünleştirme, yorum ekleme gibi işlemler yapılmayacaktır.
-//                3. Yasaklı işlemler: "Create", "Enhance", "Summarize", "Rewrite", "Reformat" gibi işlemler yapılması halinde işlem başarısız olacaktır.
-//                4. Türkçe olmayan açıklama: Eğer açıklama bulunmazsa, ürün adı (product name) ve renk bilgileri (color) yazılacaktır.
-//                5. Mağaza bilgileri: Mağazaya dair herhangi bir bilgi veya açıklama silinecektir.
-//                6. Çeviri düzeltmeleri: Eğer İngilizce açıklamada cümle bozukluğu varsa, bu bozukluk düzeltilerek cümle anlamı korunacaktır.
-//                7. HTML formatı: Açıklama, profesyonel bir şekilde HTML formatında düzenlenecektir
-//                Bu kurallara uymazsan cevabın geçersiz sayılacaktır.
-//            - **images**:
-//                - Her SKU için en fazla 5 adet olacak şekilde,`images` listesinden alınacaktır.
-//                - Resimler dizi (array) formatında verilecektir.
-//                - Yalnızca **en az 500x500** ve **en fazla 2000x2000** piksel boyutlarındaki görseller dahil edilecektir.
-//                - Bu boyut aralığı dışında kalan görseller filtrelenecektir.
-//                - Boş bırakma.
-//
-//            - **salesPrice**: Ürün içinde yer alan **price** alanını direkt kullan her sku için farklı olabilir buna dikkat et.
-//
-//            -**categoryId**: Kategori verisinden en uygun kategoriyi bul id sini al ve kaydet
-//
-//            -**renk**:
-//                - renk bilgisi verideki sku altında color fieldı Türkçe ye çevir çevirdiğinde çiçeksepetinde bulunan çok bilinen renklerden olsun Eğer iki renk varsa her iki rengi de çevir, teke düşürme iki rengide örneğin:
-//                - Altın, Gümüş, Turkuaz, Kırmızı, Mavi, Bordo, Turuncu, Yeşil, Sarı, Pembe, Füme, Kamuflaj, Kahverengi, Mor, Bej, Lacivert, Metal, Lila, Haki, Taba, Beyaz, Magenta, Mürdüm, Karışık, Gri,
-//                Antrasit, Açık Mavi, Bakır, Vişne, Açık Pembe, Bronz, Ekru, Taş renklerinden kullan 2 renk varsa ikiside bunlara uyumlu olsun aralarında boşluk olsun.
-//
-//            -**ebat**: ebat bilgisi verideki sku altında size fieldı cm olarak al (örn: 250cm) yanında boyut belirten S-M-XL gibi durum varsa bunu alma.
-//
-//            **Veri formatı**: Lütfen yalnızca aşağıdaki **JSON verisini** kullanın ve dışarıya çıkmayın. Çıkışınızı bu veriye dayalı olarak oluşturun:
-//            İşte veri: $jsonString
-//            Kategori Verisi: $categories
-//        EOD;
-//    }
 
     /**
      * Fill attribute data for products with category-specific attributes
