@@ -138,7 +138,9 @@ class AutoListingCommand extends AbstractCommand
     private function createListingProcess($toBeListedProducts)
     {
         foreach ($toBeListedProducts as $mainProduct) {
-            echo $mainProduct->getId() . "\n";
+            $parent = $mainProduct->getParent();
+            echo $parent->getId() . "\n";
+
         }
         // ciceksepeti messengere gönderilecek
         // alınan ürün bilgileri filtrelenerek product id variant id ye indirilecek
