@@ -38,9 +38,8 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $product = Product::getById(267201);
-        echo $product->getById() . "\n";
-
+        $test = json_decode(Utility::getCustomCache('stores.json', PIMCORE_PROJECT_ROOT . '/tmp/wisersell'), true);
+        print_r($test);
 
 
         return Command::SUCCESS;

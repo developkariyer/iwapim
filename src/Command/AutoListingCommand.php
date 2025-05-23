@@ -36,63 +36,21 @@ class AutoListingCommand extends AbstractCommand
     }
 
     private array $marketplaceConfig = [
-        'ciceksepeti' => ['marketplace_id' => 265384]
+        'ciceksepeti' => 265384,
+        'shopifycfwtr' => 84124,
     ];
-
-//    protected function configure(): void
-//    {
-//        $this
-//            ->setDescription('Auto product listing to specified marketplace')
-//            ->addOption('marketplace', null, InputOption::VALUE_REQUIRED, 'Marketplace key (e.g., ciceksepeti, trendyol)')
-//            ->addArgument('productCodes', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'One or more product codes to search and list.');
-//    }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-
         $this->syncShopifyCiceksepeti();
-//        $marketplace = $input->getOption('marketplace');
-//        if (!isset($this->marketplaceConfig[$marketplace])) {
-//            $output->writeln("<error>Unsupported marketplace: $marketplace</error>");
-//            return Command::FAILURE;
-//        }
-//        $marketplaceId = $this->marketplaceConfig[$marketplace]['marketplace_id'];
-//        $productCodes = $input->getArgument('productCodes');
-//        $output->writeln("Marketplace: $marketplace (Channel ID: $marketplaceId)");
-//        $output->writeln("Product Codes: " . implode(', ', $productCodes));
-//        foreach ($productCodes as $productCode) {
-//            $output->writeln("Started process: $productCode");
-//            $productData = $this->searchProductAndReturnIds($productCode);
-//            if (!$productData) {
-//                $output->writeln("<comment>Product not found for code: $productCode</comment>");
-//                continue;
-//            }
-//            $productId = $productData['product_id'];
-//            $variantIds = $productData['variantIds'];
-//            $message = new ProductListingMessage(
-//                'list',
-//                $productId,
-//                $marketplaceId,
-//                'admin',
-//                $variantIds,
-//                [],
-//                1,
-//                'test'
-//            );
-//            $stamps = [new TransportNamesStamp([$marketplace])];
-//            $this->bus->dispatch($message, $stamps);
-//            $output->writeln("Dispatched to queue for: $productCode");
-//        }
         return Command::SUCCESS;
     }
 
     private function syncShopifyCiceksepeti()
     {
-        $shopifyMarketplaceId = 84124;
-        $ciceksepetiMarketplaceId = 265384;
         $cfwTrSql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";
         $ciceksepetiSql = "SELECT oo_id FROM object_query_varyantproduct WHERE sellerSku = :seller_sku AND marketplace__id = :marketplace_id";
-        $cfwTrVariantProductsIds = Utility::fetchFromSql($cfwTrSql, ['marketplace_id' => $shopifyMarketplaceId]);
+        $cfwTrVariantProductsIds = Utility::fetchFromSql($cfwTrSql, ['marketplace_id' => $this->marketplaceConfig['shopifycfwtr']]);
         $productList = [];
         $toBeListedProducts = [];
         foreach ($cfwTrVariantProductsIds as $cfwTrVariantProductsId) {
@@ -131,7 +89,6 @@ class AutoListingCommand extends AbstractCommand
         }
         if (!empty($toBeListedProducts)) {
             $this->createListingProcess($toBeListedProducts);
-
         }
     }
 
