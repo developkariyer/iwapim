@@ -57,7 +57,7 @@ class ListingHelperService
         $parentApiJsonShopify = json_decode($variantProduct->jsonRead('parentResponseJson'), true);
         $apiJsonShopify = json_decode($variantProduct->jsonRead('apiResponseJson'), true);
         $shopifyIsActive = isset($parentApiJsonShopify['status']) && $parentApiJsonShopify['status'] === 'ACTIVE';
-        $images = $this->getShopifyImages($parentApiJsonShopify);
+        $images = $this->getShopifyImages($mainProduct, $parentApiJsonShopify);
         if (empty($images) || !$shopifyIsActive) {
             return [];
         }
@@ -78,7 +78,7 @@ class ListingHelperService
         ];
     }
 
-    private function getShopifyImages($parentApiJsonShopify)
+    private function getShopifyImages($mainProduct, $parentApiJsonShopify)
     {
         $images = [];
         $widthThreshold = 2000;
@@ -93,6 +93,19 @@ class ListingHelperService
                     $images[] = $node['preview']['image']['url'];
                 }
             }
+        }
+        if (empty($images) || count($images) <= 2) {
+            $listingItems = $mainProduct->getListingItems();
+            if (empty($listingItems)) {
+                return;
+            }
+            foreach ($listingItems as $listingItem) {
+                if (!$listingItem instanceof VariantProduct) {
+                    continue;
+                }
+                $images = array_merge($images, $this->getImages($listingItem));
+            }
+
         }
         return $images;
     }
@@ -246,9 +259,7 @@ class ListingHelperService
                 $imageUrl = $image->getFullPath();
                 $host = \Pimcore\Tool::getHostUrl();
                 $images[] = [
-                    'url' => $host . $imageUrl,
-                    'width' => $width,
-                    'height' => $height
+                    $host . $imageUrl,
                 ];
             }
         }
