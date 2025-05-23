@@ -38,10 +38,8 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/wisersell/stores.json';
-        $json = file_get_contents($filePath);
-        print_r($json);
-
+        $test = json_decode(Utility::getCustomCache('stores.json', PIMCORE_PROJECT_ROOT . '/tmp/wisersell'), true);
+        print_r($test);
 
 
         return Command::SUCCESS;
