@@ -38,8 +38,19 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $test = json_decode(Utility::getCustomCache('stores.json', PIMCORE_PROJECT_ROOT . '/tmp/wisersell'), true);
-        print_r($test);
+        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/wisersell/stores.json';
+        $json = Utility::getCustomCache('stores.json', $filePath);
+
+        if ($json === null || $json === false) {
+            echo "Dosya okunamadı veya boş! Dosya yolu: {$filePath}\n";
+        } else {
+            $test = json_decode($json, true);
+            if ($test === null) {
+                echo "JSON decode hatası: " . json_last_error_msg() . "\n";
+            } else {
+                print_r($test);
+            }
+        }
 
 
         return Command::SUCCESS;
