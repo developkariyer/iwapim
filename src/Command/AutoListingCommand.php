@@ -84,8 +84,8 @@ class AutoListingCommand extends AbstractCommand
                 }
             }
         }
-        if (!empty($productList)) {
-            $this->sendToCiceksepeti($productList);
+        if (!empty($updateProductList)) {
+            $this->sendToCiceksepeti($updateProductList);
         }
         if (!empty($listProductList)) {
             $this->createListingProcess($listProductList);
