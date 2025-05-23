@@ -96,7 +96,7 @@ class CiceksepetiListingHandler
         $fullData = json_decode($jsonString, true);
         if (!$fullData) {
             $this->logger->error("❌ [Invalid JSON] Invalid JSON data received: " . $jsonString);
-            throw new Exception("❌ [Invalid JSON] Invalid JSON data");
+            return;
         }
         $chunks = array_chunk($fullData, 2);
         $mergedResults = [];
@@ -131,7 +131,19 @@ class CiceksepetiListingHandler
             sleep(5);
         }
         $this->logger->info("Gemini chat result : " . json_encode($mergedResults, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-        print_r($mergedResults);
+        $data = $this->fillAttributeData($mergedResults);
+        if (empty($data)) {
+            $this->logger->error("❌ [No Data] No products found in the data array.");
+            return [];
+        }
+        print_r($data);
+        foreach ($data as $sku => $product) {
+            if (isset($product['Attributes']) && empty($product['Attributes'])) {
+                $this->logger->info("❌ [Attributes Empty] Attributes is empty for SKU: {$product['stockCode']}");
+            } else {
+                $this->logger->info("✔️ [Attributes Found] Attributes filled for SKU: {$product['stockCode']}");
+            }
+        }
 
     }
 
@@ -509,9 +521,9 @@ class CiceksepetiListingHandler
     private function buildProductAttributes(array $product, array $variantAttributes): array
     {
         $attributes = [];
-        if (!empty($variantAttributes['color']) && isset($product['renk']) && !empty(trim($product['renk']))) {
+        if (!empty($variantAttributes['color']) && isset($product['color']) && !empty(trim($product['color']))) {
             $colorAttrId = $variantAttributes['color']['id'];
-            $colorValue = trim($product['renk']);
+            $colorValue = trim($product['color']);
             $bestColorMatch = $this->findBestAttributeMatch($colorAttrId, $colorValue, false);
             if ($bestColorMatch) {
                 $attributes[] = [
@@ -524,9 +536,9 @@ class CiceksepetiListingHandler
                 $this->logger->error("❌ [Color Match] Not found for value: {$colorValue}");
             }
         }
-        if (!empty($variantAttributes['size']) && isset($product['ebat']) && !empty(trim($product['ebat']))) {
+        if (!empty($variantAttributes['size']) && isset($product['size']) && !empty(trim($product['size']))) {
             $sizeAttrId = $variantAttributes['size']['id'];
-            $sizeValue = trim($product['ebat']);
+            $sizeValue = trim($product['size']);
             $bestSizeMatch = $this->findBestAttributeMatch($sizeAttrId, $sizeValue, true);
 
             if ($bestSizeMatch) {
