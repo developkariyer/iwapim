@@ -265,11 +265,14 @@ class CiceksepetiListingHandler
                 Antrasit, Açık Mavi, Bakır, Vişne, Açık Pembe, Bronz, Ekru, Taş renklerinden kullan 2 renk varsa ikiside bunlara uyumlu olsun aralarında boşluk olsun.
                 Harita renk örnekleri:
                     Mixed => Karışık,
-                    Tuana => Antrasit,
+                    Tuana => Siyah-Antrasit,
                     Betül => Açık Meşe,
                     Dark Brown => Kahverengi,
-                    Light Brown => Ceviz
-                    
+                    Light Brown => Ceviz,
+                    Karışık Bordo => Bordo-Siyah,
+                    Karışık Gold => Mavi-Altın,
+                    Karışık Gri => Siyah-Gri-Beyaz,
+                                        
             
             -**ebat**: ebat bilgisi verideki size fieldı cm olarak al (örn: 250cm) yanında boyut belirten S-M-XL gibi durum varsa bunu alma.
             
