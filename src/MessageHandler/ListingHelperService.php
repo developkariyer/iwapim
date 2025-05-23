@@ -52,7 +52,7 @@ class ListingHelperService
         return $results;
     }
 
-    private function processVariant(Product $mainProduct, Product $variantProduct)
+    private function processVariant($mainProduct, $variantProduct)
     {
         $parentApiJsonShopify = json_decode($variantProduct->jsonRead('parentResponseJson'), true);
         $apiJsonShopify = json_decode($variantProduct->jsonRead('apiResponseJson'), true);
@@ -76,6 +76,25 @@ class ListingHelperService
             'attributes' => [],
             'images' => array_slice($images, 0, 5)
         ];
+    }
+
+    private function getShopifyImages($parentApiJsonShopify)
+    {
+        $images = [];
+        $widthThreshold = 2000;
+        $heightThreshold = 2000;
+        if (isset($parentApiJsonShopify['media']['nodes'])) {
+            foreach ($parentApiJsonShopify['media']['nodes'] as $node) {
+                if (
+                    isset($node['mediaContentType'], $node['preview']['image']['url'], $node['preview']['image']['width'], $node['preview']['image']['height']) &&
+                    $node['mediaContentType'] === 'IMAGE' &&
+                    ($node['preview']['image']['width'] < $widthThreshold || $node['preview']['image']['height'] < $heightThreshold)
+                ) {
+                    $images[] = $node['preview']['image']['url'];
+                }
+            }
+        }
+        return $images;
     }
 
 //    public function getPimListingsInfo(ProductListingMessage $message): false|string
