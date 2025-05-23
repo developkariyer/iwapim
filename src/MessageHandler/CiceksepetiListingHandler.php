@@ -50,22 +50,18 @@ class CiceksepetiListingHandler
 //        };
     }
 
-    private function printProductInfoLogger($jsonString): void
+    private function printProductInfoLogger(string $jsonString): void
     {
         $jsonData = json_decode($jsonString, true);
-        if (isset($jsonData) && is_array($jsonData)) {
-            foreach ($jsonData as $productId => $productData) {
-                $name = $productData['name'] ?? 'Unknown';
-                $this->logger->info("✅ [Product Info] Product ID: {$productId}, Product Name: {$name}");
-                if (isset($productData) && is_array($productData['skus'])) {
-                    foreach ($productData as $iwasku => $variantProduct) {
-                        $size = $variantProduct['size'] ?? 'Unknown';
-                        $color = $variantProduct['color'] ?? 'Unknown';
-                        $this->logger->info("✅ [Variant Info] IWASKU: {$iwasku}, Size: {$size}, Color: {$color}");
-                    }
-                } else {
-                    $this->logger->error("❌ [SKUs Error] SKUs data is missing or invalid.");
-                }
+        if (is_array($jsonData)) {
+            foreach ($jsonData as $product) {
+                $productName = $product['productName'] ?? 'Unknown';
+                $mainProductCode = $product['mainProductCode'] ?? 'Unknown';
+                $stockCode = $product['stockCode'] ?? 'Unknown';
+                $size = $product['size'] ?? 'Unknown';
+                $color = $product['color'] ?? 'Unknown';
+
+                $this->logger->info("✅ [Product Info] Product: {$productName}, MainProductCode: {$mainProductCode}, StockCode: {$stockCode}, Size: {$size}, Color: {$color}");
             }
         } else {
             $this->logger->error("❌ [PIM Data Error] PIM data is invalid or missing.");
