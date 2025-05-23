@@ -62,7 +62,7 @@ class StoreSyncService
         if (!$force && !empty($this->wisersellStores)) {
             return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/stores.json');
         }
-        $this->wisersellStores = json_decode(Utility::getCustomCache('stores.json', PIMCORE_PROJECT_ROOT . '/tmp/wisersell'), true);
+        $this->wisersellStores = json_decode(Utility::getCustomCache('stores.json', PIMCORE_PROJECT_ROOT . '/tmp/wisersell'), true) ?? [];
         if (!$force && !empty($this->wisersellStores)) {
             return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/stores.json');
         }
