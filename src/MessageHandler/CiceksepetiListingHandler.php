@@ -133,6 +133,7 @@ class CiceksepetiListingHandler
     {
         $data = $this->removeCommonAttributes($data);
         $formattedData = [];
+        $seenAttributes = [];
         foreach ($data as $sku => $product) {
             $salesPrice = $product['salesPrice'] ?? 0;
             $attributes = $product['Attributes'] ?? null;
@@ -150,9 +151,16 @@ class CiceksepetiListingHandler
             if (!$hasValidDescription) {
                 $this->logger->error("❌ [Validation Error] Description too short (<30 chars) for SKU: {$stockCode}");
             }
+
             if (!$hasValidPrice || !$hasAttributes || !$hasValidDescription) {
                 continue;
             }
+            $attributesKey = json_encode($attributes, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            if (isset($seenAttributes[$attributesKey])) {
+                $this->logger->info("🔁 [Duplicate Skipped] SKU: {$stockCode} - Attributes already processed.");
+                continue;
+            }
+            $seenAttributes[$attributesKey] = true;
             $description = str_replace("\n", "<br>", $description);
             $description = str_replace(['\/', '\"', '\\\\', '\\n', '\\r', '\\t'], ['/', '"', '\\', "\n", "\r", "\t"], $description);
             $description = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($matches) {
