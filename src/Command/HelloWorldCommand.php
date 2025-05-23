@@ -38,18 +38,8 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $shopifycfwtr = 84124;
-        $cfwTrSql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";;
-        $cfwTrVariantProductsIds = Utility::fetchFromSql($cfwTrSql, ['marketplace_id' => $shopifycfwtr]);
-        foreach ($cfwTrVariantProductsIds as $cfwTrVariantProductsId) {
-            $variantProduct = VariantProduct::getById($cfwTrVariantProductsId['oo_id']);
-            $mainProduct = $variantProduct->getMainProduct()[0];
-            if ($mainProduct instanceof Product) {
-                 $iwasku = $mainProduct->getIwasku();
-
-
-            }
-        }
+        $product = Product::getById(267201);
+        echo $product->getById() . "\n";
 
 
 
