@@ -258,9 +258,7 @@ class ListingHelperService
             if ($width >= 500 && $width <= 2000 && $height >= 500 && $height <= 2000) {
                 $imageUrl = $image->getFullPath();
                 $host = \Pimcore\Tool::getHostUrl();
-                $images[] = [
-                    $host . $imageUrl,
-                ];
+                $images[] = $host . $imageUrl;
             }
         }
         return $images;
