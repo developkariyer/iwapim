@@ -39,8 +39,8 @@ class ListingHelperService
                 if (!$listingItem instanceof VariantProduct) {
                     continue;
                 }
-                $marketplaceKey = $listingItem->getMarketplace()->getKey();
-                if ($marketplaceKey !== 'ShopifyCfwTr') {
+                $marketplaceKey = $listingItem->getMarketplace()->getId();
+                if ($marketplaceKey !== 84124) {
                     continue;
                 }
                 $processed = $this->processVariant($mainProduct, $listingItem);
