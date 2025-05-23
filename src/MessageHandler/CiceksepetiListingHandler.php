@@ -136,7 +136,6 @@ class CiceksepetiListingHandler
             $this->logger->error("❌ [No Data] No products found in the data array.");
             return [];
         }
-        print_r($data);
         foreach ($data as $sku => $product) {
             if (isset($product['Attributes']) && empty($product['Attributes'])) {
                 $this->logger->info("❌ [Attributes Empty] Attributes is empty for SKU: {$product['stockCode']}");
@@ -144,6 +143,9 @@ class CiceksepetiListingHandler
                 $this->logger->info("✔️ [Attributes Found] Attributes filled for SKU: {$product['stockCode']}");
             }
         }
+        $this->logger->info("✅ [Filled Attributes Data] All attributes data processed: " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
+        print_r($formattedData);
 
     }
 
@@ -246,12 +248,12 @@ class CiceksepetiListingHandler
                 'description' => mb_strlen($description) > 20000
                     ? mb_substr($description, 0, 20000)
                     : $description,
-                'deliveryMessageType' => 5,
-                'deliveryType' => 2,
-                'stockQuantity' => 3,
-                'salesPrice' => $salesPrice * 1.5,
-                'images' => $httpsImages,
-                'Attributes' => $attributes,
+                'deliveryMessageType' => $product['deliveryMessageType'],
+                'deliveryType' => $product['deliveryType'],
+                'stockQuantity' => $product['stockQuantity'],
+                'salesPrice' => $product['salesPrice'],
+                'images' => $product['images'],
+                'Attributes' => $product['Attributes'],
             ];
             $formattedData['products'][] = $formattedProduct;
             $this->logger->info("✅ [Formatted] Product ready for listing ➜ SKU: {$stockCode}");
