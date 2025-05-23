@@ -40,7 +40,7 @@ class ListingSyncService
         if (!$force && !empty($this->wisersellListings)) {
             return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/listings.json');
         }
-        $this->wisersellListings = json_decode(Utility::getCustomCache('listings.json', PIMCORE_PROJECT_ROOT . '/tmp/wisersell'), true);
+        $this->wisersellListings = json_decode(Utility::getCustomCache('listings.json', PIMCORE_PROJECT_ROOT . '/tmp/wisersell'), true) ?? [];
         if (!$force && !empty($this->wisersellListings)) {
             return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/listings.json');
         }

@@ -49,7 +49,7 @@ class CategorySyncService
         if (!$force && !empty($this->wisersellCategories)) {
             return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/categories.json');
         }
-        $this->wisersellCategories = json_decode(Utility::getCustomCache('categories.json', PIMCORE_PROJECT_ROOT . '/tmp/wisersell'), true);
+        $this->wisersellCategories = json_decode(Utility::getCustomCache('categories.json', PIMCORE_PROJECT_ROOT . '/tmp/wisersell'), true) ?? [];
         if (!$force && !empty($this->wisersellCategories)) {
             return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/categories.json');
         }

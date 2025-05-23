@@ -32,7 +32,7 @@ class ProductSyncService
         if (!$force && !empty($this->wisersellProducts)) {
             return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/products.json');
         }
-        $this->wisersellProducts = json_decode(Utility::getCustomCache('products.json', PIMCORE_PROJECT_ROOT . '/tmp/wisersell'), true);
+        $this->wisersellProducts = json_decode(Utility::getCustomCache('products.json', PIMCORE_PROJECT_ROOT . '/tmp/wisersell'), true) ?? [];
         if (!$force && !empty($this->wisersellProducts)) {
             return time()-filemtime(PIMCORE_PROJECT_ROOT . '/tmp/wisersell/products.json');
         }
