@@ -108,22 +108,22 @@ class AutoListingCommand extends AbstractCommand
                 if (!is_array($ciceksepetiProductsId) || empty($ciceksepetiProductsId)) {
                     $toBeListedProducts[] = $mainProduct;
                 }
-//                else {
-//                    $ciceksepetiProductId = $ciceksepetiProductsId[0];
-//                    $ciceksepetiProduct = VariantProduct::getById($ciceksepetiProductId['oo_id']);
-//                    if (!$ciceksepetiProduct instanceof VariantProduct) {
-//                        continue;
-//                    }
-//                    echo "Ciceksepeti product found for: $iwasku \n";
-//                    $preparedProduct = $this->prepareCiceksepetiProduct($ciceksepetiProduct, $shopifyProduct, $iwasku);
-//                    if ($preparedProduct) {
-//                        $productList[] = $preparedProduct;
-//                    }
-//                    if (count($productList) >= 200) {
-//                        $this->sendToCiceksepeti($productList);
-//                        $productList = [];
-//                    }
-//                }
+                else {
+                    $ciceksepetiProductId = $ciceksepetiProductsId[0];
+                    $ciceksepetiProduct = VariantProduct::getById($ciceksepetiProductId['oo_id']);
+                    if (!$ciceksepetiProduct instanceof VariantProduct) {
+                        continue;
+                    }
+                    echo "Ciceksepeti product found for: $iwasku \n";
+                    $preparedProduct = $this->prepareCiceksepetiProduct($ciceksepetiProduct, $shopifyProduct, $iwasku);
+                    if ($preparedProduct) {
+                        $productList[] = $preparedProduct;
+                    }
+                    if (count($productList) >= 200) {
+                        $this->sendToCiceksepeti($productList);
+                        $productList = [];
+                    }
+                }
             }
         }
         if (!empty($productList)) {
@@ -164,32 +164,6 @@ class AutoListingCommand extends AbstractCommand
             $stamps = [new TransportNamesStamp(['ciceksepeti'])];
             $this->bus->dispatch($message, $stamps);
         }
-    }
-
-    private function preListingCiceksepeti($mainProduct, $shopifyProduct)
-    {
-        $parentApiJsonShopify = json_decode($shopifyProduct->jsonRead('parentResponseJson'), true);
-        $apiJsonShopify = json_decode($shopifyProduct->jsonRead('apiResponseJson'), true);
-        $shopifyIsActive = $parentApiJsonShopify['status'] === 'ACTIVE';
-        $images = $this->getShopifyImages($parentApiJsonShopify);
-        if (empty($images) || !$shopifyIsActive) {
-            return [];
-        }
-        return [
-            'productName' => mb_substr($shopifyProduct->getTitle(), 0, 255),
-            'mainProductCode' => $mainProduct->getProductIdentifier(),
-            'stockCode' => $mainProduct->getIwasku(),
-            'categoryId' => null,
-            'description' => mb_substr($parentApiJsonShopify['descriptionHtml'], 0, 20000),
-            'deliveryMessageType' => 5,
-            'size' => $mainProduct->getVariationSize(),
-            'color' => $mainProduct->getVariationColor(),
-            'deliveryType' => 2,
-            'stockQuantity' => $apiJsonShopify['inventoryQuantity'],
-            'salesPrice' => $apiJsonShopify['price'] * 1.5,
-            'attributes' => [],
-            'images' => array_slice($images, 0, 5)
-        ];
     }
 
     private function getShopifyImages($parentApiJsonShopify)
