@@ -106,40 +106,40 @@ class AutoListingCommand extends AbstractCommand
                 $iwasku = $mainProduct->getIwasku();
                 $ciceksepetiProductsId = Utility::fetchFromSql($ciceksepetiSql, ['seller_sku' => $iwasku, 'marketplace_id' => $ciceksepetiMarketplaceId]);
                 if (!is_array($ciceksepetiProductsId) || empty($ciceksepetiProductsId)) {
-                    $newProduct = $this->preListingCiceksepeti($mainProduct, $shopifyProduct);
-                    if (!empty($newProduct)) {
-                        $toBeListedProducts[] = $newProduct;
-                    }
+                    $toBeListedProducts[] = $mainProduct;
                 }
-                else {
-                    $ciceksepetiProductId = $ciceksepetiProductsId[0];
-                    $ciceksepetiProduct = VariantProduct::getById($ciceksepetiProductId['oo_id']);
-                    if (!$ciceksepetiProduct instanceof VariantProduct) {
-                        continue;
-                    }
-                    echo "Ciceksepeti product found for: $iwasku \n";
-                    $preparedProduct = $this->prepareCiceksepetiProduct($ciceksepetiProduct, $shopifyProduct, $iwasku);
-                    if ($preparedProduct) {
-                        $productList[] = $preparedProduct;
-                    }
-                    if (count($productList) >= 200) {
-                        $this->sendToCiceksepeti($productList);
-                        $productList = [];
-                    }
-                }
+//                else {
+//                    $ciceksepetiProductId = $ciceksepetiProductsId[0];
+//                    $ciceksepetiProduct = VariantProduct::getById($ciceksepetiProductId['oo_id']);
+//                    if (!$ciceksepetiProduct instanceof VariantProduct) {
+//                        continue;
+//                    }
+//                    echo "Ciceksepeti product found for: $iwasku \n";
+//                    $preparedProduct = $this->prepareCiceksepetiProduct($ciceksepetiProduct, $shopifyProduct, $iwasku);
+//                    if ($preparedProduct) {
+//                        $productList[] = $preparedProduct;
+//                    }
+//                    if (count($productList) >= 200) {
+//                        $this->sendToCiceksepeti($productList);
+//                        $productList = [];
+//                    }
+//                }
             }
         }
         if (!empty($productList)) {
             $this->sendToCiceksepeti($productList);
         }
         if (!empty($toBeListedProducts)) {
-            $this->createListingProcess();
+            $this->createListingProcess($toBeListedProducts);
 
         }
     }
 
-    private function createListingProcess()
+    private function createListingProcess($toBeListedProducts)
     {
+        foreach ($toBeListedProducts as $mainProduct) {
+            echo $mainProduct->getId() . "\n";
+        }
         // ciceksepeti messengere gönderilecek
         // alınan ürün bilgileri filtrelenerek product id variant id ye indirilecek
         // filtrelenen ürünler tek tek mesaj olarak gönderilecek
