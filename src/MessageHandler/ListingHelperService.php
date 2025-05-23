@@ -58,7 +58,7 @@ class ListingHelperService
         $apiJsonShopify = json_decode($variantProduct->jsonRead('apiResponseJson'), true);
         $shopifyIsActive = isset($parentApiJsonShopify['status']) && $parentApiJsonShopify['status'] === 'ACTIVE';
         $images = $this->getShopifyImages($mainProduct, $parentApiJsonShopify);
-        if (empty($images) || !$shopifyIsActive) {
+        if (empty($images) || !$shopifyIsActive || count($images) < 2) {
             return [];
         }
         return [
