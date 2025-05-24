@@ -214,6 +214,12 @@ class AutoListingCommand extends AbstractCommand
         if (empty($images)) {
             $images = $apiJsonCiceksepeti['images'] ?? [];
         }
+        foreach ($images as &$image) {
+            if (is_string($image) && strpos($image, 'http://') === 0) {
+                $image = preg_replace('/^http:\/\//', 'https://', $image);
+            }
+        }
+        unset($image);
         $cleanAttributes = [];
         if (isset($apiJsonCiceksepeti['attributes']) && is_array($apiJsonCiceksepeti['attributes'])) {
             foreach ($apiJsonCiceksepeti['attributes'] as $attr) {
