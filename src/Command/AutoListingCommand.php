@@ -88,9 +88,9 @@ class AutoListingCommand extends AbstractCommand
         if (!empty($updateProductList)) {
             $this->updateCiceksepetiProduct($updateProductList);
         }
-        // if (!empty($listProductList)) {
-        //     $this->createListingProcess($listProductList);
-        // }
+        if (!empty($listProductList)) {
+            $this->createListingProcess($listProductList);
+        }
         echo "Ciceksepeti sync completed.\n";
         return Command::SUCCESS;
     }
