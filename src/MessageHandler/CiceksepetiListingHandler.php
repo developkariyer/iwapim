@@ -272,8 +272,13 @@ class CiceksepetiListingHandler
                     Karışık Bordo => Bordo-Siyah,
                     Karışık Gold => Mavi-Altın,
                     Karışık Gri => Siyah-Gri-Beyaz,
-                                        
-            
+                    Crimson => Kırmızı,
+                    Navy => Mavi,
+                    Sage => Yeşil,
+                    Nimbus => Gri,
+                    Terracotta => Turuncu,
+                    Soil => Kahverengi,
+
             -**ebat**: ebat bilgisi verideki size fieldı cm olarak al (örn: 250cm) yanında boyut belirten S-M-XL gibi durum varsa bunu alma.
             
             **Veri formatı**: Lütfen yalnızca aşağıdaki **JSON verisini** kullanın ve dışarıya çıkmayın. Çıkışınızı bu veriye dayalı olarak oluşturun:

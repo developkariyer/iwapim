@@ -297,9 +297,9 @@ class AutoListingCommand extends AbstractCommand
             'products' => $productList,
         ];
         $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        echo "Sent " . count($productList) . " products to Ciceksepeti.\n";
         $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
         $ciceksepetiConnector->updateProduct($json);
-        echo "Sent " . count($productList) . " products to Ciceksepeti.\n";
     }
 
 }
