@@ -76,7 +76,7 @@ class AutoListingCommand extends AbstractCommand
                 continue;
             }
             echo "Ciceksepeti product found for iwasku: $iwasku, preparing for update.\n";
-            $preparedProduct = $this->prepareUpdateCiceksepetiProduct($ciceksepetiProduct, $shopifyProduct, $iwasku);
+            $preparedProduct = $this->prepareUpdateCiceksepetiProduct($mainProduct, $ciceksepetiProduct, $shopifyProduct, $iwasku);
             if ($preparedProduct) {
                 $updateProductList[] = $preparedProduct;
             }
@@ -200,26 +200,7 @@ class AutoListingCommand extends AbstractCommand
         }
     }
 
-    private function getShopifyImages($parentApiJsonShopify)
-    {
-        $images = [];
-        $widthThreshold = 2000;
-        $heightThreshold = 2000;
-        if (isset($parentApiJsonShopify['media']['nodes'])) {
-            foreach ($parentApiJsonShopify['media']['nodes'] as $node) {
-                if (
-                    isset($node['mediaContentType'], $node['preview']['image']['url'], $node['preview']['image']['width'], $node['preview']['image']['height']) &&
-                    $node['mediaContentType'] === 'IMAGE' &&
-                    ($node['preview']['image']['width'] < $widthThreshold || $node['preview']['image']['height'] < $heightThreshold)
-                ) {
-                    $images[] = $node['preview']['image']['url'];
-                }
-            }
-        }
-        return $images;
-    }
-
-    private function prepareUpdateCiceksepetiProduct(VariantProduct $ciceksepetiProduct, VariantProduct $shopifyProduct, $iwasku)
+    private function prepareUpdateCiceksepetiProduct(Product $mainProduct, VariantProduct $ciceksepetiProduct, VariantProduct $shopifyProduct, $iwasku)
     {
         $parentApiJsonShopify = json_decode($shopifyProduct->jsonRead('parentResponseJson'), true);
         $apiJsonShopify = json_decode($shopifyProduct->jsonRead('apiResponseJson'), true);
@@ -229,7 +210,7 @@ class AutoListingCommand extends AbstractCommand
             echo "Ciceksepeti product is not active: $iwasku \n";
             return null;
         }
-        $images = $this->getShopifyImages($parentApiJsonShopify);
+        $images = $this->getShopifyImages($mainProduct, $parentApiJsonShopify);
         if (empty($images)) {
             $images = $apiJsonCiceksepeti['images'] ?? [];
         }
@@ -259,6 +240,55 @@ class AutoListingCommand extends AbstractCommand
             'isActive' => $parentApiJsonShopify['status'] === 'ACTIVE' ? 1 : 0,
             'images' => array_slice($images, 0, 5)
         ];
+    }
+
+    private function getShopifyImages($mainProduct, $parentApiJsonShopify)
+    {
+        $images = [];
+        $widthThreshold = 2000;
+        $heightThreshold = 2000;
+        if (isset($parentApiJsonShopify['media']['nodes'])) {
+            foreach ($parentApiJsonShopify['media']['nodes'] as $node) {
+                if (
+                    isset($node['mediaContentType'], $node['preview']['image']['url'], $node['preview']['image']['width'], $node['preview']['image']['height']) &&
+                    $node['mediaContentType'] === 'IMAGE' &&
+                    ($node['preview']['image']['width'] < $widthThreshold || $node['preview']['image']['height'] < $heightThreshold)
+                ) {
+                    $images[] = $node['preview']['image']['url'];
+                }
+            }
+        }
+        if (empty($images) || count($images) <= 2) {
+            $listingItems = $mainProduct->getListingItems();
+            if (empty($listingItems)) {
+                return;
+            }
+            foreach ($listingItems as $listingItem) {
+                if (!$listingItem instanceof VariantProduct) {
+                    continue;
+                }
+                $images = array_merge($images, $this->getImages($listingItem));
+            }
+
+        }
+        return $images;
+    }
+
+    private function getImages($listingItem): array
+    {
+        $images = [];
+        $imageGallery = $listingItem->getImageGallery();
+        foreach ($imageGallery as $hotspotImage) {
+            $image = $hotspotImage->getImage();
+            $width = $image->getWidth();
+            $height = $image->getHeight();
+            if ($width >= 500 && $width <= 2000 && $height >= 500 && $height <= 2000) {
+                $imageUrl = $image->getFullPath();
+                $host = \Pimcore\Tool::getHostUrl();
+                $images[] = $host . $imageUrl;
+            }
+        }
+        return $images;
     }
 
     private function updateCiceksepetiProduct($productList)
