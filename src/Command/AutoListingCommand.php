@@ -49,7 +49,6 @@ class AutoListingCommand extends AbstractCommand
     private function syncShopifyCiceksepeti()
     {
         echo "Starting Ciceksepeti sync for Shopify products...\n";
-        $ciceksepetiSql = "SELECT oo_id FROM object_query_varyantproduct WHERE sellerSku = :seller_sku AND marketplace__id = :marketplace_id";
         $cfwTrVariantProductsIds = $this->getShopifyCfwTrVariantProductsIds();
         $updateProductList = [];
         $listProductList = [];
@@ -65,32 +64,35 @@ class AutoListingCommand extends AbstractCommand
                 continue;
             }
             $mainProduct = $mainProducts[0];
-
-            // if ($mainProduct instanceof Product) {
-            //     $iwasku = $mainProduct->getIwasku();
-            //     $ciceksepetiProductsId = Utility::fetchFromSql($ciceksepetiSql, ['seller_sku' => $iwasku, 'marketplace_id' => $this->marketplaceConfig['ciceksepeti']]);;
-            //     if (!is_array($ciceksepetiProductsId) || empty($ciceksepetiProductsId)) {
-            //         $listProductList[] = $mainProduct;
-            //     }
-            //     else {
-            //         $ciceksepetiProductId = $ciceksepetiProductsId[0];
-            //         $ciceksepetiProduct = VariantProduct::getById($ciceksepetiProductId['oo_id']);
-            //         if (!$ciceksepetiProduct instanceof VariantProduct) {
-            //             continue;
-            //         }
-            //         echo "Ciceksepeti product found for: $iwasku \n";
-            //         $preparedProduct = $this->prepareCiceksepetiProduct($ciceksepetiProduct, $shopifyProduct, $iwasku);
-            //         if ($preparedProduct) {
-            //             $updateProductList[] = $preparedProduct;
-            //         }
-            //         if (count($updateProductList) >= 200) {
-            //             $this->sendToCiceksepeti($updateProductList);
-            //             $updateProductList = [];
-            //         }
-            //     }
-            // }
+            $iwasku = $mainProduct->getIwasku();
+            if (!$iwasku) {
+                echo "No iwasku found for main product ID: " . $mainProduct->getId() . "\n";
+                continue;
+            }
+            $ciceksepetiProduct = $this->getCiceksepetiProduct($iwasku);
+            if (!$ciceksepetiProduct) {
+                echo "No Ciceksepeti product found for iwasku: $iwasku, adding to list for creation.\n";
+                $listProductList[] = $mainProduct;
+                continue;
+            }
+            echo "Ciceksepeti product found for iwasku: $iwasku, preparing for update.\n";
+            $preparedProduct = $this->prepareUpdateCiceksepetiProduct($ciceksepetiProduct, $shopifyProduct, $iwasku);
+            if ($preparedProduct) {
+                $updateProductList[] = $preparedProduct;
+            }
+            if (count($updateProductList) >= 200) {
+                $this->updateCiceksepetiProduct($updateProductList);
+                $updateProductList = [];
+            }
         }
-
+        if (!empty($updateProductList)) {
+            $this->updateCiceksepetiProduct($updateProductList);
+        }
+        // if (!empty($listProductList)) {
+        //     $this->createListingProcess($listProductList);
+        // }
+        echo "Ciceksepeti sync completed.\n";
+        return Command::SUCCESS;
     }
 
     private function getShopifyCfwTrVariantProductsIds()
@@ -105,6 +107,21 @@ class AutoListingCommand extends AbstractCommand
         return $cfwTrVariantProductsIds;
     }
 
+    private function getCiceksepetiProduct($iwasku)
+    {
+        $ciceksepetiSql = "SELECT oo_id FROM object_query_varyantproduct WHERE sellerSku = :seller_sku AND marketplace__id = :marketplace_id";
+        $ciceksepetiProductsId = Utility::fetchFromSql($ciceksepetiSql, ['seller_sku' => $iwasku, 'marketplace_id' => $this->marketplaceConfig['ciceksepeti']]);
+        if (!is_array($ciceksepetiProductsId) || empty($ciceksepetiProductsId) || !isset($ciceksepetiProductsId[0]['oo_id'])) {
+            return null;
+        }
+        $ciceksepetiProductId = $ciceksepetiProductsId[0]['oo_id'];
+        $ciceksepetiProduct = VariantProduct::getById($ciceksepetiProductId);
+        if (!$ciceksepetiProduct instanceof VariantProduct) {
+            echo "Invalid Ciceksepeti product ID: $ciceksepetiProductId, skipping...\n";
+            return null;
+        }
+        return $ciceksepetiProduct;
+    }
 
     // private function syncShopifyCiceksepeti()
     // {
@@ -202,7 +219,7 @@ class AutoListingCommand extends AbstractCommand
         return $images;
     }
 
-    private function prepareCiceksepetiProduct(VariantProduct $ciceksepetiProduct, VariantProduct $shopifyProduct, $iwasku)
+    private function prepareUpdateCiceksepetiProduct(VariantProduct $ciceksepetiProduct, VariantProduct $shopifyProduct, $iwasku)
     {
         $parentApiJsonShopify = json_decode($shopifyProduct->jsonRead('parentResponseJson'), true);
         $apiJsonShopify = json_decode($shopifyProduct->jsonRead('apiResponseJson'), true);
@@ -244,7 +261,7 @@ class AutoListingCommand extends AbstractCommand
         ];
     }
 
-    private function sendToCiceksepeti($productList)
+    private function updateCiceksepetiProduct($productList)
     {
         $data = [
             'products' => $productList,
