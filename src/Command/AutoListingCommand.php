@@ -50,7 +50,7 @@ class AutoListingCommand extends AbstractCommand
     {
         
         $ciceksepetiSql = "SELECT oo_id FROM object_query_varyantproduct WHERE sellerSku = :seller_sku AND marketplace__id = :marketplace_id";
-        $cfwTrVariantProductsIds = getShopifyCfwTrVariantProductsIds();
+        $cfwTrVariantProductsIds = $this->getShopifyCfwTrVariantProductsIds();
         // $updateProductList = [];
         // $listProductList = [];
         // foreach ($cfwTrVariantProductsIds as $cfwTrVariantProductsId) {
