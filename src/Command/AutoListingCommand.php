@@ -56,7 +56,7 @@ class AutoListingCommand extends AbstractCommand
         foreach ($cfwTrVariantProductsIds as $cfwTrVariantProductsId) {
             $shopifyProduct = VariantProduct::getById($cfwTrVariantProductsId['oo_id']);
             if (!$shopifyProduct instanceof VariantProduct) {
-                echo "Invalid Shopify product ID: " . $cfwTrVariantProductsId['oo_id'] . "\n";
+                echo "Invalid Shopify product ID: " . $cfwTrVariantProductsId['oo_id'] . ", skipping...";
                 continue;
             }
             $mainProducts = $shopifyProduct->getMainProduct();
@@ -65,6 +65,7 @@ class AutoListingCommand extends AbstractCommand
                 continue;
             }
             $mainProduct = $mainProducts[0];
+
             // if ($mainProduct instanceof Product) {
             //     $iwasku = $mainProduct->getIwasku();
             //     $ciceksepetiProductsId = Utility::fetchFromSql($ciceksepetiSql, ['seller_sku' => $iwasku, 'marketplace_id' => $this->marketplaceConfig['ciceksepeti']]);;
