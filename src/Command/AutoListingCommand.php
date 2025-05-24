@@ -141,6 +141,7 @@ class AutoListingCommand extends AbstractCommand
         }
         return $images;
     }
+    
 
     private function prepareCiceksepetiProduct(VariantProduct $ciceksepetiProduct, VariantProduct $shopifyProduct, $iwasku)
     {
