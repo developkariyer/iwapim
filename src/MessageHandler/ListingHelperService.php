@@ -21,7 +21,7 @@ class ListingHelperService
         if (!$product instanceof Product) {
             return false;
         }
-        $variantIds = $message->getVariantIds();
+        $variantIds = array_unique($message->getVariantIds());
         if (empty($variantIds)) {
             return false;
         }
