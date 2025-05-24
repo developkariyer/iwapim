@@ -227,7 +227,7 @@ class AutoListingCommand extends AbstractCommand
             }
         }
         return [
-            'productName' => mb_substr($shopifyProduct->getTitle(), 0, 255),
+            'productName' => mb_substr($parentApiJsonShopify['title'], 0, 255),
             'mainProductCode' => $apiJsonCiceksepeti['mainProductCode'],
             'stockCode' => $iwasku,
             'categoryId' => $apiJsonCiceksepeti['categoryId'],
