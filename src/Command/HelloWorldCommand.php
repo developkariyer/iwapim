@@ -94,7 +94,6 @@ class HelloWorldCommand extends AbstractCommand
      */
     private function findBestAttributeMatch($attributeId, $searchValue, $isSize): ?array
     {
-
         $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
         WHERE attribute_id = :attribute_id";
         $allValues = Utility::fetchFromSql($sql, ['attribute_id' => $attributeId]);
@@ -109,6 +108,7 @@ class HelloWorldCommand extends AbstractCommand
             }
             $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
             $searchDims = $isSize ? $this->parseDimensions($searchValueNormalized) : null;
+            print_r($searchDims);
             if ($isSize && $searchDims) {
                 $dbValueNormalized = $this->normalizeAttributeValue($value['name']);
                 $dbDims = $this->parseDimensions($dbValueNormalized);
