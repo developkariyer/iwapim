@@ -99,7 +99,6 @@ class HelloWorldCommand extends AbstractCommand
             WHERE attribute_id = :attribute_id";
         $allValues = Utility::fetchFromSql($sql, ['attribute_id' => $attributeId]);
         if (empty($allValues)) {
-            $this->logger->warning("⚠️ [AttributeMatch] No attribute values found in DB for attributeId: {$attributeId}");
             return null;
         }
         $bestMatch = null;
@@ -107,13 +106,12 @@ class HelloWorldCommand extends AbstractCommand
         foreach ($allValues as $value) {
             $dbValueNormalized = $this->normalizeAttributeValue($value['name']);
             if ($searchValueNormalized === $dbValueNormalized) {
-                $this->logger->info("✅ [AttributeMatch] Exact match: '{$searchValue}' ➜ '{$value['name']}' (ID: {$value['attribute_value_id']})");
                 return $value;
             }
             if ($isSize && $searchDims) {
                 $dbDims = $this->parseDimensions($dbValueNormalized);
                 if ($dbDims === null) {
-                    $dbDimsCount = 0; 
+                    $dbDimsCount = 0;
                 } else {
                     $dbDimsCount = isset($dbDims['height']) && $dbDims['height'] === 0 ? 1 : count($dbDims);
                 }
@@ -129,11 +127,6 @@ class HelloWorldCommand extends AbstractCommand
                     }
                 }
             }
-        }
-        if ($bestMatch) {
-            $this->logger->info("🔍 [AttributeMatch] Approximate match: '{$searchValue}' ➜ '{$bestMatch['name']}' (ID: {$bestMatch['attribute_value_id']})");
-        } else {
-            $this->logger->notice("❌ [AttributeMatch] No match found for: '{$searchValueNormalized}' (attributeId: {$attributeId})");
         }
         return $bestMatch;
     }
