@@ -97,51 +97,59 @@ class HelloWorldCommand extends AbstractCommand
         $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
             WHERE attribute_id = :attribute_id";
         $allValues = Utility::fetchFromSql($sql, ['attribute_id' => $attributeId]);
-
         if (empty($allValues)) {
             return null;
         }
 
-        $normalizedSearch = strtolower(trim($searchValue));
-        $normalizedSearch = str_replace(',', '.', $normalizedSearch);
+        $searchValueNormalized = strtolower(trim($searchValue));
+        $searchValueNormalized = str_replace(',', '.', $searchValueNormalized);
 
         // 1. Doğrudan eşleşme
         foreach ($allValues as $value) {
-            if (strtolower(trim($value['name'])) === $normalizedSearch) {
+            if (strtolower(trim($value['name'])) === $searchValueNormalized) {
                 return $value;
             }
         }
 
-        // 2. S, M, L, XL, XXL gibi beden kontrolü
-        if (preg_match('/\\b(s|m|l|xl|xxl)\\b/i', $normalizedSearch, $match)) {
-            foreach ($allValues as $value) {
-                if (stripos($value['name'], strtoupper($match[1])) !== false) {
-                    return $value;
+        // 2. Beden etiketi varsa
+        $sizeLabels = ['xs', 's', 'm', 'l', 'xl', 'xxl', 'xxxl', '2xl', '3xl'];
+        foreach ($sizeLabels as $label) {
+            if (stripos($searchValueNormalized, $label) !== false) {
+                foreach ($allValues as $value) {
+                    if (stripos($value['name'], $label) !== false) {
+                        return $value;
+                    }
                 }
             }
         }
 
-        // 3. Boyut kontrolü
-        if ($isSize) {
-            $dims = $this->parseDimensions($normalizedSearch);
+        // 3. Boyut varsa - 80x90, 100cm gibi
+        $dims = $this->parseDimensions($searchValueNormalized);
+        if ($isSize && $dims) {
+            $width = $dims['width'];
+            $height = $dims['height'];
 
-            if ($dims) {
-                $w = $dims['width'];
-                $h = $dims['height'];
-
-                while ($w > 0 || $h > 0) {
-                    $candidate = ($h > 0) ? "{$w}x{$h}" : "{$w}";
+            // Yalnızca width varsa
+            if ($height === 0) {
+                for ($w = $width; $w >= max(0, $width - 25); $w--) {
                     foreach ($allValues as $value) {
-                        $normalizedDb = strtolower(str_replace([' ', 'cm'], '', $value['name']));
-                        if (strpos($normalizedDb, $candidate) !== false) {
+                        if (strpos($value['name'], (string)$w) !== false) {
                             return $value;
                         }
                     }
-
-                    // Önce genişliği azalt, sonra yüksekliği
-                    if ($w > 0) $w--;
-                    elseif ($h > 0) $h--;
-                    else break;
+                }
+            } else {
+                for ($w = $width; $w >= max(0, $width - 25); $w--) {
+                    for ($h = $height; $h >= max(0, $height - 25); $h--) {
+                        $searchStr1 = "{$w}x{$h}";
+                        $searchStr2 = "{$w} x {$h}";
+                        foreach ($allValues as $value) {
+                            $name = strtolower($value['name']);
+                            if (strpos($name, $searchStr1) !== false || strpos($name, $searchStr2) !== false) {
+                                return $value;
+                            }
+                        }
+                    }
                 }
             }
         }
