@@ -55,10 +55,9 @@ class HelloWorldCommand extends AbstractCommand
                 continue;
             }
             $mainProduct = $mainProducts[0];
-            //$result =
-            $this->findBestAttributeMatch(2000361, $mainProduct->getVariationSize(), true);
+            $result = $this->findBestAttributeMatch(2000361, $mainProduct->getVariationSize(), true);
             echo $mainProduct->getIwasku() . " - " . $mainProduct->getVariationSize() . " -----> ";
-           // print_r($result);
+            print_r($result);
             echo "\n";
 
         }
@@ -109,25 +108,22 @@ class HelloWorldCommand extends AbstractCommand
             }
             $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
             $searchDims = $isSize ? $this->parseDimensions($searchValueNormalized) : null;
-            echo $searchValueNormalized . " ";
-            print_r($searchDims);
-            echo "\n";
-//            if ($isSize && $searchDims) {
-//                $dbValueNormalized = $this->normalizeAttributeValue($value['name']);
-//                $dbDims = $this->parseDimensions($dbValueNormalized);
-//                if ($dbDims) {
-//                    $widthDiff = $searchDims['width'] - $dbDims['width'];
-//                    $heightDiff = $searchDims['height'] - $dbDims['height'];
-//                    $totalDiff = $widthDiff + $heightDiff;
-//                    $widthOk = $widthDiff >= 0 && $widthDiff <= 25;
-//                    $heightOk = $searchDims['height'] === 0 || ($heightDiff >= 0 && $heightDiff <= 25);
-//
-//                    if ($widthOk && $heightOk && $totalDiff < $smallestDiff) {
-//                        $smallestDiff = $totalDiff;
-//                        $bestMatch = $value;
-//                    }
-//                }
-//            }
+            if ($isSize && $searchDims) {
+                $dbValueNormalized = $this->normalizeAttributeValue($value['name']);
+                $dbDims = $this->parseDimensions($dbValueNormalized);
+                if ($dbDims) {
+                    $widthDiff = $searchDims['width'] - $dbDims['width'];
+                    $heightDiff = $searchDims['height'] - $dbDims['height'];
+                    $totalDiff = $widthDiff + $heightDiff;
+                    $widthOk = $widthDiff >= 0 && $widthDiff <= 25;
+                    $heightOk = $searchDims['height'] === 0 || ($heightDiff >= 0 && $heightDiff <= 25);
+
+                    if ($widthOk && $heightOk && $totalDiff < $smallestDiff) {
+                        $smallestDiff = $totalDiff;
+                        $bestMatch = $value;
+                    }
+                }
+            }
         }
         return $bestMatch;
     }
