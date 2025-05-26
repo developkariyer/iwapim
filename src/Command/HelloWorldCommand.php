@@ -107,9 +107,9 @@ class HelloWorldCommand extends AbstractCommand
             if ($searchValue === $value['name']) {
                 return $value;
             }
+            $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
             $searchDims = $isSize ? $this->parseDimensions($searchValueNormalized) : null;
             if ($isSize && $searchDims) {
-                $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
                 $dbValueNormalized = $this->normalizeAttributeValue($value['name']);
                 $dbDims = $this->parseDimensions($dbValueNormalized);
                 if ($dbDims) {
