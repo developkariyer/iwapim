@@ -239,7 +239,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         //d15702ea-5c2b-4e94-9dd2-edd80e99f858
         //87b74947-8d88-456f-9b24-48a6e6be0e31
 
-        print_r($this->getBatchRequestResult("dcda36eb-d21d-4e1d-b0a0-99374c80a28c"));
+        print_r($this->getBatchRequestResult("919a2caa-170f-41d4-a066-1d39c68ba862"));
 //        $ids = [
 //        ];
 //        foreach ($ids as $id) {
@@ -515,7 +515,6 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     public function updateProduct($data)
     {
         $response = $this->httpClient->request('PUT', static::$apiUrl['offers'], ['body' => $data]);
-        print_r($response->toArray());
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
@@ -527,7 +526,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $successCount = 0;
         $failCount = 0;
         foreach ($batchResult['items'] ?? [] as $item) {
-            if ($item['data']['status'] === 'Success') {
+            if ($item['status'] === 'Success') {
                 $successCount++;
             } else {
                 $failCount++;

@@ -21,7 +21,7 @@ class ListingHelperService
         if (!$product instanceof Product) {
             return false;
         }
-        $variantIds = $message->getVariantIds();
+        $variantIds = array_unique($message->getVariantIds());
         if (empty($variantIds)) {
             return false;
         }
@@ -61,6 +61,12 @@ class ListingHelperService
         if (empty($images) || !$shopifyIsActive || count($images) < 2) {
             return [];
         }
+        foreach ($images as &$image) {
+            if (is_string($image) && strpos($image, 'http://') === 0) {
+                $image = preg_replace('/^http:\/\//', 'https://', $image);
+            }
+        }
+        unset($image);
         return [
             'productName' => mb_substr($variantProduct->getTitle(), 0, 255),
             'mainProductCode' => $mainProduct->getProductIdentifier(),
