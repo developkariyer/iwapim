@@ -100,35 +100,43 @@ class HelloWorldCommand extends AbstractCommand
         if (empty($allValues)) {
             return null;
         }
-        $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
-        $searchDims = $isSize ? $this->parseDimensions($searchValueNormalized) : null;
-        if (!$isSize || !$searchDims) {
-            foreach ($allValues as $value) {
-                if (trim($value['name']) === trim($searchValue)) {
-                    return $value;
-                }
-            }
-            return null;
+        $dbNames = [];
+        foreach ($allValues as $value) {
+            $dbNames[strtolower(trim($value['name']))] = $value;
         }
-        $originalWidth = $searchDims['width'];
-        $originalHeight = $searchDims['height'];
-        for ($w = $originalWidth; $w >= 1; $w--) {
-            for ($h = $originalHeight; $h >= 0; $h--) {
-                $candidate = ($originalHeight > 0) ? "{$w}x{$h}" : "{$w}";
-                echo "Aranan: {$candidate}\n";
-                foreach ($allValues as $value) {
-                    $nameLower = strtolower($value['name']);
-                    if (strpos($nameLower, $candidate) !== false) {
-                        return $value;
+        $normalized = strtolower(trim($searchValue));
+        $normalized = str_replace(',', '.', $normalized);
+        $normalized = preg_replace('/[^0-9.x]/', '', $normalized);
+        if (isset($dbNames[$normalized])) {
+            return $dbNames[$normalized];
+        }
+        $parts = explode('x', $normalized);
+        if (count($parts) === 2 && is_numeric($parts[0]) && is_numeric($parts[1])) {
+            $w = (int) round((float)$parts[0]);
+            $h = (int) round((float)$parts[1]);
+
+            for ($dw = $w; $dw >= 1; $dw--) {
+                for ($dh = $h; $dh >= 0; $dh--) {
+                    $candidate = "{$dw}x{$dh}";
+                    echo "Aranan: {$candidate}\n";
+                    if (isset($dbNames[$candidate])) {
+                        return $dbNames[$candidate];
                     }
                 }
-                if ($originalHeight === 0) {
-                    break;
+            }
+        } elseif (count($parts) === 1 && is_numeric($parts[0])) {
+            $w = (int) round((float)$parts[0]);
+            for ($dw = $w; $dw >= 1; $dw--) {
+                $candidate = (string)$dw;
+                echo "Aranan: {$candidate}\n";
+                if (isset($dbNames[$candidate])) {
+                    return $dbNames[$candidate];
                 }
             }
         }
         return null;
     }
+
 
     /**
      * @param string $value
