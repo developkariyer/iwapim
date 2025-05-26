@@ -100,31 +100,32 @@ class HelloWorldCommand extends AbstractCommand
         if (empty($allValues)) {
             return null;
         }
-        $bestMatch = null;
-        $smallestDiff = PHP_INT_MAX;
-        foreach ($allValues as $value) {
-            $dbValueNormalized = $this->normalizeAttributeValue($value['name']);
-            if ($searchValue === $value['name']) {
-                return $value;
-            }
-            $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
-            $searchDims = $isSize ? $this->parseDimensions($searchValueNormalized) : null;
-            if ($isSize && $searchDims) {
-                $dbDims = $this->parseDimensions($dbValueNormalized);
-                if ($dbDims) {
-                    $widthDiff = $searchDims['width'] - $dbDims['width'];
-                    $heightDiff = $searchDims['height'] - $dbDims['height'];
-                    $totalDiff = $widthDiff + $heightDiff;
-                    $widthOk = $widthDiff >= 0 && $widthDiff <= 25;
-                    $heightOk = $searchDims['height'] === 0 || ($heightDiff >= 0 && $heightDiff <= 25);
-                    if ($widthOk && $heightOk && $totalDiff < $smallestDiff) {
-                        $smallestDiff = $totalDiff;
-                        $bestMatch = $value;
-                    }
+        $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
+        $searchDims = $isSize ? $this->parseDimensions($searchValueNormalized) : null;
+        if (!$isSize || !$searchDims) {
+            foreach ($allValues as $value) {
+                if (trim($value['name']) === trim($searchValue)) {
+                    return $value;
                 }
             }
+            return null;
         }
-        return $bestMatch;
+        $width = $searchDims['width'];
+        $height = $searchDims['height'];
+        while ($width > 0) {
+            $candidate = $height > 0 ? "{$width}x{$height}" : "{$width}";
+            foreach ($allValues as $value) {
+                if (strpos(strtolower($value['name']), (string) $candidate) !== false) {
+                    return $value;
+                }
+            }
+            if ($height > 0) {
+                $height--;
+            } else {
+                $width--;
+            }
+        }
+        return null;
     }
 
     /**
