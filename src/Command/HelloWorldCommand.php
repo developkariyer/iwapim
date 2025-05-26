@@ -39,7 +39,7 @@ class HelloWorldCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $cfwTrSql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";
-        $cfwTrVariantProductsIds = Utility::fetchFromSql($cfwTrSql, ['marketplace_id' => $this->marketplaceConfig['shopifycfwtr']]);
+        $cfwTrVariantProductsIds = Utility::fetchFromSql($cfwTrSql, ['marketplace_id' => 84124]);
         if (!is_array($cfwTrVariantProductsIds) || empty($cfwTrVariantProductsIds)) {
             echo "No Shopify products found for Ciceksepeti sync.\n";
         }
