@@ -72,13 +72,15 @@ class HelloWorldCommand extends AbstractCommand
         $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
             WHERE attribute_id = :attribute_id";
         $allValues = Utility::fetchFromSql($sql, ['attribute_id' => 2000361]);
+        $result = null;
         foreach ($allValues as $value) {
             if ($value['name'] === $valueMain) {
                 echo $value['name'] . " - " . $value['name'] . "ESLESME BULUNDU\n";
+                $result = $value['name'];
             }
-            else {
-                echo $valueMain . " ESLESME BULUNAMADI \n";
-            }
+        }
+        if (!$result) {
+            echo $valueMain . "ESLESME BULUNAMADI \n";
         }
     }
 
