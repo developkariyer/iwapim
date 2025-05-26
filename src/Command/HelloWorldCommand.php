@@ -66,21 +66,23 @@ class HelloWorldCommand extends AbstractCommand
         return Command::SUCCESS;
     }
 
+    private function fetchMatch($value) {
+        $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
+            WHERE attribute_id = :attribute_id AND name = :name";
+        return Utility::fetchFromSql($sql, ['attribute_id' => 2000361, 'name' => $value]);
+    }
+
     private function dimTest($valueMain)
     {
         $valueMain = trim($valueMain);
-        function fetchMatch($value) {
-            $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
-            WHERE attribute_id = :attribute_id AND name = :name";
-            return Utility::fetchFromSql($sql, ['attribute_id' => 2000361, 'name' => $value]);
-        }
-        if ($result = fetchMatch($valueMain)) {
+
+        if ($result = $this->fetchMatch($valueMain)) {
             echo "$valueMain -> DOĞRUDAN ESLESME BULUNDU\n";
             return;
         }
         if (strpos($valueMain, '-') !== false) {
             $firstPart = explode('-', $valueMain)[0];
-            if ($result = fetchMatch($firstPart)) {
+            if ($result = $this->fetchMatch($firstPart)) {
                 echo "$valueMain -> $firstPart ESLESME BULUNDU\n";
                 return;
             }
@@ -103,7 +105,7 @@ class HelloWorldCommand extends AbstractCommand
                         } else {
                             $tryValue = "{$d1}cm";
                         }
-                        if ($result = fetchMatch($tryValue)) {
+                        if ($result = $this->fetchMatch($tryValue)) {
                             echo "$valueMain -> $tryValue ESLESME BULUNDU\n";
                             return;
                         }
