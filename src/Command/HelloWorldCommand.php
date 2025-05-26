@@ -55,7 +55,7 @@ class HelloWorldCommand extends AbstractCommand
                 continue;
             }
             $mainProduct = $mainProducts[0];
-            echo $mainProduct->getVariationSize() . "\n";
+            $this->dimTest($mainProduct->getVariationSize());
 //            $result = $this->findBestAttributeMatch(2000361, $mainProduct->getVariationSize(), true);
 //            echo $mainProduct->getIwasku() . " - " . $mainProduct->getVariationSize() . " -----> ";
 //            print_r($result);
@@ -65,6 +65,13 @@ class HelloWorldCommand extends AbstractCommand
 
         return Command::SUCCESS;
     }
+
+    private function dimTest($value)
+    {
+        $value = trim($value);
+        echo $value . "\n";
+    }
+
 
     private function parseDimensions($value): ?array
     {
