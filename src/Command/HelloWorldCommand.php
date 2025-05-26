@@ -66,10 +66,20 @@ class HelloWorldCommand extends AbstractCommand
         return Command::SUCCESS;
     }
 
-    private function dimTest($value)
+    private function dimTest($valueMain)
     {
-        $value = trim($value);
-        echo $value . "\n";
+        $valueMain = trim($valueMain);
+        $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
+            WHERE attribute_id = :attribute_id";
+        $allValues = Utility::fetchFromSql($sql, ['attribute_id' => 2000361]);
+        foreach ($allValues as $value) {
+            if ($value['name'] === $valueMain) {
+                echo $value['name'] . " - " . $value['name'] . "ESLESME BULUNDU\n";
+            }
+            else {
+                echo $valueMain . " ESLESME BULUNAMADI \n";
+            }
+        }
     }
 
 
