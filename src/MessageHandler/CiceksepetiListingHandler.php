@@ -468,9 +468,6 @@ class CiceksepetiListingHandler
      */
     private function findBestAttributeMatch($attributeId, $searchValue, $isSize): ?array
     {
-        $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
-        $searchDims = $isSize ? $this->parseDimensions($searchValueNormalized) : null;
-        $searchDimsCount = $searchDims && isset($searchDims['height']) && $searchDims['height'] === 0 ? 1 : count($searchDims);
         $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
             WHERE attribute_id = :attribute_id";
         $allValues = Utility::fetchFromSql($sql, ['attribute_id' => $attributeId]);
@@ -482,14 +479,15 @@ class CiceksepetiListingHandler
         $smallestDiff = PHP_INT_MAX;
         foreach ($allValues as $value) {
             $dbValueNormalized = $this->normalizeAttributeValue($value['name']);
-            if ($searchValueNormalized === $dbValueNormalized) {
+            if ($searchValue === $value['name']) {
                 $this->logger->info("✅ [AttributeMatch] Exact match: '{$searchValue}' ➜ '{$value['name']}' (ID: {$value['attribute_value_id']})");
                 return $value;
             }
+            $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
+            $searchDims = $isSize ? $this->parseDimensions($searchValueNormalized) : null;
             if ($isSize && $searchDims) {
                 $dbDims = $this->parseDimensions($dbValueNormalized);
-                $dbDimsCount = $dbDims && isset($dbDims['height']) && $dbDims['height'] === 0 ? 1 : count($dbDims);;
-                if ($dbDims && $dbDimsCount === $searchDimsCount) {
+                if ($dbDims) {
                     $widthDiff = $searchDims['width'] - $dbDims['width'];
                     $heightDiff = $searchDims['height'] - $dbDims['height'];
                     $totalDiff = $widthDiff + $heightDiff;
