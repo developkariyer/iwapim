@@ -105,11 +105,14 @@ class HelloWorldCommand extends AbstractCommand
             $dim2 = isset($matches[3]) ? (int)$matches[3] : null;
             $dim3 = isset($matches[5]) ? (int)$matches[5] : null;
             for ($i = 0; $i < 25; $i++) {
-                $d1 = round($dim1 / 5) * 5 - $i * 5;
+                $d1 = $dim1 - $i;
+                echo "Denemek için d1: {$d1}cm\n";
                 for ($j = 0; $j < 25; $j++) {
-                    $d2 = $dim2 !== null ? round($dim2 / 5) * 5 - $j * 5 : null;
+                    $d2 = $dim2 !== null ? $dim2 - $j : null;
+                    echo "    Denemek için d2: {$d2}cm\n";
                     for ($k = 0; $k < 25; $k++) {
-                        $d3 = $dim3 !== null ? round($dim3 / 5) * 5 - $k * 5 : null;
+                        $d3 = $dim3 !== null ? $dim3 - $k : null;
+                        echo "        Denemek için d3: {$d3}cm\n";
                         if ($d3 !== null) {
                             $tryValue = "{$d1}x{$d2}x{$d3}cm";
                         } elseif ($d2 !== null) {
@@ -117,6 +120,7 @@ class HelloWorldCommand extends AbstractCommand
                         } else {
                             $tryValue = "{$d1}cm";
                         }
+                        echo "            Deneniyor: {$tryValue}\n";
                         if ($result = $this->fetchMatch($tryValue)) {
                             echo "$valueMain -> $tryValue ESLESME BULUNDU\n";
                             return;
