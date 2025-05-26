@@ -106,32 +106,29 @@ class HelloWorldCommand extends AbstractCommand
             $dim3 = isset($matches[5]) ? (int)$matches[5] : null;
             for ($i = 0; $i < 25; $i++) {
                 $d1 = $dim1 - $i;
-                echo "Denemek için d1: {$d1}cm\n";
                 if ($dim2 === null) {
                     $tryValue = "{$d1}cm";
-                    echo "    Deneniyor: {$tryValue}\n";
                     if ($result = $this->fetchMatch($tryValue)) {
+                        echo "$valueMain -> $tryValue ESLESME BULUNDU\n";
                         return;
                     }
                     continue;
                 }
                 for ($j = 0; $j < 25; $j++) {
                     $d2 = $dim2 - $j;
-                    echo "    Denemek için d2: {$d2}cm\n";
                     if ($dim3 === null) {
                         $tryValue = "{$d1}x{$d2}cm";
-                        echo "        Deneniyor: {$tryValue}\n";
                         if ($result = $this->fetchMatch($tryValue)) {
+                            echo "$valueMain -> $tryValue ESLESME BULUNDU\n";
                             return;
                         }
                         continue;
                     }
                     for ($k = 0; $k < 25; $k++) {
                         $d3 = $dim3 - $k;
-                        echo "        Denemek için d3: {$d3}cm\n";
                         $tryValue = "{$d1}x{$d2}x{$d3}cm";
-                        echo "            Deneniyor: {$tryValue}\n";
                         if ($result = $this->fetchMatch($tryValue)) {
+                            echo "$valueMain -> $tryValue ESLESME BULUNDU\n";
                             return;
                         }
                     }
