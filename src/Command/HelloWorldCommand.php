@@ -75,7 +75,7 @@ class HelloWorldCommand extends AbstractCommand
         if (!$result) {
             echo $valueMain . " ESLESME BULUNAMADI \n";
         }
-        print_r($result);
+        echo $valueMain . " ESLESME BULUNDU \n";
     }
 
 }
