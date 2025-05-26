@@ -104,11 +104,11 @@ class HelloWorldCommand extends AbstractCommand
             $dim1 = isset($matches[1]) ? (int)$matches[1] : null;
             $dim2 = isset($matches[3]) ? (int)$matches[3] : null;
             $dim3 = isset($matches[5]) ? (int)$matches[5] : null;
-            for ($i = 0; $i < 5; $i++) {
+            for ($i = 0; $i < 25; $i++) {
                 $d1 = $dim1 - $i;
-                for ($j = 0; $j < 5; $j++) {
+                for ($j = 0; $j < 25; $j++) {
                     $d2 = $dim2 !== null ? $dim2 - $j : null;
-                    for ($k = 0; $k < 5; $k++) {
+                    for ($k = 0; $k < 25; $k++) {
                         $d3 = $dim3 !== null ? $dim3 - $k : null;
                         if ($d3 !== null) {
                             $tryValue = "{$d1}x{$d2}x{$d3}cm";
