@@ -454,7 +454,7 @@ class CiceksepetiListingHandler
         if (count($parts) === 1 && is_numeric($parts[0])) {
             return [
                 'width' => (int) round((float) $parts[0]),
-                'height' => 0,
+                'height' => 0
             ];
         }
         return null;
@@ -470,6 +470,7 @@ class CiceksepetiListingHandler
     {
         $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
         $searchDims = $isSize ? $this->parseDimensions($searchValueNormalized) : null;
+        $searchDimsCount = $searchDims && isset($searchDims['height']) && $searchDims['height'] === 0 ? 1 : count($searchDims);
         $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
             WHERE attribute_id = :attribute_id";
         $allValues = Utility::fetchFromSql($sql, ['attribute_id' => $attributeId]);
@@ -487,7 +488,8 @@ class CiceksepetiListingHandler
             }
             if ($isSize && $searchDims) {
                 $dbDims = $this->parseDimensions($dbValueNormalized);
-                if ($dbDims) {
+                $dbDimsCount = $dbDims && isset($dbDims['height']) && $dbDims['height'] === 0 ? 1 : count($dbDims);;
+                if ($dbDims && $dbDimsCount === $searchDimsCount) {
                     $widthDiff = $searchDims['width'] - $dbDims['width'];
                     $heightDiff = $searchDims['height'] - $dbDims['height'];
                     $totalDiff = $widthDiff + $heightDiff;
