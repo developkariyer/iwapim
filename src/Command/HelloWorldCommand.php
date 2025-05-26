@@ -111,7 +111,6 @@ class HelloWorldCommand extends AbstractCommand
                     $tryValue = "{$d1}cm";
                     echo "    Deneniyor: {$tryValue}\n";
                     if ($result = $this->fetchMatch($tryValue)) {
-                        echo "$valueMain -> $tryValue ESLESME BULUNDU\n";
                         return;
                     }
                     continue;
@@ -123,7 +122,6 @@ class HelloWorldCommand extends AbstractCommand
                         $tryValue = "{$d1}x{$d2}cm";
                         echo "        Deneniyor: {$tryValue}\n";
                         if ($result = $this->fetchMatch($tryValue)) {
-                            echo "$valueMain -> $tryValue ESLESME BULUNDU\n";
                             return;
                         }
                         continue;
@@ -134,7 +132,6 @@ class HelloWorldCommand extends AbstractCommand
                         $tryValue = "{$d1}x{$d2}x{$d3}cm";
                         echo "            Deneniyor: {$tryValue}\n";
                         if ($result = $this->fetchMatch($tryValue)) {
-                            echo "$valueMain -> $tryValue ESLESME BULUNDU\n";
                             return;
                         }
                     }
