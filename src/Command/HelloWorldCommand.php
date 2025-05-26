@@ -55,7 +55,8 @@ class HelloWorldCommand extends AbstractCommand
                 continue;
             }
             $mainProduct = $mainProducts[0];
-            $this->dimTest($mainProduct->getVariationSize());
+            echo $mainProduct->getProductIdentifier() . "\n";
+            //$this->dimTest($mainProduct->getVariationSize());
 //            $result = $this->findBestAttributeMatch(2000361, $mainProduct->getVariationSize(), true);
 //            echo $mainProduct->getIwasku() . " - " . $mainProduct->getVariationSize() . " -----> ";
 //            print_r($result);
