@@ -56,7 +56,9 @@ class HelloWorldCommand extends AbstractCommand
             }
             $mainProduct = $mainProducts[0];
             $result = $this->findBestAttributeMatch(2000361, $mainProduct->getVariationSize(), true);
-            echo $mainProduct->getIwasku() . " - " . $mainProduct->getVariationSize() . "----->" . $result ."\n";
+            echo $mainProduct->getIwasku() . " - " . $mainProduct->getVariationSize() . " -----> ";
+            print_r($result);
+            echo "\n";
 
         }
 
