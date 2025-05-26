@@ -67,49 +67,20 @@ class HelloWorldCommand extends AbstractCommand
 
     private function parseDimensions($value): ?array
     {
-        if (empty($value)) {
-            return null;
-        }
         $normalized = strtolower(trim($value));
         $normalized = str_replace(',', '.', $normalized);
-        if (preg_match('/([a-z]+)-(\d+)cm/i', $normalized, $matches)) {
-            return [
-                'width' => (int) round((float) $matches[2]),
-                'height' => 0,
-                'depth' => 0,
-                'size_type' => '1D',
-            ];
-        }
         $normalized = preg_replace('/[^0-9.x]/', '', $normalized);
         $parts = explode('x', $normalized);
-        if (count($parts) >= 3 && is_numeric($parts[0]) && is_numeric($parts[1]) && is_numeric($parts[2])) {
-            return [
-                'width' => (int) round((float) $parts[0]),
-                'height' => (int) round((float) $parts[1]),
-                'depth' => (int) round((float) $parts[2]),
-                'size_type' => '3D',
-            ];
-        } elseif (count($parts) >= 2 && is_numeric($parts[0]) && is_numeric($parts[1])) {
-            return [
-                'width' => (int) round((float) $parts[0]),
-                'height' => (int) round((float) $parts[1]),
-                'depth' => 0,
-                'size_type' => '2D',
-            ];
-        } elseif (count($parts) === 1 && is_numeric($parts[0])) {
-            return [
-                'width' => (int) round((float) $parts[0]),
-                'height' => 0,
-                'depth' => 0,
-                'size_type' => '1D',
-            ];
+        $dims = [];
+        foreach ($parts as $part) {
+            if (is_numeric($part)) {
+                $dims[] = (int) round((float) $part);
+            }
         }
-
-        return null;
+        return !empty($dims) ? $dims : null;
     }
 
     /**
-     * Find best attribute match based on dimensions comparison
      * @param int $attributeId
      * @param string $searchValue
      * @param bool $isSize
@@ -118,63 +89,47 @@ class HelloWorldCommand extends AbstractCommand
     private function findBestAttributeMatch($attributeId, $searchValue, $isSize): ?array
     {
         $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
-                WHERE attribute_id = :attribute_id";
+    WHERE attribute_id = :attribute_id";
         $allValues = Utility::fetchFromSql($sql, ['attribute_id' => $attributeId]);
-        if (empty($allValues) || empty($searchValue)) {
+        if (empty($allValues)) {
             return null;
         }
+        $bestMatch = null;
+        $smallestDiff = PHP_INT_MAX;
+
+        $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
+        $searchDims = $isSize ? $this->parseDimensions($searchValueNormalized) : null;
+
         foreach ($allValues as $value) {
-            if (strtolower(trim($searchValue)) === strtolower(trim($value['name']))) {
+            if ($searchValue === $value['name']) {
                 return $value;
             }
-        }
-        if ($isSize) {
-            $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
-            $searchDims = $this->parseDimensions($searchValueNormalized);
-            if (!$searchDims) {
-                return null;
-            }
-            $bestMatch = null;
-            $bestScore = -1;
-            $maxDiffAllowed = 25;
-            $primaryDimension = $searchDims['width'];
-            foreach ($allValues as $value) {
+            if ($isSize && $searchDims) {
                 $dbValueNormalized = $this->normalizeAttributeValue($value['name']);
                 $dbDims = $this->parseDimensions($dbValueNormalized);
-                if (!$dbDims) {
-                    continue;
-                }
-                $dimensionRatio = $dbDims['height'] > 0 ? $dbDims['width'] / $dbDims['height'] : 0;
-                if ($dbDims['height'] > 0 && ($dimensionRatio > 10 || $dimensionRatio < 0.1)) {
-                    continue;
-                }
-                if ($searchDims['size_type'] === '1D' && $dbDims['size_type'] === '1D') {
-                    $diff = abs($searchDims['width'] - $dbDims['width']);
-                    $score = $diff <= $maxDiffAllowed ? 100 - $diff : 0;
-                } elseif ($searchDims['size_type'] === '1D') {
-                    $diff = abs($searchDims['width'] - $dbDims['width']);
-                    $score = $diff <= $maxDiffAllowed ? 90 - $diff : 0;
-                } elseif ($dbDims['size_type'] === '1D') {
-                    $diff = abs($primaryDimension - $dbDims['width']);
-                    $score = $diff <= $maxDiffAllowed ? 85 - $diff : 0;
-                } else {
-                    $widthDiff = abs($searchDims['width'] - $dbDims['width']);
-                    $heightDiff = abs($searchDims['height'] - $dbDims['height']);
-                    $totalDiff = $widthDiff + $heightDiff;
-                    if ($widthDiff <= $maxDiffAllowed && $heightDiff <= $maxDiffAllowed) {
-                        $score = 95 - $totalDiff;
-                    } else {
-                        continue;
+
+                if ($dbDims && count($dbDims) === count($searchDims)) {
+                    $diffs = [];
+                    $allWithinThreshold = true;
+                    foreach ($searchDims as $i => $dim) {
+                        $diff = abs($dim - $dbDims[$i]);
+                        $diffs[] = $diff;
+                        if ($diff > 25) { // threshold
+                            $allWithinThreshold = false;
+                            break;
+                        }
+                    }
+                    if ($allWithinThreshold) {
+                        $totalDiff = array_sum($diffs);
+                        if ($totalDiff < $smallestDiff) {
+                            $smallestDiff = $totalDiff;
+                            $bestMatch = $value;
+                        }
                     }
                 }
-                if ($score > $bestScore) {
-                    $bestScore = $score;
-                    $bestMatch = $value;
-                }
             }
-            return $bestMatch;
         }
-        return null;
+        return $bestMatch;
     }
 
     /**
