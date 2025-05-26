@@ -75,12 +75,12 @@ class HelloWorldCommand extends AbstractCommand
         $result = null;
         foreach ($allValues as $value) {
             if ($value['name'] === $valueMain) {
-                echo $value['name'] . " - " . $value['name'] . "ESLESME BULUNDU\n";
+                echo $value['name'] . " - " . $value['name'] . " ESLESME BULUNDU\n";
                 $result = $value['name'];
             }
         }
         if (!$result) {
-            echo $valueMain . "ESLESME BULUNAMADI \n";
+            echo $valueMain . " ESLESME BULUNAMADI \n";
         }
     }
 
