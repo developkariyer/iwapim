@@ -110,19 +110,21 @@ class HelloWorldCommand extends AbstractCommand
             }
             return null;
         }
-        $width = $searchDims['width'];
-        $height = $searchDims['height'];
-        while ($width > 0) {
-            $candidate = $height > 0 ? "{$width}x{$height}" : "{$width}";
-            foreach ($allValues as $value) {
-                if (strpos(strtolower($value['name']), (string) $candidate) !== false) {
-                    return $value;
+        $originalWidth = $searchDims['width'];
+        $originalHeight = $searchDims['height'];
+        for ($w = $originalWidth; $w >= 1; $w--) {
+            for ($h = $originalHeight; $h >= 0; $h--) {
+                $candidate = ($originalHeight > 0) ? "{$w}x{$h}" : "{$w}";
+                echo "Aranan: {$candidate}\n";
+                foreach ($allValues as $value) {
+                    $nameLower = strtolower($value['name']);
+                    if (strpos($nameLower, $candidate) !== false) {
+                        return $value;
+                    }
                 }
-            }
-            if ($height > 0) {
-                $height--;
-            } else {
-                $width--;
+                if ($originalHeight === 0) {
+                    break;
+                }
             }
         }
         return null;
