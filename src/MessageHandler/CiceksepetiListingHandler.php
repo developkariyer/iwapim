@@ -522,7 +522,6 @@ class CiceksepetiListingHandler
             $replace = ['i', 'g', 'u', 's', 'o', 'c', 'i', 'g', 'u', 's', 'o', 'c'];
             $value = str_replace($search, $replace, $value);
             $value = mb_strtolower($value, 'UTF-8');
-            $value = preg_replace('/\s+/', '', $value);
         }
         return $value;
     }
