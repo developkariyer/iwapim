@@ -69,13 +69,49 @@ class HelloWorldCommand extends AbstractCommand
     private function dimTest($valueMain)
     {
         $valueMain = trim($valueMain);
-        $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
+        function fetchMatch($value) {
+            $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
             WHERE attribute_id = :attribute_id AND name = :name";
-        $result = Utility::fetchFromSql($sql, ['attribute_id' => 2000361, 'name' => $valueMain]);
-        if (!$result) {
-            echo $valueMain . " ESLESME BULUNAMADI \n";
+            return Utility::fetchFromSql($sql, ['attribute_id' => 2000361, 'name' => $value]);
         }
-        echo $valueMain . " ESLESME BULUNDU \n";
+        if ($result = fetchMatch($valueMain)) {
+            echo "$valueMain -> DOĞRUDAN ESLESME BULUNDU\n";
+            return;
+        }
+        if (strpos($valueMain, '-') !== false) {
+            $firstPart = explode('-', $valueMain)[0];
+            if ($result = fetchMatch($firstPart)) {
+                echo "$valueMain -> $firstPart ESLESME BULUNDU\n";
+                return;
+            }
+        }
+        if (preg_match('/^(\d+)(x(\d+))?(x(\d+))?cm$/i', strtolower($valueMain), $matches)) {
+            $dim1 = isset($matches[1]) ? (int)$matches[1] : null;
+            $dim2 = isset($matches[3]) ? (int)$matches[3] : null;
+            $dim3 = isset($matches[5]) ? (int)$matches[5] : null;
+            for ($i = 0; $i < 5; $i++) {
+                $d1 = $dim1 - $i;
+                for ($j = 0; $j < 5; $j++) {
+                    $d2 = $dim2 !== null ? $dim2 - $j : null;
+                    for ($k = 0; $k < 5; $k++) {
+                        $d3 = $dim3 !== null ? $dim3 - $k : null;
+
+                        if ($d3 !== null) {
+                            $tryValue = "{$d1}x{$d2}x{$d3}cm";
+                        } elseif ($d2 !== null) {
+                            $tryValue = "{$d1}x{$d2}cm";
+                        } else {
+                            $tryValue = "{$d1}cm";
+                        }
+                        if ($result = fetchMatch($tryValue)) {
+                            echo "$valueMain -> $tryValue ESLESME BULUNDU\n";
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+        echo "$valueMain -> ESLESME BULUNAMADI\n";
     }
 
 }
