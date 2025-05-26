@@ -55,7 +55,7 @@ class HelloWorldCommand extends AbstractCommand
                 continue;
             }
             $mainProduct = $mainProducts[0];
-            echo $mainProduct->getVariationSize() . "\n";
+            echo $mainProduct->getVariationSize() . " - " . $mainProduct->getIwasku() . "\n";
 
         }
 
