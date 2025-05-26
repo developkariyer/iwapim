@@ -71,7 +71,7 @@ class HelloWorldCommand extends AbstractCommand
     private function loadAllValues(): void {
         if (empty($this->allValues)) {
             $sql = "SELECT name FROM iwa_ciceksepeti_category_attributes_values WHERE attribute_id = :attribute_id";
-            $result = Utility::fetchAllFromSql($sql, ['attribute_id' => 2000361]);
+            $result = Utility::fetchFromSql($sql, ['attribute_id' => 2000361]);
             $this->allValues = $result;
         }
     }
