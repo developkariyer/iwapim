@@ -69,18 +69,19 @@ class HelloWorldCommand extends AbstractCommand
     {
         $normalized = strtolower(trim($value));
         $normalized = str_replace(',', '.', $normalized);
-        $normalized = preg_replace('/[^0-9.x]/', '', $normalized);
-        $parts = explode('x', $normalized);
-        if (count($parts) >= 2 && is_numeric($parts[0]) && is_numeric($parts[1])) {
+        preg_match_all('/\d+(?:\.\d+)?/', $normalized, $matches);
+        $numbers = $matches[0] ?? [];
+
+        if (count($numbers) >= 2) {
             return [
-                'width' => (int) round((float) $parts[0]),
-                'height' => (int) round((float) $parts[1]),
+                'width' => (int) round((float) $numbers[0]),
+                'height' => (int) round((float) $numbers[1]),
             ];
         }
-        if (count($parts) === 1 && is_numeric($parts[0])) {
+        if (count($numbers) === 1) {
             return [
-                'width' => (int) round((float) $parts[0]),
-                'height' => 0
+                'width' => (int) round((float) $numbers[0]),
+                'height' => null,
             ];
         }
         return null;
@@ -95,7 +96,7 @@ class HelloWorldCommand extends AbstractCommand
     private function findBestAttributeMatch($attributeId, $searchValue, $isSize): ?array
     {
         $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
-        WHERE attribute_id = :attribute_id";
+            WHERE attribute_id = :attribute_id";
         $allValues = Utility::fetchFromSql($sql, ['attribute_id' => $attributeId]);
         if (empty($allValues)) {
             return null;
@@ -108,18 +109,24 @@ class HelloWorldCommand extends AbstractCommand
             }
             $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
             $searchDims = $isSize ? $this->parseDimensions($searchValueNormalized) : null;
-            print_r($searchDims);
             if ($isSize && $searchDims) {
                 $dbValueNormalized = $this->normalizeAttributeValue($value['name']);
                 $dbDims = $this->parseDimensions($dbValueNormalized);
                 if ($dbDims) {
                     $widthDiff = $searchDims['width'] - $dbDims['width'];
-                    $heightDiff = $searchDims['height'] - $dbDims['height'];
-                    $totalDiff = $widthDiff + $heightDiff;
-                    $widthOk = $widthDiff >= 0 && $widthDiff <= 25;
-                    $heightOk = $searchDims['height'] === 0 || ($heightDiff >= 0 && $heightDiff <= 25);
-
-                    if ($widthOk && $heightOk && $totalDiff < $smallestDiff) {
+                    if ($widthDiff < 0 || $widthDiff > 25) {
+                        continue;
+                    }
+                    $heightDiff = 0;
+                    $heightOk = true;
+                    if (isset($searchDims['height']) && isset($dbDims['height'])) {
+                        $heightDiff = $searchDims['height'] - $dbDims['height'];
+                        if ($heightDiff < 0 || $heightDiff > 25) {
+                            $heightOk = false;
+                        }
+                    }
+                    $totalDiff = $widthDiff + max($heightDiff, 0);
+                    if ($heightOk && $totalDiff < $smallestDiff) {
                         $smallestDiff = $totalDiff;
                         $bestMatch = $value;
                     }
