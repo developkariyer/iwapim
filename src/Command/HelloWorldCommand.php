@@ -97,43 +97,55 @@ class HelloWorldCommand extends AbstractCommand
         $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
             WHERE attribute_id = :attribute_id";
         $allValues = Utility::fetchFromSql($sql, ['attribute_id' => $attributeId]);
+
         if (empty($allValues)) {
             return null;
         }
-        $dbNames = [];
-        foreach ($allValues as $value) {
-            $dbNames[strtolower(trim($value['name']))] = $value;
-        }
-        $normalized = strtolower(trim($searchValue));
-        $normalized = str_replace(',', '.', $normalized);
-        $normalized = preg_replace('/[^0-9.x]/', '', $normalized);
-        if (isset($dbNames[$normalized])) {
-            return $dbNames[$normalized];
-        }
-        $parts = explode('x', $normalized);
-        if (count($parts) === 2 && is_numeric($parts[0]) && is_numeric($parts[1])) {
-            $w = (int) round((float)$parts[0]);
-            $h = (int) round((float)$parts[1]);
 
-            for ($dw = $w; $dw >= 1; $dw--) {
-                for ($dh = $h; $dh >= 0; $dh--) {
-                    $candidate = "{$dw}x{$dh}";
-                    echo "Aranan: {$candidate}\n";
-                    if (isset($dbNames[$candidate])) {
-                        return $dbNames[$candidate];
-                    }
-                }
+        $normalizedSearch = strtolower(trim($searchValue));
+        $normalizedSearch = str_replace(',', '.', $normalizedSearch);
+
+        // 1. Doğrudan eşleşme
+        foreach ($allValues as $value) {
+            if (strtolower(trim($value['name'])) === $normalizedSearch) {
+                return $value;
             }
-        } elseif (count($parts) === 1 && is_numeric($parts[0])) {
-            $w = (int) round((float)$parts[0]);
-            for ($dw = $w; $dw >= 1; $dw--) {
-                $candidate = (string)$dw;
-                echo "Aranan: {$candidate}\n";
-                if (isset($dbNames[$candidate])) {
-                    return $dbNames[$candidate];
+        }
+
+        // 2. S, M, L, XL, XXL gibi beden kontrolü
+        if (preg_match('/\\b(s|m|l|xl|xxl)\\b/i', $normalizedSearch, $match)) {
+            foreach ($allValues as $value) {
+                if (stripos($value['name'], strtoupper($match[1])) !== false) {
+                    return $value;
                 }
             }
         }
+
+        // 3. Boyut kontrolü
+        if ($isSize) {
+            $dims = $this->parseDimensions($normalizedSearch);
+
+            if ($dims) {
+                $w = $dims['width'];
+                $h = $dims['height'];
+
+                while ($w > 0 || $h > 0) {
+                    $candidate = ($h > 0) ? "{$w}x{$h}" : "{$w}";
+                    foreach ($allValues as $value) {
+                        $normalizedDb = strtolower(str_replace([' ', 'cm'], '', $value['name']));
+                        if (strpos($normalizedDb, $candidate) !== false) {
+                            return $value;
+                        }
+                    }
+
+                    // Önce genişliği azalt, sonra yüksekliği
+                    if ($w > 0) $w--;
+                    elseif ($h > 0) $h--;
+                    else break;
+                }
+            }
+        }
+
         return null;
     }
 
