@@ -112,7 +112,11 @@ class HelloWorldCommand extends AbstractCommand
             }
             if ($isSize && $searchDims) {
                 $dbDims = $this->parseDimensions($dbValueNormalized);
-                $dbDimsCount = $dbDims && isset($dbDims['height']) && $dbDims['height'] === 0 ? 1 : count($dbDims);;
+                if ($dbDims === null) {
+                    $dbDimsCount = 0; 
+                } else {
+                    $dbDimsCount = isset($dbDims['height']) && $dbDims['height'] === 0 ? 1 : count($dbDims);
+                }
                 if ($dbDims && $dbDimsCount === $searchDimsCount) {
                     $widthDiff = $searchDims['width'] - $dbDims['width'];
                     $heightDiff = $searchDims['height'] - $dbDims['height'];
