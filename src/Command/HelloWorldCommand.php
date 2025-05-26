@@ -95,7 +95,7 @@ class HelloWorldCommand extends AbstractCommand
         $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
         $searchDims = $isSize ? $this->parseDimensions($searchValueNormalized) : null;
         $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
-            WHERE attribute_id = :attribute_id";
+        WHERE attribute_id = :attribute_id";
         $allValues = Utility::fetchFromSql($sql, ['attribute_id' => $attributeId]);
         if (empty($allValues)) {
             return null;
@@ -107,7 +107,7 @@ class HelloWorldCommand extends AbstractCommand
             if ($searchValueNormalized === $dbValueNormalized) {
                 return $value;
             }
-            if ($isSize) {
+            if ($isSize && $searchDims) {
                 $dbDims = $this->parseDimensions($dbValueNormalized);
                 if ($dbDims) {
                     $widthDiff = $searchDims['width'] - $dbDims['width'];
@@ -115,6 +115,7 @@ class HelloWorldCommand extends AbstractCommand
                     $totalDiff = $widthDiff + $heightDiff;
                     $widthOk = $widthDiff >= 0 && $widthDiff <= 25;
                     $heightOk = $searchDims['height'] === 0 || ($heightDiff >= 0 && $heightDiff <= 25);
+
                     if ($widthOk && $heightOk && $totalDiff < $smallestDiff) {
                         $smallestDiff = $totalDiff;
                         $bestMatch = $value;
