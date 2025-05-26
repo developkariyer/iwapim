@@ -66,16 +66,29 @@ class HelloWorldCommand extends AbstractCommand
         return Command::SUCCESS;
     }
 
-    private function fetchMatch($value) {
-        $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
-            WHERE attribute_id = :attribute_id AND name = :name";
-        return Utility::fetchFromSql($sql, ['attribute_id' => 2000361, 'name' => $value]);
+    private array $allValues = [];
+
+    private function loadAllValues(): void {
+        if (empty($this->allValues)) {
+            $sql = "SELECT name FROM iwa_ciceksepeti_category_attributes_values WHERE attribute_id = :attribute_id";
+            $result = Utility::fetchAllFromSql($sql, ['attribute_id' => 2000361]);
+            $this->allValues = $result;
+        }
+    }
+
+    private function fetchMatch($valueMain): ?string {
+        $this->loadAllValues();
+        foreach ($this->allValues as $value) {
+            if ($value['name'] === $valueMain) {
+                return $value['name'];
+            }
+        }
+        return null;
     }
 
     private function dimTest($valueMain)
     {
         $valueMain = trim($valueMain);
-
         if ($result = $this->fetchMatch($valueMain)) {
             echo "$valueMain -> DOĞRUDAN ESLESME BULUNDU\n";
             return;
@@ -91,13 +104,12 @@ class HelloWorldCommand extends AbstractCommand
             $dim1 = isset($matches[1]) ? (int)$matches[1] : null;
             $dim2 = isset($matches[3]) ? (int)$matches[3] : null;
             $dim3 = isset($matches[5]) ? (int)$matches[5] : null;
-            for ($i = 0; $i < 25; $i++) {
+            for ($i = 0; $i < 5; $i++) {
                 $d1 = $dim1 - $i;
-                for ($j = 0; $j < 25; $j++) {
+                for ($j = 0; $j < 5; $j++) {
                     $d2 = $dim2 !== null ? $dim2 - $j : null;
-                    for ($k = 0; $k < 25; $k++) {
+                    for ($k = 0; $k < 5; $k++) {
                         $d3 = $dim3 !== null ? $dim3 - $k : null;
-
                         if ($d3 !== null) {
                             $tryValue = "{$d1}x{$d2}x{$d3}cm";
                         } elseif ($d2 !== null) {
