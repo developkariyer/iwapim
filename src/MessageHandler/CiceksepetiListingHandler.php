@@ -66,7 +66,15 @@ class CiceksepetiListingHandler
             $size = $product['size'];
             $product['sizeLabel'] = $sizeToLabelMap[$identifier][$size] ?? 'CUSTOM';
         }
+
         print_r($products);
+        $html = "<strong>Ölçüler:</strong><ul>";
+        foreach ($products as $product) {
+            $html .= "<li>{$product['size']} ⇒ {$product['sizeLabel']}</li>";
+        }
+        $html .= "</ul>";
+
+        echo $html;
 //        $this->printProductInfoLogger($jsonString);
 //        $this->logger->info("✅ [PIM Listings] PIM listings information successfully completed.");
 //        $messageType = $message->getActionType();
