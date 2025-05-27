@@ -66,21 +66,30 @@ class CiceksepetiListingHandler
             $size = $product['size'];
             $product['sizeLabel'] = $sizeToLabelMap[$identifier][$size] ?? 'CUSTOM';
         }
-
-        print_r($products);
-        $html = "<strong>Ölçüler:</strong><ul>";
-        $seenSizes = [];
+        $groupedDescriptions = [];
         foreach ($products as $product) {
-            $key = $product['size'] . '⇒' . $product['sizeLabel'];
-            if (!in_array($key, $seenSizes)) {
-                $seenSizes[] = $key;
-                $html .= "<li>{$product['size']} ⇒ {$product['sizeLabel']}</li>";
+            $identifier = $product['mainProductCode'];
+            $size = $product['size'];
+            $label = $product['sizeLabel'];
+
+            if (!isset($groupedDescriptions[$identifier])) {
+                $groupedDescriptions[$identifier] = [];
             }
+            $key = $size . '⇒' . $label;
+            $groupedDescriptions[$identifier][$key] = "<li>{$size} ⇒ {$label}</li>";
+        }
+        $descriptionsHtml = [];
+        foreach ($groupedDescriptions as $identifier => $items) {
+            $html = "<strong>Ölçüler:</strong><ul>" . implode('', $items) . "</ul>";
+            $descriptionsHtml[$identifier] = $html;
+        }
+        foreach ($products as &$product) {
+            $identifier = $product['mainProductCode'];
+            $product['description'] .= "\n" . $descriptionsHtml[$identifier];
         }
 
-        $html .= "</ul>";
+        print_r($products);
 
-        echo $html;
 //        $this->printProductInfoLogger($jsonString);
 //        $this->logger->info("✅ [PIM Listings] PIM listings information successfully completed.");
 //        $messageType = $message->getActionType();
