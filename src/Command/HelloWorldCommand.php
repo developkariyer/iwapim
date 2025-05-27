@@ -73,8 +73,6 @@ class HelloWorldCommand extends AbstractCommand
 
         }
         print_r($groupedProducts);
-        $maxCount = max(array_map('count', $groupedProducts));
-        echo "Bir ürün için en fazla beden sayısı: $maxCount\n";
         return Command::SUCCESS;
     }
 
