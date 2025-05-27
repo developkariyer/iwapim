@@ -85,7 +85,7 @@ class ListingHelperService
                 $groupedDescriptions[$identifier] = [];
             }
             $key = $size . '⇒' . $label;
-            $groupedDescriptions[$identifier][$key] = "<li>{$size} ⇒ {$label}</li>";
+            $groupedDescriptions[$identifier][$key] = "<li><strong>{$size}</strong> ⇒ <strong>{$label}</strong></li>";
         }
         $descriptionsHtml = [];
         foreach ($groupedDescriptions as $identifier => $items) {

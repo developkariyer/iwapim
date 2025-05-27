@@ -63,8 +63,7 @@ class GeminiConnector
                 'properties' => [
                     'stockCode'       => ['type'=>'STRING'],
                     'categoryId'      => ['type'=>'INTEGER'],
-                    'color'            => ['type'=>'STRING'],
-                    'size'            => ['type'=>'STRING'],
+                    'color'            => ['type'=>'STRING']
                 ],
                 'required'=>[
                     'stockCode', 'categoryId','color','size'

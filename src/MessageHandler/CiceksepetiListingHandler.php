@@ -39,17 +39,14 @@ class CiceksepetiListingHandler
         echo "ciceksepeti categories fetched\n";
         $this->logger->info("✅ [Category Data] Ciceksepeti category details successfully retrieved.");
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
-        $decodedJson = json_decode($jsonString, true);
-        print_r($decodedJson);
-
-//        $this->printProductInfoLogger($jsonString);
-//        $this->logger->info("✅ [PIM Listings] PIM listings information successfully completed.");
-//        $messageType = $message->getActionType();
-//        $this->logger->info("📝 [Action Type] Processing action of type: {$messageType}");
-//        match ($messageType) {
-//            'list' => $this->processListingData($jsonString, $categories),
-//            default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
-//        };
+        $this->printProductInfoLogger($jsonString);
+        $this->logger->info("✅ [PIM Listings] PIM listings information successfully completed.");
+        $messageType = $message->getActionType();
+        $this->logger->info("📝 [Action Type] Processing action of type: {$messageType}");
+        match ($messageType) {
+            'list' => $this->processListingData($jsonString, $categories),
+            default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
+        };
     }
 
     private function printProductInfoLogger(string $jsonString): void
@@ -98,7 +95,6 @@ class CiceksepetiListingHandler
                 foreach ($chunkData as &$product) {
                     if ($product['stockCode'] === $updateData['stockCode']) {
                         $product['categoryId'] = $updateData['categoryId'] ?? $product['categoryId'];
-                        $product['size'] = $updateData['size'] ?? $product['size'];
                         $product['color'] = $updateData['color'] ?? $product['color'];
                     }
                 }
@@ -109,27 +105,28 @@ class CiceksepetiListingHandler
             $this->logger->info("✅ [Gemini Success] Gemini result success. Chunk {$chunkNumber} completed.");
             sleep(5);
         }
-        $this->logger->info("Gemini chat result : " . json_encode($mergedResults, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-        $data = $this->fillAttributeData($mergedResults);
-        if (empty($data)) {
-            $this->logger->error("❌ [No Data] No products found in the data array.");
-            return [];
-        }
-        foreach ($data as $sku => $product) {
-            if (isset($product['Attributes']) && empty($product['Attributes'])) {
-                $this->logger->info("❌ [Attributes Empty] Attributes is empty for SKU: {$product['stockCode']}");
-            } else {
-                $this->logger->info("✔️ [Attributes Found] Attributes filled for SKU: {$product['stockCode']}");
-            }
-        }
-        $this->logger->info("✅ [Filled Attributes Data] All attributes data processed: " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-        $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
-        print_r($formattedData);
-        $this->logger->info("✅ [Formatted Data]: " . $formattedData);
-        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
-        $result = $ciceksepetiConnector->createListing($formattedData);
-        $this->logger->info("✅ [CiceksepetiConnector] Result batch:\n" . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-        print_r($result);
+        print_r($mergedResults);
+//        $this->logger->info("Gemini chat result : " . json_encode($mergedResults, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+//        $data = $this->fillAttributeData($mergedResults);
+//        if (empty($data)) {
+//            $this->logger->error("❌ [No Data] No products found in the data array.");
+//            return [];
+//        }
+//        foreach ($data as $sku => $product) {
+//            if (isset($product['Attributes']) && empty($product['Attributes'])) {
+//                $this->logger->info("❌ [Attributes Empty] Attributes is empty for SKU: {$product['stockCode']}");
+//            } else {
+//                $this->logger->info("✔️ [Attributes Found] Attributes filled for SKU: {$product['stockCode']}");
+//            }
+//        }
+//        $this->logger->info("✅ [Filled Attributes Data] All attributes data processed: " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+//        $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
+//        print_r($formattedData);
+//        $this->logger->info("✅ [Formatted Data]: " . $formattedData);
+//        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
+//        $result = $ciceksepetiConnector->createListing($formattedData);
+//        $this->logger->info("✅ [CiceksepetiConnector] Result batch:\n" . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+//        print_r($result);
     }
 
     private function fillMissingListingDataAndFormattedCiceksepetiListing($data): false|string
@@ -248,8 +245,7 @@ class CiceksepetiListingHandler
               {
                 "stockCode": AAA11
                 "categoryId": 111,
-                "color": "Renk bilgisi",
-                "size": "Ebat bilgisi"
+                "color": "Renk bilgisi"
               },
               {
                 ...
@@ -283,11 +279,7 @@ class CiceksepetiListingHandler
                     Soil => Kahverengi,
                     Shiny Silver => Gümüş-Sarı,
                     Shiny Gold => Sarı Altın,
-                    Shiny Copper => Bakır- Altın,
-
-
-            -**ebat**: ebat bilgisi verideki size fieldı cm olarak al (örn: 250cm) yanında boyut belirten S-M-XL gibi durum varsa bunu alma.
-            
+                    Shiny Copper => Bakır- Altın,  
             **Veri formatı**: Lütfen yalnızca aşağıdaki **JSON verisini** kullanın ve dışarıya çıkmayın. Çıkışınızı bu veriye dayalı olarak oluşturun:
             İşte veri: $jsonString
             Kategori Verisi: $categories
