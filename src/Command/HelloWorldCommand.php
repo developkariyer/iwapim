@@ -43,6 +43,7 @@ class HelloWorldCommand extends AbstractCommand
         if (!is_array($cfwTrVariantProductsIds) || empty($cfwTrVariantProductsIds)) {
             echo "No Shopify products found for Ciceksepeti sync.\n";
         }
+        $groupedProducts = [];
         foreach ($cfwTrVariantProductsIds as $cfwTrVariantProductsId) {
             $shopifyProduct = VariantProduct::getById($cfwTrVariantProductsId['oo_id']);
             if (!$shopifyProduct instanceof VariantProduct) {
@@ -55,13 +56,23 @@ class HelloWorldCommand extends AbstractCommand
                 continue;
             }
             $mainProduct = $mainProducts[0];
-            $this->dimTest($mainProduct->getVariationSize());
+            $mainProduct->getProductIdentifier();
+            $identifier = $mainProduct->getProductIdentifier();
+            if (!isset($groupedProducts[$identifier])) {
+                $groupedProducts[$identifier] = [];
+            }
+            $groupedProducts[$identifier][] = [
+                'iwasku' => $mainProduct->getIwasku(),
+                'variation_size' => $mainProduct->getVariationSize(),
+            ];
+           // $this->dimTest($mainProduct->getVariationSize());
 //            $result = $this->findBestAttributeMatch(2000361, $mainProduct->getVariationSize(), true);
 //            echo $mainProduct->getIwasku() . " - " . $mainProduct->getVariationSize() . " -----> ";
 //            print_r($result);
 //            echo "\n";
 
         }
+        print_r($groupedProducts);
 
         return Command::SUCCESS;
     }
