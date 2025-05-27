@@ -45,21 +45,28 @@ class CiceksepetiListingHandler
         foreach ($products as $product) {
             $identifier = $product['mainProductCode'];
             $size = $product['size'];
+
             if (!isset($groupedSizes[$identifier])) {
                 $groupedSizes[$identifier] = [];
             }
+
             if (!in_array($size, $groupedSizes[$identifier])) {
                 $groupedSizes[$identifier][] = $size;
             }
         }
-        $groupedSizesWithLabels = [];
+        $sizeToLabelMap = [];
         foreach ($groupedSizes as $identifier => $sizes) {
             foreach ($sizes as $i => $size) {
-                $label = $sizeLabels[$i] ?? "CUSTOM";
-                $groupedSizesWithLabels[$identifier][$label] = $size;
+                $label = $sizeLabels[$i] ?? 'CUSTOM';
+                $sizeToLabelMap[$identifier][$size] = $label;
             }
         }
-        print_r($groupedSizesWithLabels);
+        foreach ($products as &$product) {
+            $identifier = $product['mainProductCode'];
+            $size = $product['size'];
+            $product['sizeLabel'] = $sizeToLabelMap[$identifier][$size] ?? 'CUSTOM';
+        }
+        print_r($products);
 //        $this->printProductInfoLogger($jsonString);
 //        $this->logger->info("✅ [PIM Listings] PIM listings information successfully completed.");
 //        $messageType = $message->getActionType();
