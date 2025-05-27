@@ -31,9 +31,11 @@ class Import
     
     private function getAttributes($listing): string
     {
-        $title = $listing['item-name'];
-        if (preg_match('/\(([^()]*)\)[^(]*$/', $title, $matches)) {
-            return trim($matches[1]);
+        if (isset($listing['item-name'])) {
+            $title = $listing['item-name'];
+            if (preg_match('/\(([^()]*)\)[^(]*$/', $title, $matches)) {
+                return trim($matches[1]);
+            }
         }
         return '';    
     }
@@ -190,7 +192,7 @@ class Import
             if (!$amazonCollection instanceof AmazonMarketplace) {
                 continue;
             }
-            if ($amazonCollection->getListingId() === $listing['listing-id']) {
+            if (isset($listing['listing-id']) && $amazonCollection->getListingId() === $listing['listing-id']) {
                 $found = true;
                 $this->setAmazonCollectionProperties($amazonCollection, $listing, $country, $this->connector->marketplace);
             } else {
