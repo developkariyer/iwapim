@@ -39,7 +39,27 @@ class CiceksepetiListingHandler
         echo "ciceksepeti categories fetched\n";
         $this->logger->info("✅ [Category Data] Ciceksepeti category details successfully retrieved.");
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
-        print_r($jsonString);
+        $products = json_decode($jsonString, true);
+        $groupedSizes = [];
+        $sizeLabels = ['M', 'L', 'XL', '2XL', '3XL', '4XL'];
+        foreach ($products as $product) {
+            $identifier = $product['mainProductCode'];
+            $size = $product['size'];
+            if (!isset($groupedSizes[$identifier])) {
+                $groupedSizes[$identifier] = [];
+            }
+            if (!in_array($size, $groupedSizes[$identifier])) {
+                $groupedSizes[$identifier][] = $size;
+            }
+        }
+        $groupedSizesWithLabels = [];
+        foreach ($groupedSizes as $identifier => $sizes) {
+            foreach ($sizes as $i => $size) {
+                $label = $sizeLabels[$i] ?? "CUSTOM";
+                $groupedSizesWithLabels[$identifier][$label] = $size;
+            }
+        }
+        print_r($groupedSizesWithLabels);
 //        $this->printProductInfoLogger($jsonString);
 //        $this->logger->info("✅ [PIM Listings] PIM listings information successfully completed.");
 //        $messageType = $message->getActionType();
