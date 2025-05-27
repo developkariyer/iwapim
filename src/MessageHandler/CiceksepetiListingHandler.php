@@ -39,56 +39,7 @@ class CiceksepetiListingHandler
         echo "ciceksepeti categories fetched\n";
         $this->logger->info("✅ [Category Data] Ciceksepeti category details successfully retrieved.");
         $jsonString = $this->listingHelper->getPimListingsInfo($message);
-        $products = json_decode($jsonString, true);
-        $groupedSizes = [];
-        $sizeLabels = ['M', 'L', 'XL', '2XL', '3XL', '4XL'];
-        foreach ($products as $product) {
-            $identifier = $product['mainProductCode'];
-            $size = $product['size'];
-
-            if (!isset($groupedSizes[$identifier])) {
-                $groupedSizes[$identifier] = [];
-            }
-
-            if (!in_array($size, $groupedSizes[$identifier])) {
-                $groupedSizes[$identifier][] = $size;
-            }
-        }
-        $sizeToLabelMap = [];
-        foreach ($groupedSizes as $identifier => $sizes) {
-            foreach ($sizes as $i => $size) {
-                $label = $sizeLabels[$i] ?? 'CUSTOM';
-                $sizeToLabelMap[$identifier][$size] = $label;
-            }
-        }
-        foreach ($products as &$product) {
-            $identifier = $product['mainProductCode'];
-            $size = $product['size'];
-            $product['sizeLabel'] = $sizeToLabelMap[$identifier][$size] ?? 'CUSTOM';
-        }
-        $groupedDescriptions = [];
-        foreach ($products as $product) {
-            $identifier = $product['mainProductCode'];
-            $size = $product['size'];
-            $label = $product['sizeLabel'];
-
-            if (!isset($groupedDescriptions[$identifier])) {
-                $groupedDescriptions[$identifier] = [];
-            }
-            $key = $size . '⇒' . $label;
-            $groupedDescriptions[$identifier][$key] = "<li>{$size} ⇒ {$label}</li>";
-        }
-        $descriptionsHtml = [];
-        foreach ($groupedDescriptions as $identifier => $items) {
-            $html = "<strong>Ölçüler:</strong><ul>" . implode('', $items) . "</ul>";
-            $descriptionsHtml[$identifier] = $html;
-        }
-        foreach ($products as &$product) {
-            $identifier = $product['mainProductCode'];
-            $product['description'] .= "\n" . $descriptionsHtml[$identifier];
-        }
-
-        print_r($products);
+        print_r($jsonString);
 
 //        $this->printProductInfoLogger($jsonString);
 //        $this->logger->info("✅ [PIM Listings] PIM listings information successfully completed.");
