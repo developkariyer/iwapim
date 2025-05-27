@@ -179,6 +179,13 @@ class AutoListingCommand extends AbstractCommand
             }
             $parentId = $parent->getId();
             $productId = $mainProduct->getId();
+
+            $identifier = $parent->getProductIdentifier();
+            if (strpos($identifier, 'CM-') !== 0) {
+                continue;
+            }
+
+
             if (!isset($groupedProducts[$parentId])) {
                 $groupedProducts[$parentId] = [];
             }
