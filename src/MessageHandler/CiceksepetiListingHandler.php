@@ -69,9 +69,15 @@ class CiceksepetiListingHandler
 
         print_r($products);
         $html = "<strong>Ölçüler:</strong><ul>";
+        $seenSizes = [];
         foreach ($products as $product) {
-            $html .= "<li>{$product['size']} ⇒ {$product['sizeLabel']}</li>";
+            $key = $product['size'] . '⇒' . $product['sizeLabel'];
+            if (!in_array($key, $seenSizes)) {
+                $seenSizes[] = $key;
+                $html .= "<li>{$product['size']} ⇒ {$product['sizeLabel']}</li>";
+            }
         }
+
         $html .= "</ul>";
 
         echo $html;
