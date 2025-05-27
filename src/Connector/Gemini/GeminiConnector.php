@@ -66,7 +66,7 @@ class GeminiConnector
                     'color'            => ['type'=>'STRING']
                 ],
                 'required'=>[
-                    'stockCode', 'categoryId','color','size'
+                    'stockCode', 'categoryId','color'
                 ]
             ]
         ]
