@@ -106,23 +106,23 @@ class CiceksepetiListingHandler
             sleep(5);
         }
         print_r($mergedResults);
-//        $this->logger->info("Gemini chat result : " . json_encode($mergedResults, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-//        $data = $this->fillAttributeData($mergedResults);
-//        if (empty($data)) {
-//            $this->logger->error("❌ [No Data] No products found in the data array.");
-//            return [];
-//        }
-//        foreach ($data as $sku => $product) {
-//            if (isset($product['Attributes']) && empty($product['Attributes'])) {
-//                $this->logger->info("❌ [Attributes Empty] Attributes is empty for SKU: {$product['stockCode']}");
-//            } else {
-//                $this->logger->info("✔️ [Attributes Found] Attributes filled for SKU: {$product['stockCode']}");
-//            }
-//        }
-//        $this->logger->info("✅ [Filled Attributes Data] All attributes data processed: " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-//        $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
-//        print_r($formattedData);
-//        $this->logger->info("✅ [Formatted Data]: " . $formattedData);
+        $this->logger->info("Gemini chat result : " . json_encode($mergedResults, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        $data = $this->fillAttributeData($mergedResults);
+        if (empty($data)) {
+            $this->logger->error("❌ [No Data] No products found in the data array.");
+            return [];
+        }
+        foreach ($data as $sku => $product) {
+            if (isset($product['Attributes']) && empty($product['Attributes'])) {
+                $this->logger->info("❌ [Attributes Empty] Attributes is empty for SKU: {$product['stockCode']}");
+            } else {
+                $this->logger->info("✔️ [Attributes Found] Attributes filled for SKU: {$product['stockCode']}");
+            }
+        }
+        $this->logger->info("✅ [Filled Attributes Data] All attributes data processed: " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        $formattedData = $this->fillMissingListingDataAndFormattedCiceksepetiListing($data);
+        print_r($formattedData);
+        $this->logger->info("✅ [Formatted Data]: " . $formattedData);
 //        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
 //        $result = $ciceksepetiConnector->createListing($formattedData);
 //        $this->logger->info("✅ [CiceksepetiConnector] Result batch:\n" . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
@@ -416,7 +416,6 @@ class CiceksepetiListingHandler
             $sizeAttrId = $variantAttributes['size']['id'];
             $sizeValue = trim($product['size']);
             $bestSizeMatch = $this->findBestAttributeMatch($sizeAttrId, $sizeValue, true);
-
             if ($bestSizeMatch) {
                 $attributes[] = [
                     'id' => $sizeAttrId,
@@ -473,33 +472,33 @@ class CiceksepetiListingHandler
         $bestMatch = null;
         $smallestDiff = PHP_INT_MAX;
         foreach ($allValues as $value) {
-            $dbValueNormalized = $this->normalizeAttributeValue($value['name']);
+            //$dbValueNormalized = $this->normalizeAttributeValue($value['name']);
             if ($searchValue === $value['name']) {
                 $this->logger->info("✅ [AttributeMatch] Exact match: '{$searchValue}' ➜ '{$value['name']}' (ID: {$value['attribute_value_id']})");
                 return $value;
             }
-            $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
-            $searchDims = $isSize ? $this->parseDimensions($searchValueNormalized) : null;
-            if ($isSize && $searchDims) {
-                $dbDims = $this->parseDimensions($dbValueNormalized);
-                if ($dbDims) {
-                    $widthDiff = $searchDims['width'] - $dbDims['width'];
-                    $heightDiff = $searchDims['height'] - $dbDims['height'];
-                    $totalDiff = $widthDiff + $heightDiff;
-                    $widthOk = $widthDiff >= 0 && $widthDiff <= 25;
-                    $heightOk = $searchDims['height'] === 0 || ($heightDiff >= 0 && $heightDiff <= 25);
-                    if ($widthOk && $heightOk && $totalDiff < $smallestDiff) {
-                        $smallestDiff = $totalDiff;
-                        $bestMatch = $value;
-                    }
-                }
-            }
+//            $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
+//            $searchDims = $isSize ? $this->parseDimensions($searchValueNormalized) : null;
+//            if ($isSize && $searchDims) {
+//                $dbDims = $this->parseDimensions($dbValueNormalized);
+//                if ($dbDims) {
+//                    $widthDiff = $searchDims['width'] - $dbDims['width'];
+//                    $heightDiff = $searchDims['height'] - $dbDims['height'];
+//                    $totalDiff = $widthDiff + $heightDiff;
+//                    $widthOk = $widthDiff >= 0 && $widthDiff <= 25;
+//                    $heightOk = $searchDims['height'] === 0 || ($heightDiff >= 0 && $heightDiff <= 25);
+//                    if ($widthOk && $heightOk && $totalDiff < $smallestDiff) {
+//                        $smallestDiff = $totalDiff;
+//                        $bestMatch = $value;
+//                    }
+//                }
+//            }
         }
-        if ($bestMatch) {
-            $this->logger->info("🔍 [AttributeMatch] Approximate match: '{$searchValue}' ➜ '{$bestMatch['name']}' (ID: {$bestMatch['attribute_value_id']})");
-        } else {
-            $this->logger->notice("❌ [AttributeMatch] No match found for: '{$searchValueNormalized}' (attributeId: {$attributeId})");
-        }
+//        if ($bestMatch) {
+//            $this->logger->info("🔍 [AttributeMatch] Approximate match: '{$searchValue}' ➜ '{$bestMatch['name']}' (ID: {$bestMatch['attribute_value_id']})");
+//        } else {
+//            $this->logger->notice("❌ [AttributeMatch] No match found for: '{$searchValue}' (attributeId: {$attributeId})");
+//        }
         return $bestMatch;
     }
 
