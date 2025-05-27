@@ -58,13 +58,13 @@ class HelloWorldCommand extends AbstractCommand
             $mainProduct = $mainProducts[0];
             $mainProduct->getProductIdentifier();
             $identifier = $mainProduct->getProductIdentifier();
+            $variationSize = $mainProduct->getVariationSize();
             if (!isset($groupedProducts[$identifier])) {
                 $groupedProducts[$identifier] = [];
             }
-            $groupedProducts[$identifier][] = [
-                'iwasku' => $mainProduct->getIwasku(),
-                'variation_size' => $mainProduct->getVariationSize(),
-            ];
+            if (!in_array($variationSize, $groupedProducts[$identifier], true)) {
+                $groupedProducts[$identifier][] = $variationSize;
+            }
            // $this->dimTest($mainProduct->getVariationSize());
 //            $result = $this->findBestAttributeMatch(2000361, $mainProduct->getVariationSize(), true);
 //            echo $mainProduct->getIwasku() . " - " . $mainProduct->getVariationSize() . " -----> ";
