@@ -264,7 +264,7 @@ class CiceksepetiListingHandler
                 Antrasit, Açık Mavi, Bakır, Vişne, Açık Pembe, Bronz, Ekru, Taş renklerinden kullan 2 renk varsa ikiside bunlara uyumlu olsun aralarında boşluk olsun.
                 Renk örnekleri:
                     Mixed => Karışık,
-                    Tuana => Siyah-Antrasit,
+                    Tuana => Antrasit,
                     Betül => Açık Meşe,
                     Dark Brown => Kahverengi,
                     Light Brown => Ceviz,
@@ -279,7 +279,8 @@ class CiceksepetiListingHandler
                     Soil => Kahverengi,
                     Shiny Silver => Gümüş-Sarı,
                     Shiny Gold => Sarı Altın,
-                    Shiny Copper => Bakır- Altın,  
+                    Shiny Copper => Bakır- Altın,
+                    Bu renkleri olduğu gibi kullan '-' ve boşluklara dikkat et bunları kaldırma.  
             **Veri formatı**: Lütfen yalnızca aşağıdaki **JSON verisini** kullanın ve dışarıya çıkmayın. Çıkışınızı bu veriye dayalı olarak oluşturun:
             İşte veri: $jsonString
             Kategori Verisi: $categories
