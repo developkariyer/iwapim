@@ -75,6 +75,7 @@ class ListingHelperService
             $size = $product['size'];
             $product['sizeLabel'] = $sizeToLabelMap[$identifier][$size] ?? 'CUSTOM';
         }
+        unset($product);
         $groupedDescriptions = [];
         foreach ($results as $product) {
             $identifier = $product['mainProductCode'];
@@ -96,6 +97,7 @@ class ListingHelperService
             $identifier = $product['mainProductCode'];
             $product['description'] .= "\n" . $descriptionsHtml[$identifier];
         }
+        unset($product);
         return json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
