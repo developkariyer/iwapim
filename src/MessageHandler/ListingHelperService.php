@@ -90,7 +90,7 @@ class ListingHelperService
         }
         $descriptionsHtml = [];
         foreach ($groupedDescriptions as $identifier => $items) {
-            $html = "<strong>Ölçüler:</strong><ul>" . implode('', $items) . "</ul>";
+            $html = "<strong>BOYUT SEÇENCEKLERİ:</strong><ul>" . implode('', $items) . "</ul>";
             $descriptionsHtml[$identifier] = $html;
         }
         foreach ($results as &$product) {
