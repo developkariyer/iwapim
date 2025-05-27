@@ -309,7 +309,7 @@ class CiceksepetiListingHandler
                 continue;
             }
             $variantAttributes = $this->getVariantAttributes($product['categoryId']);
-            if (empty($variantAttributes['color']) && empty($variantAttributes['size'])) {
+            if (empty($variantAttributes['color']) && empty($variantAttributes['sizeLabel'])) {
                 continue;
             }
             $product['Attributes'] = $this->buildProductAttributes(
@@ -412,9 +412,9 @@ class CiceksepetiListingHandler
                 $this->logger->error("❌ [Color Match] Not found for value: {$colorValue}");
             }
         }
-        if (!empty($variantAttributes['size']) && isset($product['size']) && !empty(trim($product['size']))) {
+        if (!empty($variantAttributes['size']) && isset($product['sizeLabel']) && !empty(trim($product['sizeLabel']))) {
             $sizeAttrId = $variantAttributes['size']['id'];
-            $sizeValue = trim($product['size']);
+            $sizeValue = trim($product['sizeLabel']);
             $bestSizeMatch = $this->findBestAttributeMatch($sizeAttrId, $sizeValue, true);
             if ($bestSizeMatch) {
                 $attributes[] = [
