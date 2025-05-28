@@ -89,7 +89,7 @@ class AutoListingCommand2 extends AbstractCommand
             }
             $fromMarketplaceVariantCountWithMainProduct++;
             $targetMarketplaceVariantProduct = $this->getTargetMarketplaceVariantProduct($toMarketplace, $iwasku);
-            if (!$targetMarketplaceVariantProduct) {
+            if (!$targetMarketplaceVariantProduct instanceof VariantProduct) {
                 $toMarketplaceNewProductCount++;
             }
             else {
@@ -128,7 +128,7 @@ class AutoListingCommand2 extends AbstractCommand
     {
         $sql = "SELECT oo_id FROM object_query_varyantproduct WHERE sellerSku = :seller_sku AND marketplace__id = :marketplace_id";
         $targetMarketplaceVariantProductIds = Utility::fetchFromSql($sql, ['seller_sku' => $iwasku, 'marketplace_id' => $this->marketplaceConfig[$marketplace]]);
-        if (!is_array($targetMarketplaceVariantProductIds) || empty($ciceksepetiProductsId)) {
+        if (!is_array($targetMarketplaceVariantProductIds) || empty($ciceksepetiProductsId) || !isset($ciceksepetiProductsId[0]['oo_id'])) {
             $this->logger->info("[" . __METHOD__ . "] 🆕 Target Marketplace $marketplace variant product not found for iwasku: $iwasku, adding to list for creation. ");
             return null;
         }
