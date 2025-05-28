@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Connector\Gemini\GeminiConnector;
+use App\Connector\Marketplace\CiceksepetiConnector;
 use App\Message\CiceksepetiCategoryUpdateMessage;
 use App\Message\TestMessage;
 use App\Model\DataObject\Marketplace;
@@ -43,12 +44,13 @@ class HelloWorldCommand extends AbstractCommand
             return is_file($directory . DIRECTORY_SEPARATOR . $file) &&
                 str_starts_with($file, 'CREATE_LISTING_');
         });
+        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
         foreach ($files as $fileName) {
             $filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
             $content = file_get_contents($filePath);
             $json = json_decode($content, true);
             $batchId = $json['response']['batchRequestResult']['batchId'];
-            print_r($batchId . "\n");
+            print_r($ciceksepetiConnector->getBatchRequestResult($batchId));
         }
 
 
