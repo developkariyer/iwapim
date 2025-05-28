@@ -104,18 +104,18 @@ class AutoListingCommand2 extends AbstractCommand
         $this->logger->info("[" . __METHOD__ . "] ✅ From Marketplace $fromMarketplace Count: $fromMarketplaceVariantCountWithMainProduct products find has main product  ");
         $this->logger->info("[" . __METHOD__ . "] ✅ Target Marketplace $toMarketplace Count: $toMarketplaceNewProductCount to marketplace find new products ");
         $this->logger->info("[" . __METHOD__ . "] ✅ Target Marketplace $toMarketplace Count: $toMarketplaceUpdateProductCount to marketplace find update products ");
-        $this->processNewList($newProductList);
-        $this->processUpdateList($updateProductList);
+        $this->processNewList($newProductList, $this->marketplaceConfig[$toMarketplace], $this->marketplaceConfig[$fromMarketplace]);
+        $this->processUpdateList($updateProductList, $this->marketplaceConfig[$toMarketplace], $this->marketplaceConfig[$fromMarketplace]);
     }
 
-    private function processNewList($newProductList)
+    private function processNewList($newProductList, $targetMarketplaceId, $referenceMarketplaceId)
     {
         $message = new ProductListingMessage(
             'list',
-            11,
-            265384,
+            $targetMarketplaceId,
+            $referenceMarketplaceId,
             'admin',
-            [1],
+            $newProductList,
             [],
             1,
             'test',
@@ -123,12 +123,23 @@ class AutoListingCommand2 extends AbstractCommand
         );
         $stamps = [new TransportNamesStamp(['ciceksepeti'])];
         $this->bus->dispatch($message, $stamps);
-
     }
 
-    private function processUpdateList()
+    private function processUpdateList($updateProductList, $targetMarketplaceId, $referenceMarketplaceId)
     {
-
+        $message = new ProductListingMessage(
+            'update_list',
+            $targetMarketplaceId,
+            $referenceMarketplaceId,
+            'admin',
+            $updateProductList,
+            [],
+            1,
+            'test',
+            $this->logger
+        );
+        $stamps = [new TransportNamesStamp(['ciceksepeti'])];
+        $this->bus->dispatch($message, $stamps);
     }
 
     private function getFromMarketplaceVariantIds(string $marketplace): array | null
@@ -165,6 +176,5 @@ class AutoListingCommand2 extends AbstractCommand
         }
         return $targetMarketplaceVariantProduct;
     }
-
 
 }

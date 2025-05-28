@@ -35,6 +35,7 @@ class CiceksepetiListingHandler
         $logger = $message->getLogger();
         echo "Ciceksepeti Listing Handler\n";
         $logger->info("Success logger test");
+        $logger->info(json_encode($message));
 //        sleep(5);
 //        $traceId = $message->getTraceId();
 //        echo "Ciceksepeti Listing Handler\n";
