@@ -48,7 +48,7 @@ class ListingHelperService
                 $logger->error("[" . __METHOD__ . "] ❌ Reference marketplace $referenceMarketplaceKey variant product empty fields");
                 continue;
             }
-            $baseProductData[] = [
+            $baseProductData = [
               'mainProductCode' => $referenceMarketplaceMainProductIdentifier,
               'stockCode' => $referenceMarketplaceMainProductIwasku,
               'size' => $referenceMarketplaceMainProductSize,
@@ -103,14 +103,23 @@ class ListingHelperService
                     isset($node['mediaContentType'], $node['preview']['image']['url'], $node['preview']['image']['width'], $node['preview']['image']['height']) &&
                     $node['mediaContentType'] === 'IMAGE'
                 ) {
-                    $images[] = [
-                        'url' => $node['preview']['image']['url'],
-                        'width' => $node['preview']['image']['width'],
-                        'height' => $node['preview']['image']['height'],
-                    ];
+                    $imageUrl = $node['preview']['image']['url'];
+                    $headers = @get_headers($imageUrl);
+                    if ($headers && strpos($headers[0], '200') !== false) {
+                        $images[] = [
+                            'url' => $imageUrl,
+                            'width' => $node['preview']['image']['width'],
+                            'height' => $node['preview']['image']['height'],
+                        ];
+                    }
                 }
             }
         }
+        $images[] = [
+            'url' => 'https://fake-image.jpg',
+            'width' => 123,
+            'height' => 456,
+        ];
         return $images;
     }
 
