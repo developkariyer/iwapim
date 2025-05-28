@@ -21,7 +21,7 @@ class ListingHelperService
         }
         $referenceMarketplaceName = $referenceMarketplace->getKey();
         $logger->info("[" . __METHOD__ . "] ✅ Reference marketplace found: $referenceMarketplaceName");
-        
+
 
 
     }
