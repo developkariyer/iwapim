@@ -88,10 +88,10 @@ class AutoListingCommand2 extends AbstractCommand
             $fromMarketplaceVariantCountWithMainProduct++;
             $targetMarketplaceVariantProduct = $this->getTargetMarketplaceVariantProduct($toMarketplace, $iwasku);
             if (!$targetMarketplaceVariantProduct instanceof VariantProduct) {
-                $newProductList[] = $fromMarketplaceMainProduct;
+                $newProductList[] = $fromMarketplaceVariantProduct;
             }
             else {
-                $updateProductList[] = $fromMarketplaceMainProduct;
+                $updateProductList[] = ['from' => $fromMarketplaceVariantProduct, 'to' => $targetMarketplaceVariantProduct];
             }
         }
         $toMarketplaceNewProductCount = count($newProductList);
@@ -103,6 +103,16 @@ class AutoListingCommand2 extends AbstractCommand
         $this->logger->info("[" . __METHOD__ . "] ✅ Target Marketplace $toMarketplace Count: $toMarketplaceUpdateProductCount to marketplace find update products ");
 
 
+
+    }
+
+    private function processNewList()
+    {
+
+    }
+
+    private function processUpdateList()
+    {
 
     }
 
