@@ -58,8 +58,6 @@ class AutoListingCommand2 extends AbstractCommand
         $fromMarketplaceNoMainProductCount = 0;
         $fromMarketplaceManyMainProductCount = 0;
         $fromMarketplaceVariantCountWithMainProduct = 0;
-        $toMarketplaceNewProductCount = 0;
-        $toMarketplaceUpdateProductCount = 0;
         foreach ($fromMarketplaceVariantIds as $fromMarketplaceVariantId) {
             $fromMarketplaceVariantProduct = VariantProduct::getById($fromMarketplaceVariantId);
             if (!$fromMarketplaceVariantProduct instanceof VariantProduct) {
@@ -90,15 +88,14 @@ class AutoListingCommand2 extends AbstractCommand
             $fromMarketplaceVariantCountWithMainProduct++;
             $targetMarketplaceVariantProduct = $this->getTargetMarketplaceVariantProduct($toMarketplace, $iwasku);
             if (!$targetMarketplaceVariantProduct instanceof VariantProduct) {
-                $toMarketplaceNewProductCount++;
+                $newProductList[] = $fromMarketplaceMainProduct;
             }
             else {
-                $toMarketplaceUpdateProductCount++;
+                $updateProductList[] = $fromMarketplaceMainProduct;
             }
-
-
-
         }
+        $toMarketplaceNewProductCount = count($newProductList);
+        $toMarketplaceUpdateProductCount = count($updateProductList);
         $this->logger->warning("[" . __METHOD__ . "] ⚠️ From Marketplace $fromMarketplace Count: $fromMarketplaceNoMainProductCount products find has no main product ");
         $this->logger->warning("[" . __METHOD__ . "] ⚠️ From Marketplace $fromMarketplace Count: $fromMarketplaceManyMainProductCount products find main product count is more than 1 ");
         $this->logger->info("[" . __METHOD__ . "] ✅ From Marketplace $fromMarketplace Count: $fromMarketplaceVariantCountWithMainProduct products find has main product  ");
