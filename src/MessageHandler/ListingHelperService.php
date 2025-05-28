@@ -34,7 +34,7 @@ class ListingHelperService
                 $logger->error("[" . __METHOD__ . "] ❌ Reference marketplace  variant product not found: $variantId");
                 continue;
             }
-            $referenceMarketplaceMainProduct = $referenceMarketplaceVariantProduct->getMainProduct();
+            $referenceMarketplaceMainProduct = $referenceMarketplaceVariantProduct->getMainProduct()[0];
             if (!$referenceMarketplaceMainProduct instanceof Product) {
                 $logger->error("[" . __METHOD__ . "] ❌ Reference marketplace $referenceMarketplaceKey variant product not found $variantId");
                 continue;
