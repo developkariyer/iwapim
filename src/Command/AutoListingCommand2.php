@@ -88,10 +88,13 @@ class AutoListingCommand2 extends AbstractCommand
             $fromMarketplaceVariantCountWithMainProduct++;
             $targetMarketplaceVariantProduct = $this->getTargetMarketplaceVariantProduct($toMarketplace, $iwasku);
             if (!$targetMarketplaceVariantProduct instanceof VariantProduct) {
-                $newProductList[] = $fromMarketplaceVariantProduct;
+                $newProductList[] = $fromMarketplaceVariantProduct->getId();
             }
             else {
-                $updateProductList[] = ['from' => $fromMarketplaceVariantProduct, 'to' => $targetMarketplaceVariantProduct];
+                $updateProductList[] = [
+                    'from' => $fromMarketplaceVariantProduct->getId(),
+                    'to' => $targetMarketplaceVariantProduct->getId()
+                ];
             }
         }
         $toMarketplaceNewProductCount = count($newProductList);
@@ -101,13 +104,24 @@ class AutoListingCommand2 extends AbstractCommand
         $this->logger->info("[" . __METHOD__ . "] ✅ From Marketplace $fromMarketplace Count: $fromMarketplaceVariantCountWithMainProduct products find has main product  ");
         $this->logger->info("[" . __METHOD__ . "] ✅ Target Marketplace $toMarketplace Count: $toMarketplaceNewProductCount to marketplace find new products ");
         $this->logger->info("[" . __METHOD__ . "] ✅ Target Marketplace $toMarketplace Count: $toMarketplaceUpdateProductCount to marketplace find update products ");
-
-
-
+        $this->processNewList($newProductList);
+        $this->processUpdateList($updateProductList);
     }
 
-    private function processNewList()
+    private function processNewList($newProductList)
     {
+        $message = new ProductListingMessage(
+            'list',
+            11,
+            265384,
+            'admin',
+            [1],
+            [],
+            1,
+            'test'
+        );
+        $stamps = [new TransportNamesStamp(['ciceksepeti'])];
+        $this->bus->dispatch($message, $stamps);
 
     }
 

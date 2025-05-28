@@ -20,10 +20,11 @@ use App\Logger\LoggerFactory;
 class CiceksepetiListingHandler
 {
     private LoggerInterface $logger;
-    public function __construct(ListingHelperService $listingHelperService)
+    public function __construct(ListingHelperService $listingHelperService, LoggerInterface $ciceksepetiAutoListingLogger)
     {
         $this->listingHelper = $listingHelperService;
-        $this->logger = LoggerFactory::create('ciceksepeti','auto_listing');
+        //$this->logger = LoggerFactory::create('ciceksepeti','auto_listing');
+        $this->logger = $ciceksepetiAutoListingLogger;
     }
 
     /**
@@ -31,22 +32,23 @@ class CiceksepetiListingHandler
      */
     public function __invoke(ProductListingMessage $message): void
     {
-        sleep(5);
-        $traceId = $message->getTraceId();
-        echo "Ciceksepeti Listing Handler\n";
-        $this->logger->info("🚀 [Listing Started] Automated product listing process started Ciceksepeti | Trace ID: {$traceId}");
-        $categories = $this->getCiceksepetiCategoriesDetails();
-        echo "ciceksepeti categories fetched\n";
-        $this->logger->info("✅ [Category Data] Ciceksepeti category details successfully retrieved.");
-        $jsonString = $this->listingHelper->getPimListingsInfo($message);
-        $this->printProductInfoLogger($jsonString);
-        $this->logger->info("✅ [PIM Listings] PIM listings information successfully completed.");
-        $messageType = $message->getActionType();
-        $this->logger->info("📝 [Action Type] Processing action of type: {$messageType}");
-        match ($messageType) {
-            'list' => $this->processListingData($jsonString, $categories),
-            default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
-        };
+        $this->logger("Success logger test");
+//        sleep(5);
+//        $traceId = $message->getTraceId();
+//        echo "Ciceksepeti Listing Handler\n";
+//        $this->logger->info("🚀 [Listing Started] Automated product listing process started Ciceksepeti | Trace ID: {$traceId}");
+//        $categories = $this->getCiceksepetiCategoriesDetails();
+//        echo "ciceksepeti categories fetched\n";
+//        $this->logger->info("✅ [Category Data] Ciceksepeti category details successfully retrieved.");
+//        $jsonString = $this->listingHelper->getPimListingsInfo($message);
+//        $this->printProductInfoLogger($jsonString);
+//        $this->logger->info("✅ [PIM Listings] PIM listings information successfully completed.");
+//        $messageType = $message->getActionType();
+//        $this->logger->info("📝 [Action Type] Processing action of type: {$messageType}");
+//        match ($messageType) {
+//            'list' => $this->processListingData($jsonString, $categories),
+//            default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
+//        };
     }
 
     private function printProductInfoLogger(string $jsonString): void

@@ -7,6 +7,7 @@ use Symfony\Component\Uid\Uuid;
 class ProductListingMessage
 {
     public const ACTION_LIST = 'list';
+    PUBLİC const ACTION_UPDATE_LIST = 'update_list';
     public const ACTION_UNLIST = 'unlist';
     public const ACTION_UPDATE_PRICE = 'update_price';
     public const ACTION_UPDATE_STOCK = 'update_stock';
@@ -17,20 +18,21 @@ class ProductListingMessage
     public const TARGET_TEST = 'test';
 
     private string $traceId;
-    private string $actionType; // Ne yapılacağını belirtir
-    private int $productId;  // Ana ürün ID'si
-    private int $marketplaceId; // Pazaryeri ID'si (Pimcore içindeki)
-    private string $userName; // İşlemi başlatan kullanıcı
-    private array $variantIds; // İşlem yapılacak varyantların ID listesi
-    private array $payload; // Aksiyona özel ek veri (örn: yeni fiyat, stok miktarı)
-    private int $priority; // Mesajın işlenme önceliği
-    private ?string $targetAccountKey; // Hangi pazaryeri hesabı kullanılacak (örn: 'live', 'test')
-    private \DateTimeImmutable $createdAt; // Mesajın oluşturulma zamanı
+    private string $actionType;
+    private int $targetMarketplaceId;
+    private int $referenceMarketplaceId;
+
+    private string $userName;
+    private array $variantIds;
+    private array $payload; // update price update stock ?
+    private int $priority;
+    private ?string $targetAccountKey;
+    private \DateTimeImmutable $createdAt;
 
     public function __construct(
         string $actionType,
-        int $productId,
-        int $marketplaceId,
+        int $targetMarketplaceId,
+        int $referenceMarketplaceId,
         string $userName,
         array $variantIds,
         array $payload = [],
@@ -41,8 +43,9 @@ class ProductListingMessage
         $validActions = [
             self::ACTION_LIST,
             self::ACTION_UNLIST,
+            self::ACTION_UPDATE_LIST,
             self::ACTION_UPDATE_PRICE,
-            self::ACTION_UPDATE_STOCK,
+            self::ACTION_UPDATE_STOCK
         ];
         if (!in_array($actionType, $validActions)) {
             throw new \InvalidArgumentException(sprintf('Geçersiz aksiyon tipi: "%s". İzin verilenler: %s', $actionType, implode(', ', $validActions)));
@@ -64,14 +67,14 @@ class ProductListingMessage
         }
 
         $this->actionType = $actionType;
-        $this->productId = $productId;
-        $this->marketplaceId = $marketplaceId;
+        $this->$targetMarketplaceId = $targetMarketplaceId;
         $this->userName = $userName;
         $this->variantIds = $variantIds;
         $this->payload = $payload;
         $this->priority = $priority;
         $this->targetAccountKey = $targetAccountKey;
         $this->createdAt = new \DateTimeImmutable();
+        $this->referenceMarketplaceId = $referenceMarketplaceId;
         $this->traceId = $traceId ?? Uuid::v4()->toRfc4122();
     }
 
@@ -85,14 +88,9 @@ class ProductListingMessage
         return $this->actionType;
     }
 
-    public function getProductId(): int
+    public function getTargetMarketplaceId(): int
     {
-        return $this->productId;
-    }
-
-    public function getMarketplaceId(): int
-    {
-        return $this->marketplaceId;
+        return $this->$targetMarketplaceId;
     }
 
     public function getUserName(): string
