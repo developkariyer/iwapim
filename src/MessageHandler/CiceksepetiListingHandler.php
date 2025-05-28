@@ -32,8 +32,9 @@ class CiceksepetiListingHandler
      */
     public function __invoke(ProductListingMessage $message): void
     {
+        $logger = $message->getLogger();
         echo "Ciceksepeti Listing Handler\n";
-        $this->logger->info("Success logger test");
+        $logger->info("Success logger test");
 //        sleep(5);
 //        $traceId = $message->getTraceId();
 //        echo "Ciceksepeti Listing Handler\n";

@@ -3,6 +3,7 @@
 namespace App\Message;
 
 use Symfony\Component\Uid\Uuid;
+use Psr\Log\LoggerInterface;
 
 class ProductListingMessage
 {
@@ -28,6 +29,7 @@ class ProductListingMessage
     private int $priority;
     private ?string $targetAccountKey;
     private \DateTimeImmutable $createdAt;
+    private LoggerInterface $logger;
 
     public function __construct(
         string $actionType,
@@ -38,7 +40,8 @@ class ProductListingMessage
         array $payload = [],
         int $priority = self::PRIORITY_NORMAL,
         string $targetAccountKey,
-        ?string $traceId = null
+        ?string $traceId = null,
+        LoggerInterface $logger
     ) {
         $validActions = [
             self::ACTION_LIST,
@@ -76,6 +79,7 @@ class ProductListingMessage
         $this->createdAt = new \DateTimeImmutable();
         $this->referenceMarketplaceId = $referenceMarketplaceId;
         $this->traceId = $traceId ?? Uuid::v4()->toRfc4122();
+        $this->logger = $logger;
     }
 
     public function getTraceId(): string
@@ -91,6 +95,11 @@ class ProductListingMessage
     public function getTargetMarketplaceId(): int
     {
         return $this->$targetMarketplaceId;
+    }
+
+    public function getLogger(): LoggerInterface
+    {
+        return $this->logger;
     }
 
     public function getUserName(): string

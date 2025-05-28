@@ -118,7 +118,8 @@ class AutoListingCommand2 extends AbstractCommand
             [1],
             [],
             1,
-            'test'
+            'test',
+            $this->logger
         );
         $stamps = [new TransportNamesStamp(['ciceksepeti'])];
         $this->bus->dispatch($message, $stamps);
