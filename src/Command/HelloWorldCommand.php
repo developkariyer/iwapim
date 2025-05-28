@@ -39,21 +39,8 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $directory = PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/Ciceksepeti";
-        $files = array_filter(scandir($directory), function ($file) use ($directory) {
-            return is_file($directory . DIRECTORY_SEPARATOR . $file) &&
-                str_starts_with($file, 'CREATE_LISTING_');
-        });
-        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
-        foreach ($files as $fileName) {
-            $filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
-            $content = file_get_contents($filePath);
-            $json = json_decode($content, true);
-            $batchId = $json['response']['batchRequestResult']['batchId'];
-            $result = $ciceksepetiConnector->getBatchRequestResult($batchId);
-            echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . "\n\n";
-        }
-
+        $marketplace = Marketplace::getById(84124);
+        echo $marketplace->getName();
 
         return Command::SUCCESS;
     }
