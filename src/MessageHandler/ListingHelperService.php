@@ -11,7 +11,24 @@ use App\Utils\Utility;
 class ListingHelperService
 {
 
-    public function getPimListingsInfo(ProductListingMessage $message)
+    public function getPimlistingsInfo(ProductListingMessage $message, $logger)
+    {
+        $referenceMarketplaceId = $message->getReferenceMarketplaceId();
+        $referenceMarketplace = Marketplace::getById($referenceMarketplaceId);
+        if (!$referenceMarketplace instanceof Marketplace) {
+            $logger->error("[" . __METHOD__ . "] ❌ Reference marketplace not found: $referenceMarketplaceId");
+            return false;
+        }
+        $referenceMarketplaceName = $referenceMarketplace->getMarketplaceKey();
+        $logger->info("[" . __METHOD__ . "] ✅ Reference marketplace found: $referenceMarketplaceName");
+        
+    }
+
+
+
+
+
+    public function getPimListingsInfo2(ProductListingMessage $message)
     {
         $marketplace = Marketplace::getById($message->getMarketplaceId());
         if (!$marketplace instanceof Marketplace) {

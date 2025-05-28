@@ -70,7 +70,7 @@ class ProductListingMessage
         }
 
         $this->actionType = $actionType;
-        $this->$targetMarketplaceId = $targetMarketplaceId;
+        $this->targetMarketplaceId = $targetMarketplaceId;
         $this->userName = $userName;
         $this->variantIds = $variantIds;
         $this->payload = $payload;
@@ -94,7 +94,12 @@ class ProductListingMessage
 
     public function getTargetMarketplaceId(): int
     {
-        return $this->$targetMarketplaceId;
+        return $this->targetMarketplaceId;
+    }
+
+    public function getReferenceMarketplaceId(): int
+    {
+        return $this->referenceMarketplaceId;
     }
 
     public function getLogger(): LoggerInterface

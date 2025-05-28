@@ -35,7 +35,14 @@ class CiceksepetiListingHandler
         }
         echo "Ciceksepeti Listing Handler\n";
         $this->logger->info("[" . __METHOD__ . "] 🚀 Ciceksepeti Listing Handler Started");
-
+        $actionType = $message->getActionType();
+        echo "action type: $actionType\n";
+        $this->logger->info("[" . __METHOD__ . "] ✅ Action Type: $actionType ");
+        match ($actionType) {
+            'list' => $this->processNewListing($message),
+            'update_list' => $this->processUpdateListing($message),
+            default => throw new \InvalidArgumentException("Unknown Action Type: $actionType")
+        };
 
 //        sleep(5);
 //        $traceId = $message->getTraceId();
@@ -53,6 +60,20 @@ class CiceksepetiListingHandler
 //            'list' => $this->processListingData($jsonString, $categories),
 //            default => throw new \InvalidArgumentException("Unknown Action Type: $messageType"),
 //        };
+    }
+
+    private function processNewListing($message)
+    {
+        $this->logger->info("[" . __METHOD__ . "] ✅ Processing new listing ");
+        $listingInfo = $this->listingHelper->getPimListingsInfo($message, $this->logger);
+        // referans alınan marketplace biligisi variant id bilgisi gönderilir variant id ler referansa ait zaten
+        // referans kullanılarak her mağaza için alınacak bilgileri alacağız
+
+    }
+
+    private function processUpdateListing($message)
+    {
+        //
     }
 
     private function printProductInfoLogger(string $jsonString): void
