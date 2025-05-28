@@ -64,28 +64,28 @@ class AutoListingCommand2 extends AbstractCommand
             $fromMarketplaceVariantProduct = VariantProduct::getById($fromMarketplaceVariantId);
             if (!$fromMarketplaceVariantProduct instanceof VariantProduct) {
                 echo "Invalid $fromMarketplaceVariantId, skipping...\n";
-                $this->logger->warning("[" . __METHOD__ . "] ⚠️ Invalid $fromMarketplaceVariantId, skipping...");
+                $this->logger->warning("[" . __METHOD__ . "] ⚠️ From Marketplace $fromMarketplace Invalid variantProductId:$fromMarketplaceVariantId, skipping...");
                 continue;
             }
             $fromMarketplaceMainProducts = $fromMarketplaceVariantProduct->getMainProduct();
             if (!is_array($fromMarketplaceMainProducts) || empty($fromMarketplaceMainProducts)) {
                 $fromMarketplaceNoMainProductCount++;
-                $this->logger->warning("[" . __METHOD__ . "] ⚠️ $fromMarketplaceVariantId has no main product ");
+                $this->logger->warning("[" . __METHOD__ . "] ⚠️ From Marketplace $fromMarketplace variantProductId:$fromMarketplaceVariantId has no main product ");
                 continue;
             }
             if (count($fromMarketplaceMainProducts) > 1) {
                 $fromMarketplaceManyMainProductCount++;
-                $this->logger->warning("[" . __METHOD__ . "] ⚠️ $fromMarketplaceVariantId has many main products ");
+                $this->logger->warning("[" . __METHOD__ . "] ⚠️ From Marketplace $fromMarketplace variantProductId:$fromMarketplaceVariantId has many main products ");
                 continue;
             }
             $fromMarketplaceMainProduct = $fromMarketplaceMainProducts[0];
             if (!$fromMarketplaceMainProduct instanceof Product) {
-                $this->logger->warning("[" . __METHOD__ . "] ⚠️ $fromMarketplaceVariantId has invalid main product ");
+                $this->logger->warning("[" . __METHOD__ . "] ⚠️ From Marketplace $fromMarketplace variantProductId:$fromMarketplaceVariantId has invalid main product ");
                 continue;
             }
             $iwasku = $fromMarketplaceMainProduct->getIwasku();
             if (!$iwasku) {
-                $this->logger->warning("[" . __METHOD__ . "] ⚠️ $fromMarketplaceVariantId has no iwasku ");
+                $this->logger->warning("[" . __METHOD__ . "] ⚠️ From Marketplace $fromMarketplace variantProductId:$fromMarketplaceVariantId has no iwasku ");
             }
             $fromMarketplaceVariantCountWithMainProduct++;
             $targetMarketplaceVariantProduct = $this->getTargetMarketplaceVariantProduct($toMarketplace, $iwasku);
@@ -99,11 +99,11 @@ class AutoListingCommand2 extends AbstractCommand
 
 
         }
-        $this->logger->warning("[" . __METHOD__ . "] ⚠️ $fromMarketplaceNoMainProductCount products has no main product ");
-        $this->logger->warning("[" . __METHOD__ . "] ⚠️ $fromMarketplaceManyMainProductCount products main product count is more than 1 ");
-        $this->logger->info("[" . __METHOD__ . "] ✅ $fromMarketplaceVariantCountWithMainProduct products has main product  ");
-        $this->logger->info("[" . __METHOD__ . "] ✅ $toMarketplaceNewProductCount to marketplace new products ");
-        $this->logger->info("[" . __METHOD__ . "] ✅ $toMarketplaceUpdateProductCount to marketplace update products ");
+        $this->logger->warning("[" . __METHOD__ . "] ⚠️ From Marketplace $fromMarketplace Count: $fromMarketplaceNoMainProductCount products find has no main product ");
+        $this->logger->warning("[" . __METHOD__ . "] ⚠️ From Marketplace $fromMarketplace Count: $fromMarketplaceManyMainProductCount products find main product count is more than 1 ");
+        $this->logger->info("[" . __METHOD__ . "] ✅ From Marketplace $fromMarketplace Count: $fromMarketplaceVariantCountWithMainProduct products find has main product  ");
+        $this->logger->info("[" . __METHOD__ . "] ✅ Target Marketplace $toMarketplace Count: $toMarketplaceNewProductCount to marketplace find new products ");
+        $this->logger->info("[" . __METHOD__ . "] ✅ Target Marketplace $toMarketplace Count: $toMarketplaceUpdateProductCount to marketplace find update products ");
 
 
 
