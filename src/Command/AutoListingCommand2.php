@@ -52,12 +52,14 @@ class AutoListingCommand2 extends AbstractCommand
     {
         echo "Syncing $fromMarketplace to $toMarketplace\n";
         $this->logger->info("[" . __METHOD__ . "] 🚀 Syncing $fromMarketplace to $toMarketplace");
-        $fromMarketplaceVariantIds = $this->getMarketplaceVariantIds($fromMarketplace);
+        $fromMarketplaceVariantIds = $this->getFromMarketplaceVariantIds($fromMarketplace);
         $updateProductList = [];
         $newProductList = [];
-        $noMainProductCount = 0;
-        $manyMainProductCount = 0;
-        $variantCountWithMainProduct = 0;
+        $fromMarketplaceNoMainProductCount = 0;
+        $fromMarketplaceManyMainProductCount = 0;
+        $fromMarketplaceVariantCountWithMainProduct = 0;
+        $toMarketplaceNewProductCount = 0;
+        $toMarketplaceUpdateProductCount = 0;
         foreach ($fromMarketplaceVariantIds as $fromMarketplaceVariantId) {
             $fromMarketplaceVariantProduct = VariantProduct::getById($fromMarketplaceVariantId);
             if (!$fromMarketplaceVariantProduct instanceof VariantProduct) {
@@ -67,12 +69,12 @@ class AutoListingCommand2 extends AbstractCommand
             }
             $fromMarketplaceMainProducts = $fromMarketplaceVariantProduct->getMainProduct();
             if (!is_array($fromMarketplaceMainProducts) || empty($fromMarketplaceMainProducts)) {
-                $noMainProductCount++;
+                $fromMarketplaceNoMainProductCount++;
                 $this->logger->warning("[" . __METHOD__ . "] ⚠️ $fromMarketplaceVariantId has no main product ");
                 continue;
             }
             if (count($fromMarketplaceMainProducts) > 1) {
-                $manyMainProductCount++;
+                $fromMarketplaceManyMainProductCount++;
                 $this->logger->warning("[" . __METHOD__ . "] ⚠️ $fromMarketplaceVariantId has many main products ");
                 continue;
             }
@@ -85,28 +87,61 @@ class AutoListingCommand2 extends AbstractCommand
             if (!$iwasku) {
                 $this->logger->warning("[" . __METHOD__ . "] ⚠️ $fromMarketplaceVariantId has no iwasku ");
             }
-            $variantCountWithMainProduct++;
+            $fromMarketplaceVariantCountWithMainProduct++;
+            $targetMarketplaceVariantProduct = $this->getTargetMarketplaceVariantProduct($toMarketplace, $iwasku);
+            if (!$targetMarketplaceVariantProduct) {
+                $toMarketplaceNewProductCount++;
+            }
+            else {
+                $toMarketplaceUpdateProductCount++;
+            }
+
+
+
         }
-        $this->logger->warning("[" . __METHOD__ . "] ⚠️ $noMainProductCount products has no main product ");
-        $this->logger->warning("[" . __METHOD__ . "] ⚠️ $manyMainProductCount products main product count is more than 1 ");
-        $this->logger->info("[" . __METHOD__ . "] ✅ $variantCountWithMainProduct products has main product  ");
+        $this->logger->warning("[" . __METHOD__ . "] ⚠️ $fromMarketplaceNoMainProductCount products has no main product ");
+        $this->logger->warning("[" . __METHOD__ . "] ⚠️ $fromMarketplaceManyMainProductCount products main product count is more than 1 ");
+        $this->logger->info("[" . __METHOD__ . "] ✅ $fromMarketplaceVariantCountWithMainProduct products has main product  ");
+        $this->logger->info("[" . __METHOD__ . "] ✅ $toMarketplaceNewProductCount to marketplace new products ");
+        $this->logger->info("[" . __METHOD__ . "] ✅ $toMarketplaceUpdateProductCount to marketplace update products ");
+
 
 
     }
 
-    private function getMarketplaceVariantIds(string $marketplace): array | null
+    private function getFromMarketplaceVariantIds(string $marketplace): array | null
     {
         $variantProductQuerySql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";
         $variantProductIds = Utility::fetchFromSql($variantProductQuerySql, ['marketplace_id' => $this->marketplaceConfig[$marketplace]]);
         if (!is_array($variantProductIds) || empty($variantProductIds)) {
             echo "Marketplace $marketplace variant product ids not found\n";
-            $this->logger->error("[" . __METHOD__ . "] ❌ Marketplace $marketplace variant product ids not found");
+            $this->logger->error("[" . __METHOD__ . "] ❌ From Marketplace $marketplace variant product ids not found");
             return null;
         }
         $count = count($variantProductIds);
         echo "Marketplace $marketplace variant product ids found: $count\n";
-        $this->logger->info("[" . __METHOD__ . "] ✅ Marketplace $marketplace variant product ids found: $count");
+        $this->logger->info("[" . __METHOD__ . "] ✅ From Marketplace $marketplace variant product ids found: $count");
         return array_column($variantProductIds, 'oo_id');
+    }
+
+    private function getTargetMarketplaceVariantProduct(string $marketplace, string $iwasku): VariantProduct | null
+    {
+        $sql = "SELECT oo_id FROM object_query_varyantproduct WHERE sellerSku = :seller_sku AND marketplace__id = :marketplace_id";
+        $targetMarketplaceVariantProductIds = Utility::fetchFromSql($sql, ['seller_sku' => $iwasku, 'marketplace_id' => $this->marketplaceConfig[$marketplace]]);
+        if (!is_array($targetMarketplaceVariantProductIds) || empty($ciceksepetiProductsId)) {
+            $this->logger->info("[" . __METHOD__ . "] 🆕 Target Marketplace $marketplace variant product not found for iwasku: $iwasku, adding to list for creation. ");
+            return null;
+        }
+        if (count($targetMarketplaceVariantProductIds) > 1) {
+            $this->logger->error("[" . __METHOD__ . "] ❌ Target Marketplace $marketplace variant product count is more than 1 for iwasku: $iwasku ");
+        }
+        $targetMarketplaceVariantProductId = $targetMarketplaceVariantProductIds[0]['oo_id'] ?? '';
+        $targetMarketplaceVariantProduct = VariantProduct::getById($targetMarketplaceVariantProductId);
+        if (!$targetMarketplaceVariantProduct instanceof VariantProduct) {
+            $this->logger->error("[" . __METHOD__ . "] ❌ Target Marketplace $marketplace variant product not found for iwasku: $iwasku ");
+            return null;
+        }
+        return $targetMarketplaceVariantProduct;
     }
 
 
