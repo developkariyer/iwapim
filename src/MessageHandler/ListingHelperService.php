@@ -17,17 +17,102 @@ class ListingHelperService
         $referenceMarketplace = Marketplace::getById($referenceMarketplaceId);
         if (!$referenceMarketplace instanceof Marketplace) {
             $logger->error("[" . __METHOD__ . "] ❌ Reference marketplace not found: $referenceMarketplaceId");
-            return false;
+            return null;
         }
         $referenceMarketplaceType = $referenceMarketplace->getMarketplaceType();
-        $logger->info("[" . __METHOD__ . "] ✅ Reference marketplace found: $referenceMarketplaceType");
+        $referenceMarketplaceKey = $referenceMarketplace->getKey();
+        $logger->info("[" . __METHOD__ . "] ✅ Reference marketplace found: $referenceMarketplaceType:$referenceMarketplaceKey");
+        $variantIds = $message->getVariantIds();
+        if (empty($variantIds)) {
+            $logger->error("[" . __METHOD__ . "] ❌ No variant IDs found");
+            return null;
+        }
+        $result = [];
+        foreach ($variantIds as $variantId) {
+            $referenceMarketplaceVariantProduct = VariantProduct::getById($variantId);
+            if (!$referenceMarketplaceVariantProduct instanceof VariantProduct) {
+                $logger->error("[" . __METHOD__ . "] ❌ Reference marketplace  variant product not found: $variantId");
+                continue;
+            }
+            $referenceMarketplaceMainProduct = $referenceMarketplaceVariantProduct->getMainProduct();
+            if (!$referenceMarketplaceMainProduct instanceof Product) {
+                $logger->error("[" . __METHOD__ . "] ❌ Reference marketplace $referenceMarketplaceKey variant product not found $variantId");
+                continue;
+            }
+            $referenceMarketplaceMainProductIdentifier = $referenceMarketplaceMainProduct->getProductIdentifier();
+            $referenceMarketplaceMainProductIwasku = $referenceMarketplaceMainProduct->getIwasku();
+            $referenceMarketplaceMainProductSize = $referenceMarketplaceMainProduct->getVariationSize();
+            $referenceMarketplaceMainProductColor = $referenceMarketplaceMainProduct->getVariationColor();
+            $referenceMarketplaceMainProductEanGtin = $referenceMarketplaceMainProduct->getEanGtin() ?? '';
+            if (empty($referenceMarketplaceMainProductIdentifier) || empty($referenceMarketplaceMainProductIwasku) || empty($referenceMarketplaceMainProductSize) || empty($referenceMarketplaceMainProductColor)) {
+                $logger->error("[" . __METHOD__ . "] ❌ Reference marketplace $referenceMarketplaceKey variant product empty fields");
+                continue;
+            }
+            $baseProductData[] = [
+              'mainProductCode' => $referenceMarketplaceMainProductIdentifier,
+              'stockCode' => $referenceMarketplaceMainProductIwasku,
+              'size' => $referenceMarketplaceMainProductSize,
+              'color' => $referenceMarketplaceMainProductColor,
+              'ean' => $referenceMarketplaceMainProductEanGtin,
+            ];
+            $additionalData = match ($referenceMarketplaceType) {
+                'Shopify' => $this->getShopifyAdditionalData($referenceMarketplaceVariantProduct),
+                default => null,
+            };
+            if (empty($additionalData)) {
+                $this->logger->error("[" . __METHOD__ . "] ❌ Reference marketplace $referenceMarketplaceKey variant product:$variantId additional data is empty");
+                continue;
+            }
+            $result[] = array_merge($baseProductData, $additionalData);
+            break;
+        }
+        print_r($result);
 
 
 
     }
 
+    private function getShopifyAdditionalData($referenceMarketplaceVariantProduct)
+    {
+        $parentApiJsonShopify = json_decode($referenceMarketplaceVariantProduct->jsonRead('parentResponseJson'), true);
+        $apiJsonShopify = json_decode($referenceMarketplaceVariantProduct->jsonRead('apiResponseJson'), true);
+        $shopifyIsActive = isset($parentApiJsonShopify['status']) && $parentApiJsonShopify['status'] === 'ACTIVE';
+        $title = $parentApiJsonShopify['title'] ?? '';
+        $description = $parentApiJsonShopify['descriptionHtml'] ?? '';
+        $stockQuantity = $apiJsonShopify['inventoryQuantity'] ?? '';
+        $salesPrice = $apiJsonShopify['price'] ?? '';
+        $images = $this->getShopifyImages($parentApiJsonShopify);
+        if (!$shopifyIsActive || empty($images) || empty($title) || empty($description) || empty($stockQuantity) || empty($salesPrice) ) {
+            return [];
+        }
+        return [
+            'title' => $title,
+            'description' => $description,
+            'stockQuantity' => $stockQuantity,
+            'salesPrice' => $salesPrice,
+            'images' => $images
+        ];
+    }
 
-
+    private function getShopifyImages($parentApiJsonShopify): array | null
+    {
+        $images = [];
+        if (isset($parentApiJsonShopify['media']['nodes'])) {
+            foreach ($parentApiJsonShopify['media']['nodes'] as $node) {
+                if (
+                    isset($node['mediaContentType'], $node['preview']['image']['url'], $node['preview']['image']['width'], $node['preview']['image']['height']) &&
+                    $node['mediaContentType'] === 'IMAGE'
+                ) {
+                    $images[] = [
+                        'url' => $node['preview']['image']['url'],
+                        'width' => $node['preview']['image']['width'],
+                        'height' => $node['preview']['image']['height'],
+                    ];
+                }
+            }
+        }
+        return $images;
+    }
 
 
     public function getPimListingsInfo2(ProductListingMessage $message)
@@ -152,7 +237,7 @@ class ListingHelperService
         ];
     }
 
-    private function getShopifyImages($mainProduct, $parentApiJsonShopify)
+    private function getShopifyImages2($mainProduct, $parentApiJsonShopify)
     {
         $images = [];
         $widthThreshold = 2000;
