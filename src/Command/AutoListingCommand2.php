@@ -44,26 +44,53 @@ class AutoListingCommand2 extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->getMarketplaceVariantIds('ShopifyCfwTr');
+        $this->syncMarketplaceProducts('ShopifyCfwTr', 'Ciceksepeti');
         return Command::SUCCESS;
     }
 
     private function syncMarketplaceProducts($fromMarketplace, $toMarketplace)
     {
         echo "Syncing $fromMarketplace to $toMarketplace\n";
-        $this->logger->info("🚀 Syncing $fromMarketplace to $toMarketplace");
+        $this->logger->info("[" . __METHOD__ . "] 🚀 Syncing $fromMarketplace to $toMarketplace");
         $fromMarketplaceVariantIds = $this->getMarketplaceVariantIds($fromMarketplace);
         $updateProductList = [];
         $newProductList = [];
+        $noMainProductCount = 0;
+        $manyMainProductCount = 0;
+        $variantCountWithMainProduct = 0;
         foreach ($fromMarketplaceVariantIds as $fromMarketplaceVariantId) {
             $fromMarketplaceVariantProduct = VariantProduct::getById($fromMarketplaceVariantId);
             if (!$fromMarketplaceVariantProduct instanceof VariantProduct) {
                 echo "Invalid $fromMarketplaceVariantId, skipping...\n";
-                $this->logger->error("❌ Invalid $fromMarketplaceVariantId, skipping...");
+                $this->logger->warning("[" . __METHOD__ . "] ⚠️ Invalid $fromMarketplaceVariantId, skipping...");
                 continue;
             }
-
+            $fromMarketplaceMainProducts = $fromMarketplaceVariantProduct->getMainProduct();
+            if (!is_array($fromMarketplaceMainProducts) || empty($fromMarketplaceMainProducts)) {
+                $noMainProductCount++;
+                $this->logger->warning("[" . __METHOD__ . "] ⚠️ $fromMarketplaceVariantId has no main product ");
+                continue;
+            }
+            if (count($fromMarketplaceMainProducts) > 1) {
+                $manyMainProductCount++;
+                $this->logger->warning("[" . __METHOD__ . "] ⚠️ $fromMarketplaceVariantId has many main products ");
+                continue;
+            }
+            $fromMarketplaceMainProduct = $fromMarketplaceMainProducts[0];
+            if (!$fromMarketplaceMainProduct instanceof Product) {
+                $this->logger->warning("[" . __METHOD__ . "] ⚠️ $fromMarketplaceVariantId has invalid main product ");
+                continue;
+            }
+            $iwasku = $fromMarketplaceMainProduct->getIwasku();
+            if (!$iwasku) {
+                $this->logger->warning("[" . __METHOD__ . "] ⚠️ $fromMarketplaceVariantId has no iwasku ");
+            }
+            $variantCountWithMainProduct++;
         }
+        $this->logger->warning("[" . __METHOD__ . "] ⚠️ $noMainProductCount products has no main product ");
+        $this->logger->warning("[" . __METHOD__ . "] ⚠️ $manyMainProductCount products main product count is more than 1 ");
+        $this->logger->info("[" . __METHOD__ . "] ✅ $variantCountWithMainProduct products has main product  ");
+
 
     }
 
@@ -73,7 +100,7 @@ class AutoListingCommand2 extends AbstractCommand
         $variantProductIds = Utility::fetchFromSql($variantProductQuerySql, ['marketplace_id' => $this->marketplaceConfig[$marketplace]]);
         if (!is_array($variantProductIds) || empty($variantProductIds)) {
             echo "Marketplace $marketplace variant product ids not found\n";
-            $this->logger->error("[" . __METHOD__ . "] Marketplace $marketplace variant product ids not found");
+            $this->logger->error("[" . __METHOD__ . "] ❌ Marketplace $marketplace variant product ids not found");
             return null;
         }
         $count = count($variantProductIds);
