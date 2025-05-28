@@ -21,6 +21,13 @@ class ListingHelperService
         }
         $referenceMarketplaceType = $referenceMarketplace->getMarketplaceType();
         $referenceMarketplaceKey = $referenceMarketplace->getKey();
+        $targetMarketplaceId = $message->getTargetMarketplaceId();
+        $targetMarketplace = Marketplace::getById($targetMarketplaceId);
+        if (!$targetMarketplace instanceof Marketplace) {
+            $logger->error("[" . __METHOD__ . "] ❌ Target marketplace not found: $targetMarketplaceId");
+            return null;
+        }
+        $targetMarketplaceType = $targetMarketplace->getMarketplaceType();
         $logger->info("[" . __METHOD__ . "] ✅ Reference marketplace found: $referenceMarketplaceType:$referenceMarketplaceKey");
         $variantIds = $message->getVariantIds();
         if (empty($variantIds)) {
@@ -63,13 +70,32 @@ class ListingHelperService
                 $this->logger->error("[" . __METHOD__ . "] ❌ Reference marketplace $referenceMarketplaceKey variant product:$variantId additional data is empty");
                 continue;
             }
-            $result[] = array_merge($baseProductData, $additionalData);
-            break;
+            $images = match ($targetMarketplaceType) {
+                'Ciceksepeti' => $this->ciceksepetiCheckImages($additionalData['images']),
+                default => null
+            };
+            $additionalData['images'] = $images;
+            $mergedData = array_merge($baseProductData, $additionalData);
+            $result[] = $mergedData;
         }
-        print_r($result);
+        $resultCount = count($result);
+        $this->logger->info("[" . __METHOD__ . "] ✅ $resultCount variant products retrieved for product info in reference marketplace: $referenceMarketplaceKey");
+        return $result;
+    }
 
+    private function ciceksepetiCheckImages($images): array | null
+    {
+        $cleanImages = [];
+        foreach ($images as $image) {
+            // control w | h
+        }
 
+        // control images size
+        // if < 2
+        // get main product listing images
+        // return images ? ? ? ? ? ?? ? ? ? ?
 
+        return null;
     }
 
     private function getShopifyAdditionalData($referenceMarketplaceVariantProduct)
@@ -115,14 +141,13 @@ class ListingHelperService
                 }
             }
         }
-        $images[] = [
-            'url' => 'https://fake-image.jpg',
-            'width' => 123,
-            'height' => 456,
-        ];
         return $images;
     }
 
+    private function filterImagesCiceksepeti($images)
+    {
+
+    }
 
     public function getPimListingsInfo2(ProductListingMessage $message)
     {
