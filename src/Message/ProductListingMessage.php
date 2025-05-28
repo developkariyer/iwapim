@@ -40,8 +40,8 @@ class ProductListingMessage
         array $payload = [],
         int $priority = self::PRIORITY_NORMAL,
         string $targetAccountKey,
-        ?string $traceId = null,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        ?string $traceId = null
     ) {
         $validActions = [
             self::ACTION_LIST,
