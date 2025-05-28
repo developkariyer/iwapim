@@ -104,8 +104,8 @@ class AutoListingCommand2 extends AbstractCommand
         $this->logger->info("[" . __METHOD__ . "] ✅ From Marketplace $fromMarketplace Count: $fromMarketplaceVariantCountWithMainProduct products find has main product  ");
         $this->logger->info("[" . __METHOD__ . "] ✅ Target Marketplace $toMarketplace Count: $toMarketplaceNewProductCount to marketplace find new products ");
         $this->logger->info("[" . __METHOD__ . "] ✅ Target Marketplace $toMarketplace Count: $toMarketplaceUpdateProductCount to marketplace find update products ");
-        $this->processNewList($newProductList, $this->marketplaceConfig[$toMarketplace], $this->marketplaceConfig[$fromMarketplace]);
         $this->processUpdateList($updateProductList, $this->marketplaceConfig[$toMarketplace], $this->marketplaceConfig[$fromMarketplace]);
+        $this->processNewList($newProductList, $this->marketplaceConfig[$toMarketplace], $this->marketplaceConfig[$fromMarketplace]);
     }
 
     private function processNewList($newProductList, $targetMarketplaceId, $referenceMarketplaceId)
@@ -123,6 +123,7 @@ class AutoListingCommand2 extends AbstractCommand
         );
         $stamps = [new TransportNamesStamp(['ciceksepeti'])];
         $this->bus->dispatch($message, $stamps);
+        $this->logger->info("[" . __METHOD__ . "] ✅ NewProductsList sent to Ciceksepeti Queue");
     }
 
     private function processUpdateList($updateProductList, $targetMarketplaceId, $referenceMarketplaceId)
@@ -140,6 +141,7 @@ class AutoListingCommand2 extends AbstractCommand
         );
         $stamps = [new TransportNamesStamp(['ciceksepeti'])];
         $this->bus->dispatch($message, $stamps);
+        $this->logger->info("[" . __METHOD__ . "] ✅ UpdateProductsList sent to Ciceksepeti Queue");
     }
 
     private function getFromMarketplaceVariantIds(string $marketplace): array | null
