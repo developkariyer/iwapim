@@ -7,7 +7,7 @@ use Symfony\Component\Uid\Uuid;
 class ProductListingMessage
 {
     public const ACTION_LIST = 'list';
-    PUBLİC const ACTION_UPDATE_LIST = 'update_list';
+    public const ACTION_UPDATE_LIST = 'update_list';
     public const ACTION_UNLIST = 'unlist';
     public const ACTION_UPDATE_PRICE = 'update_price';
     public const ACTION_UPDATE_STOCK = 'update_stock';
