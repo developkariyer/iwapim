@@ -26,7 +26,7 @@ use App\Connector\Marketplace\CiceksepetiConnector;
 use App\Logger\LoggerFactory;
 
 #[AsCommand(
-    name: 'app:autolisting',
+    name: 'app:autolisting2',
     description: 'Outputs Hello, World!'
 )]
 class AutoListingCommand2 extends AbstractCommand
