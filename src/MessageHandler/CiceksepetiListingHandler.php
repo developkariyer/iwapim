@@ -20,11 +20,9 @@ use App\Logger\LoggerFactory;
 class CiceksepetiListingHandler
 {
     private LoggerInterface $logger;
-    public function __construct(ListingHelperService $listingHelperService, LoggerInterface $ciceksepetiAutoListingLogger)
+    public function __construct(ListingHelperService $listingHelperService)
     {
         $this->listingHelper = $listingHelperService;
-        //$this->logger = LoggerFactory::create('ciceksepeti','auto_listing');
-        $this->logger = $ciceksepetiAutoListingLogger;
     }
 
     /**
@@ -32,10 +30,12 @@ class CiceksepetiListingHandler
      */
     public function __invoke(ProductListingMessage $message): void
     {
-        $logger = $message->getLogger();
+        if (method_exists($message, 'getLogger') && $message->getLogger() instanceof LoggerInterface) {
+            $this->logger = $message->getLogger();
+        }
         echo "Ciceksepeti Listing Handler\n";
-        $logger->info("Success logger test");
-        $logger->info(json_encode($message));
+        $this->logger->info("Success logger test");
+        $this->logger->info(json_encode($message));
 //        sleep(5);
 //        $traceId = $message->getTraceId();
 //        echo "Ciceksepeti Listing Handler\n";
