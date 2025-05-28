@@ -48,18 +48,37 @@ class AutoListingCommand2 extends AbstractCommand
         return Command::SUCCESS;
     }
 
+    private function syncMarketplaceProducts($fromMarketplace, $toMarketplace)
+    {
+        echo "Syncing $fromMarketplace to $toMarketplace\n";
+        $this->logger->info("🚀 Syncing $fromMarketplace to $toMarketplace");
+        $fromMarketplaceVariantIds = $this->getMarketplaceVariantIds($fromMarketplace);
+        $updateProductList = [];
+        $newProductList = [];
+        foreach ($fromMarketplaceVariantIds as $fromMarketplaceVariantId) {
+            $fromMarketplaceVariantProduct = VariantProduct::getById($fromMarketplaceVariantId);
+            if (!$fromMarketplaceVariantProduct instanceof VariantProduct) {
+                echo "Invalid $fromMarketplaceVariantId, skipping...\n";
+                $this->logger->error("❌ Invalid $fromMarketplaceVariantId, skipping...");
+                continue;
+            }
+
+        }
+
+    }
+
     private function getMarketplaceVariantIds(string $marketplace): array | null
     {
         $variantProductQuerySql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";
         $variantProductIds = Utility::fetchFromSql($variantProductQuerySql, ['marketplace_id' => $this->marketplaceConfig[$marketplace]]);
         if (!is_array($variantProductIds) || empty($variantProductIds)) {
             echo "Marketplace $marketplace variant product ids not found\n";
-            $this->logger->error("Marketplace $marketplace variant product ids not found");
+            $this->logger->error("[" . __METHOD__ . "] Marketplace $marketplace variant product ids not found");
             return null;
         }
         $count = count($variantProductIds);
         echo "Marketplace $marketplace variant product ids found: $count\n";
-        $this->logger->info("Marketplace $marketplace variant product ids found: $count");
+        $this->logger->info("[" . __METHOD__ . "] ✅ Marketplace $marketplace variant product ids found: $count");
         return array_column($variantProductIds, 'oo_id');
     }
 
