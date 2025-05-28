@@ -19,8 +19,8 @@ class ListingHelperService
             $logger->error("[" . __METHOD__ . "] ❌ Reference marketplace not found: $referenceMarketplaceId");
             return false;
         }
-        $referenceMarketplaceName = $referenceMarketplace->getKey();
-        $logger->info("[" . __METHOD__ . "] ✅ Reference marketplace found: $referenceMarketplaceName");
+        $referenceMarketplaceType = $referenceMarketplace->getMarketplaceType();
+        $logger->info("[" . __METHOD__ . "] ✅ Reference marketplace found: $referenceMarketplaceType");
 
 
 
