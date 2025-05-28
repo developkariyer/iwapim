@@ -38,114 +38,21 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $cfwTrSql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";
-        $cfwTrVariantProductsIds = Utility::fetchFromSql($cfwTrSql, ['marketplace_id' => 84124]);
-        if (!is_array($cfwTrVariantProductsIds) || empty($cfwTrVariantProductsIds)) {
-            echo "No Shopify products found for Ciceksepeti sync.\n";
+        $directory = PIMCORE_PROJECT_ROOT . "/tmp/marketplaces/Ciceksepeti";
+        $files = array_filter(scandir($directory), function ($file) use ($directory) {
+            return is_file($directory . DIRECTORY_SEPARATOR . $file) &&
+                str_starts_with($file, 'CREATE_LISTING_');
+        });
+        foreach ($files as $fileName) {
+            $filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
+            $content = file_get_contents($filePath);
+            $json = json_decode($content, true);
+            $batchId = $json['response']['batchRequestResult']['batchId'];
+            print_r($batchId . "\n");
         }
-        $groupedProducts = [];
-        foreach ($cfwTrVariantProductsIds as $cfwTrVariantProductsId) {
-            $shopifyProduct = VariantProduct::getById($cfwTrVariantProductsId['oo_id']);
-            if (!$shopifyProduct instanceof VariantProduct) {
-                echo "Invalid Shopify product ID: " . $cfwTrVariantProductsId['oo_id'] . ", skipping...";
-                continue;
-            }
-            $mainProducts = $shopifyProduct->getMainProduct();
-            if (!is_array($mainProducts) || empty($mainProducts) || !$mainProducts[0] instanceof Product) {
-                echo "No main product found for Shopify product ID: " . $cfwTrVariantProductsId['oo_id'] . "\n";
-                continue;
-            }
-            $mainProduct = $mainProducts[0];
-            $mainProduct->getProductIdentifier();
-            $identifier = $mainProduct->getProductIdentifier();
-            $variationSize = $mainProduct->getVariationSize();
-            if (!isset($groupedProducts[$identifier])) {
-                $groupedProducts[$identifier] = [];
-            }
-            if (!in_array($variationSize, $groupedProducts[$identifier], true)) {
-                $groupedProducts[$identifier][] = $variationSize;
-            }
-           // $this->dimTest($mainProduct->getVariationSize());
-//            $result = $this->findBestAttributeMatch(2000361, $mainProduct->getVariationSize(), true);
-//            echo $mainProduct->getIwasku() . " - " . $mainProduct->getVariationSize() . " -----> ";
-//            print_r($result);
-//            echo "\n";
 
-        }
-        print_r($groupedProducts);
+
         return Command::SUCCESS;
-    }
-
-    private array $allValues = [];
-
-    private function loadAllValues(): void {
-        if (empty($this->allValues)) {
-            $sql = "SELECT name FROM iwa_ciceksepeti_category_attributes_values WHERE attribute_id = :attribute_id";
-            $result = Utility::fetchFromSql($sql, ['attribute_id' => 2000361]);
-            $this->allValues = $result;
-        }
-    }
-
-    private function fetchMatch($valueMain): ?string {
-        $this->loadAllValues();
-        foreach ($this->allValues as $value) {
-            if ($value['name'] === $valueMain) {
-                return $value['name'];
-            }
-        }
-        return null;
-    }
-
-    private function dimTest($valueMain)
-    {
-        $valueMain = trim($valueMain);
-        if ($result = $this->fetchMatch($valueMain)) {
-            echo "$valueMain -> DOĞRUDAN ESLESME BULUNDU\n";
-            return;
-        }
-        if (strpos($valueMain, '-') !== false) {
-            $firstPart = explode('-', $valueMain)[0];
-            if ($result = $this->fetchMatch($firstPart)) {
-                echo "$valueMain -> $firstPart ESLESME BULUNDU\n";
-                return;
-            }
-        }
-        if (preg_match('/^(\d+)(x(\d+))?(x(\d+))?cm$/i', strtolower($valueMain), $matches)) {
-            $dim1 = isset($matches[1]) ? (int)$matches[1] : null;
-            $dim2 = isset($matches[3]) ? (int)$matches[3] : null;
-            $dim3 = isset($matches[5]) ? (int)$matches[5] : null;
-            for ($i = 0; $i < 25; $i++) {
-                $d1 = $dim1 - $i;
-                if ($dim2 === null) {
-                    $tryValue = "{$d1}cm";
-                    if ($result = $this->fetchMatch($tryValue)) {
-                        echo "$valueMain -> $tryValue ESLESME BULUNDU\n";
-                        return;
-                    }
-                    continue;
-                }
-                for ($j = 0; $j < 25; $j++) {
-                    $d2 = $dim2 - $j;
-                    if ($dim3 === null) {
-                        $tryValue = "{$d1}x{$d2}cm";
-                        if ($result = $this->fetchMatch($tryValue)) {
-                            echo "$valueMain -> $tryValue ESLESME BULUNDU\n";
-                            return;
-                        }
-                        continue;
-                    }
-                    for ($k = 0; $k < 25; $k++) {
-                        $d3 = $dim3 - $k;
-                        $tryValue = "{$d1}x{$d2}x{$d3}cm";
-                        if ($result = $this->fetchMatch($tryValue)) {
-                            echo "$valueMain -> $tryValue ESLESME BULUNDU\n";
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-        echo "$valueMain -> ESLESME BULUNAMADI\n";
     }
 
 }
