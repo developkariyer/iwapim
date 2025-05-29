@@ -88,7 +88,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
             $listing['detail'] = $productDetail;
         }
         unset($listing);
-        print_r($result);
+        print_r(json_encode($result, JSON_PRETTY_PRINT));;
         // TODO: Implement download() method.
     }
 
