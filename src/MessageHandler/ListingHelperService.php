@@ -13,6 +13,7 @@ class ListingHelperService
 
     public function getPimlistingsInfo(ProductListingMessage $message, $logger)
     {
+        $logger->info("[" . __METHOD__ . "] Processing product listing message");
         $referenceMarketplaceId = $message->getReferenceMarketplaceId();
         $referenceMarketplace = Marketplace::getById($referenceMarketplaceId);
         if (!$referenceMarketplace instanceof Marketplace) {
@@ -29,6 +30,7 @@ class ListingHelperService
         }
         $logger->info("[" . __METHOD__ . "] ✅ Reference marketplace found: $referenceMarketplaceType:$referenceMarketplaceKey");
         $variantIds = $message->getVariantIds();
+        $variantIdsCount = count($variantIds);
         if (empty($variantIds)) {
             $logger->error("[" . __METHOD__ . "] ❌ No variant IDs found");
             return null;
@@ -77,7 +79,10 @@ class ListingHelperService
             $result[] = $mergedData;
         }
         $resultCount = count($result);
-        $logger->info("[" . __METHOD__ . "] ✅ $resultCount variant products retrieved for product info in reference marketplace: $referenceMarketplaceKey");
+        $mainProductCodes = array_column($result, 'mainProductCode');
+        $mainProductCode = !empty($mainProductCodes) ? $mainProductCodes[0] : 'N/A';
+        $statusIcon = $variantIdsCount === $resultCount ? "✅" : "⚠️";
+        $logger->info("[" . __METHOD__ . "] $statusIcon Processed Reference Marketplace: $referenceMarketplaceKey variant IDs: $resultCount / $variantIdsCount | Main Product Code: $mainProductCode");
         return $result;
     }
 

@@ -109,8 +109,8 @@ class AutoListingCommand2 extends AbstractCommand
         $this->logger->info("[" . __METHOD__ . "] ✅ From Marketplace $fromMarketplace Count: $fromMarketplaceVariantCountWithMainProduct products find has main product  ");
         $this->logger->info("[" . __METHOD__ . "] ✅ Target Marketplace $toMarketplace contains $mainProductCount main products and $variantCount variants found for syncing.");
         $this->logger->info("[" . __METHOD__ . "] ✅ Target Marketplace $toMarketplace Count: $toMarketplaceUpdateProductCount to marketplace find update products ");
-        $this->processUpdateList($updateProductList, $this->marketplaceConfig[$toMarketplace], $this->marketplaceConfig[$fromMarketplace]);
-        $this->processNewList($groupedByMainCode, $this->marketplaceConfig[$toMarketplace], $this->marketplaceConfig[$fromMarketplace]);
+        $this->processUpdateList($updateProductList, $this->marketplaceConfig[$toMarketplace], $this->marketplaceConfig[$fromMarketplace], $toMarketplace);
+        $this->processNewList($groupedByMainCode, $this->marketplaceConfig[$toMarketplace], $this->marketplaceConfig[$fromMarketplace], $toMarketplace);
     }
 
     private function groupByMainCode(array $newProductList): array
@@ -127,10 +127,23 @@ class AutoListingCommand2 extends AbstractCommand
         return $grouped;
     }
 
-    private function processNewList($groupedByMainCode, $targetMarketplaceId, $referenceMarketplaceId): void
+    private function processNewList($groupedByMainCode, $targetMarketplaceId, $referenceMarketplaceId, $toMarketplace): void
     {
         foreach ($groupedByMainCode as $mainCode => $variantIds) {
-            $this->logger->info("[" . __METHOD__ . "] ✅ Created Message for main product code: $mainCode");;
+            $message = new ProductListingMessage(
+                'list',
+                $targetMarketplaceId,
+                $referenceMarketplaceId,
+                'admin',
+                $variantIds,
+                [],
+                1,
+                'test',
+                $this->logger
+            );
+            $stamps = [new TransportNamesStamp([strtolower($toMarketplace)])];
+            $this->bus->dispatch($message, $stamps);
+            $this->logger->info("[" . __METHOD__ . "] ✅ Created Message for Main Product Code: $mainCode");
         }
 
         // grouped main product ids
@@ -153,7 +166,7 @@ class AutoListingCommand2 extends AbstractCommand
 //        $this->logger->info("[" . __METHOD__ . "] ✅ NewProductsList sent to Ciceksepeti Queue");
     }
 
-    private function processUpdateList($updateProductList, $targetMarketplaceId, $referenceMarketplaceId): void
+    private function processUpdateList($updateProductList, $targetMarketplaceId, $referenceMarketplaceId, $toMarketplace): void
     {
         $message = new ProductListingMessage(
             'update_list',
