@@ -81,7 +81,10 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
                 }
                 $responseArray = $response->toArray();
                 $data = $responseArray['data'];
-                $data['listingStatus'] = $approvedStatus;
+                foreach ($data as &$item) {
+                    $item['listingStatus'] = $approvedStatus;
+                }
+                unset($item);
                 $dataCount = count($data);
                 echo "Approved = {$approvedStatus} | Page: {$page} | Data Count: {$dataCount}" . PHP_EOL;
                 $page++;
@@ -137,6 +140,9 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
     public function import($updateFlag, $importFlag): void
     {
         foreach ($this->listings as $listing) {
+            if (!is_array($listing)){
+                continue;
+            };
             $url = $this->getPazaramaUrlLink($listing['name'], $listing['code'], $listing['brandName']);;
             echo $url . "\n";
         }
@@ -183,7 +189,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
 //        }
     }
 
-    private function getPazaramaUrlLink($title, $code, $brand)
+    private function getPazaramaUrlLink($title, $code, $brand): string
     {
         $title = mb_strtolower($title, 'UTF-8');
         $turkish = ['ç', 'ğ', 'ı', 'ö', 'ş', 'ü'];
