@@ -20,7 +20,8 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
 {
     private static array $apiUrl = [
         'loginTokenUrl' => "https://isortagimgiris.pazarama.com/connect/token",
-        'offers' => "product/products"
+        'offers' => "product/products",
+        'productDetail' => "product/getProductDetail"
     ];
 
     public static string $marketplaceType = 'Pazarama';
@@ -57,30 +58,42 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
 
     public function download(bool $forceDownload = false): void
     {
-        echo "Downloading Pazarama...\n";
-        $this->prepareToken();
-        $page = 1;
-        $size = 100;
-        $result = [];
-        do {
-            $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
-                'query' => [
-                    'Approved' => 'true',
-                    'page' => $page,
-                    'size' => $size
-                ]
-            ]);
-            $responseArray = $response->toArray();
-            $data = $responseArray['data'];
-            $dataCount = count($data);
-            echo "Page: $page Data Count: $dataCount \n";
-            $page++;
-            $result = array_merge($result, $data);
-        } while ($dataCount === $size);
-
-        print_r($result);
+         $this->getProductDetail("SC00200S0RH3");
+//        echo "Downloading Pazarama...\n";
+//        $this->prepareToken();
+//        $page = 1;
+//        $size = 100;
+//        $result = [];
+//        do {
+//            $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
+//                'query' => [
+//                    'Approved' => 'true',
+//                    'page' => $page,
+//                    'size' => $size
+//                ]
+//            ]);
+//            $responseArray = $response->toArray();
+//            $data = $responseArray['data'];
+//            $dataCount = count($data);
+//            echo "Page: $page Data Count: $dataCount \n";
+//            $page++;
+//            $result = array_merge($result, $data);
+//        } while ($dataCount === $size);
+//
+//        print_r($result);
 
         // TODO: Implement download() method.
+    }
+
+    private function getProductDetail($code)
+    {
+        $response = $this->httpClient->request('GET', static::$apiUrl['productDetail'], [
+            'query' => [
+                'Code' => $code
+            ]
+        ]);
+        $responseArray = $response->toArray();
+        print_r($responseArray);
     }
 
     public function downloadOrders(): void
