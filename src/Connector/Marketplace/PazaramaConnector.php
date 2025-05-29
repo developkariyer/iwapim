@@ -37,11 +37,11 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
                     'scope' => 'merchantgatewayapi.fullaccess'
                 ]
             ]);
-            print_r($response->getContent());
             if ($response->getStatusCode() !== 200) {
                 throw new \Exception('Failed to get JWT token from Bol.com');
             }
             $decodedResponse = json_decode($response->getContent(), true);
+            print_r($decodedResponse['data']['accessToken']);
             $this->marketplace->setPazaramaAccessToken($decodedResponse['data']['accessToken']);
             $this->marketplace->save();
         }
