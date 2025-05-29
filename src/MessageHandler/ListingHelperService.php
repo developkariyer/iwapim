@@ -47,6 +47,9 @@ class ListingHelperService
                 $logger->error("[" . __METHOD__ . "] ❌ Reference marketplace $referenceMarketplaceKey variant product not found $variantId");
                 continue;
             }
+
+            $this->setSizeLabel($referenceMarketplaceMainProduct);
+
             $referenceMarketplaceMainProductIdentifier = $referenceMarketplaceMainProduct->getProductIdentifier();
             $referenceMarketplaceMainProductIwasku = $referenceMarketplaceMainProduct->getIwasku();
             $referenceMarketplaceMainProductSize = $referenceMarketplaceMainProduct->getVariationSize();
@@ -78,6 +81,7 @@ class ListingHelperService
             $mergedData = array_merge($baseProductData, $additionalData);
             $result[] = $mergedData;
         }
+        //$this->setSizeLabel($result);
         $resultCount = count($result);
         $mainProductCodes = array_column($result, 'mainProductCode');
         $mainProductCode = !empty($mainProductCodes) ? $mainProductCodes[0] : 'N/A';
@@ -179,7 +183,14 @@ class ListingHelperService
         return $images;
     }
 
+    private function setSizeLabel($referenceMarketplaceMainProduct)
+    {
+        echo $referenceMarketplaceMainProduct->getVariationSizeList() . "\n";
 
+
+
+
+    }
 
 
 
