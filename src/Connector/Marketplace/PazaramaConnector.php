@@ -27,17 +27,41 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
     protected function prepareToken(): void
     {
 
-        $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
-            'headers' => [
-                'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getPazaramaClientId()}:{$this->marketplace->getPazaramaClientSecret()}"),
-                'Accept' => 'application/json'
-            ],
-            'form_params' => [
-                'grant_type' => 'client_credentials',
-                'scope' => 'merchantgatewayapi.fullaccess'
-            ]
-        ]);
-        print_r($response);
+        try {
+            $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
+                'headers' => [
+                    'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getPazaramaClientId()}:{$this->marketplace->getPazaramaClientSecret()}"),
+                    'Accept' => 'application/json'
+                ],
+                'form_params' => [
+                    'grant_type' => 'client_credentials',
+                    'scope' => 'merchantgatewayapi.fullaccess'
+                ]
+            ]);
+
+            // Durum kodunu kontrol et
+            $statusCode = $response->getStatusCode();
+            echo "Status Code: " . $statusCode . "\n"; // Durum kodunu yazdır
+
+            // Yanıtın içeriğini al ve yazdır
+            $responseContent = $response->getContent();
+            echo "Response Content: " . $responseContent . "\n"; // Yanıtı yazdır
+
+            // JSON formatında yanıtı işlemek
+            $decodedResponse = json_decode($responseContent, true);
+            if ($decodedResponse === null) {
+                echo "JSON decode hatası: " . json_last_error_msg(); // JSON çözümlemede hata varsa
+            } else {
+                print_r($decodedResponse);  // JSON verisini yazdır
+            }
+
+        } catch (\Exception $e) {
+            // Hata durumunda yakalanan mesajı yazdır
+            echo "Hata: " . $e->getMessage(); // Hata mesajını yazdır
+            echo "Hata kodu: " . $e->getCode(); // Hata kodunu yazdır
+            // Eğer hata geçmişi isteniyorsa:
+            echo "Stack Trace: " . $e->getTraceAsString(); // Hata izini yazdır
+        }
 //        print_r($response->getContent());
 //        if (!Utility::checkJwtTokenValidity($this->marketplace->getPazaramaAccessToken())) {
 //            $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
