@@ -27,7 +27,6 @@ class ListingHelperService
             $logger->error("[" . __METHOD__ . "] ❌ Target marketplace not found: $targetMarketplaceId");
             return null;
         }
-        $targetMarketplaceType = $targetMarketplace->getMarketplaceType();
         $logger->info("[" . __METHOD__ . "] ✅ Reference marketplace found: $referenceMarketplaceType:$referenceMarketplaceKey");
         $variantIds = $message->getVariantIds();
         if (empty($variantIds)) {

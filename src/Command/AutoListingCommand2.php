@@ -88,7 +88,8 @@ class AutoListingCommand2 extends AbstractCommand
             $fromMarketplaceVariantCountWithMainProduct++;
             $targetMarketplaceVariantProduct = $this->getTargetMarketplaceVariantProduct($toMarketplace, $iwasku);
             if (!$targetMarketplaceVariantProduct instanceof VariantProduct) {
-                $newProductList[] = $fromMarketplaceVariantProduct->getId();
+                $newProductList['ids'] = $fromMarketplaceVariantProduct->getId();
+                $newProductList['maincode'] = $fromMarketplaceVariantProduct->getId();
             }
             else {
                 $updateProductList[] = [
@@ -96,6 +97,7 @@ class AutoListingCommand2 extends AbstractCommand
                     'to' => $targetMarketplaceVariantProduct->getId()
                 ];
             }
+            break;
         }
         $toMarketplaceNewProductCount = count($newProductList);
         $toMarketplaceUpdateProductCount = count($updateProductList);
@@ -110,20 +112,25 @@ class AutoListingCommand2 extends AbstractCommand
 
     private function processNewList($newProductList, $targetMarketplaceId, $referenceMarketplaceId): void
     {
-        $message = new ProductListingMessage(
-            'list',
-            $targetMarketplaceId,
-            $referenceMarketplaceId,
-            'admin',
-            $newProductList,
-            [],
-            1,
-            'test',
-            $this->logger
-        );
-        $stamps = [new TransportNamesStamp(['ciceksepeti'])];
-        $this->bus->dispatch($message, $stamps);
-        $this->logger->info("[" . __METHOD__ . "] ✅ NewProductsList sent to Ciceksepeti Queue");
+        print_r($newProductList);
+        // grouped main product ids
+
+
+
+//        $message = new ProductListingMessage(
+//            'list',
+//            $targetMarketplaceId,
+//            $referenceMarketplaceId,
+//            'admin',
+//            $newProductList,
+//            [],
+//            1,
+//            'test',
+//            $this->logger
+//        );
+//        $stamps = [new TransportNamesStamp(['ciceksepeti'])];
+//        $this->bus->dispatch($message, $stamps);
+//        $this->logger->info("[" . __METHOD__ . "] ✅ NewProductsList sent to Ciceksepeti Queue");
     }
 
     private function processUpdateList($updateProductList, $targetMarketplaceId, $referenceMarketplaceId): void
