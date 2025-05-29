@@ -51,7 +51,7 @@ class ListingHelperService
             $referenceMarketplaceMainProductIdentifier = $referenceMarketplaceMainProduct->getProductIdentifier();
             $referenceMarketplaceMainProductIwasku = $referenceMarketplaceMainProduct->getIwasku();
             $referenceMarketplaceMainProductSize = $referenceMarketplaceMainProduct->getVariationSize();
-            $referenceMarketplaceMainProductSizeLabel = $sizesAndLabels[$referenceMarketplaceMainProductSize] ?? null;
+            $referenceMarketplaceMainProductSizeLabel =  $this->findSizeLabelFromMap($referenceMarketplaceMainProductSize, $sizesAndLabels) ?? '';
             $referenceMarketplaceMainProductColor = $referenceMarketplaceMainProduct->getVariationColor();
             $referenceMarketplaceMainProductEanGtin = $referenceMarketplaceMainProduct->getEanGtin() ?? '';
             if (empty($referenceMarketplaceMainProductIdentifier) || empty($referenceMarketplaceMainProductIwasku) || empty($referenceMarketplaceMainProductSize) || empty($referenceMarketplaceMainProductColor)) {
@@ -88,6 +88,16 @@ class ListingHelperService
         $statusIcon = $variantIdsCount === $resultCount ? "✅" : "⚠️";
         $logger->info("[" . __METHOD__ . "] $statusIcon Processed Reference Marketplace: $referenceMarketplaceKey variant IDs: $resultCount / $variantIdsCount | Main Product Code: $mainProductCode");
         return $result;
+    }
+
+    private function findSizeLabelFromMap($size, $sizesAndLabels)
+    {
+        foreach ($sizesAndLabels as $entry) {
+            if (($entry['value'] ?? '') === $size || ($entry['original'] ?? '') === $size) {
+                return $entry['label'] ?? null;
+            }
+        }
+        return null;
     }
 
     private function getShopifyAdditionalData($referenceMarketplaceVariantProduct)
