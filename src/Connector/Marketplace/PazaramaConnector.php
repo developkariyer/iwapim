@@ -59,7 +59,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
     {
         echo "Downloading Pazarama...\n";
         $this->prepareToken();
-        $page = 5;
+        $page = 4;
         $size = 100;
         $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
             'query' => [
