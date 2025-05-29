@@ -132,29 +132,33 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
 
     public function import($updateFlag, $importFlag): void
     {
-        if (empty($this->listings)) {
-            echo "Nothing to import\n";
-        }
-        $marketplaceFolder = Utility::checkSetPath(
-            Utility::sanitizeVariable($this->marketplace->getKey(), 190),
-            Utility::checkSetPath('Pazaryerleri')
-        );
-        $total = count($this->listings);
-        $index = 0;
         foreach ($this->listings as $listing) {
-            print_r($listing);
-//            echo "($index/$total) Processing Listing {$listing['barcode']}:{$listing['productName']} ...";
+            $url = $this->getPazaramaUrlLink($listing['name'], $listing['code']);
+            echo $url . "\n";
+        }
+//        if (empty($this->listings)) {
+//            echo "Nothing to import\n";
+//        }
+//        $marketplaceFolder = Utility::checkSetPath(
+//            Utility::sanitizeVariable($this->marketplace->getKey(), 190),
+//            Utility::checkSetPath('Pazaryerleri')
+//        );
+//        $total = count($this->listings);
+//        $index = 0;
+//        foreach ($this->listings as $listing) {
+//            print_r($listing);
+//            echo "($index/$total) Processing Listing {$listing['code']}:{$listing['name']} ...";
 //            $parent = Utility::checkSetPath($marketplaceFolder);
-//            if ($listing['mainProductCode']) {
+//            if ($listing['detail']['groupCode']) {
 //                $parent = Utility::checkSetPath(
-//                    Utility::sanitizeVariable($listing['mainProductCode']),
+//                    Utility::sanitizeVariable($listing['detail']['groupCode']),
 //                    $parent
 //                );
 //            }
 //            VariantProduct::addUpdateVariant(
 //                variant: [
-//                    'imageUrl' => Utility::getCachedImage($listing['images'][0]) ?? '',
-//                    'urlLink' =>  $this->getUrlLink($listing['link']) ?? '',
+//                    'imageUrl' => Utility::getCachedImage($listing['detail']['images'][0]) ?? '',
+//                    'urlLink' =>  $this->getPazaramaUrlLink($listing['name'], $listing['code']) ?? '',
 //                    'salePrice' => $listing['salesPrice'] ?? 0,
 //                    'saleCurrency' =>  $this->marketplace->getCurrency(),
 //                    'title' => $listing['productName'] ?? '',
@@ -169,10 +173,22 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
 //                updateFlag: $updateFlag,
 //                marketplace: $this->marketplace,
 //                parent: $parent
-        //    );
-            echo "OK\n";
-            $index++;
-        }
+//            );
+//            echo "OK\n";
+//            $index++;
+//        }
+    }
+
+    private function getPazaramaUrlLink($title, $code)
+    {
+        $title = mb_strtolower($title, 'UTF-8');
+        $turkish = ['ç', 'ğ', 'ı', 'ö', 'ş', 'ü'];
+        $english = ['c', 'g', 'i', 'o', 's', 'u'];
+        $title = str_replace($turkish, $english, $title);
+        $title = preg_replace('/[^a-z0-9\s-]/', '', $title);
+        $title = preg_replace('/[\s]+/', '-', trim($title));
+        $url = "https://www.pazarama.com/{$title}-p-{$code}";
+        return $url;
     }
 
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null): void
