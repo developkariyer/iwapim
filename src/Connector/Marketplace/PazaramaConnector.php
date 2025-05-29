@@ -81,6 +81,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
                 }
                 $responseArray = $response->toArray();
                 $data = $responseArray['data'];
+                $data['listingStatus'] = $approvedStatus;
                 $dataCount = count($data);
                 echo "Approved = {$approvedStatus} | Page: {$page} | Data Count: {$dataCount}" . PHP_EOL;
                 $page++;
@@ -131,7 +132,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
 
     public function import($updateFlag, $importFlag): void
     {
-        // TODO: Implement import() method.
+
     }
 
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null): void
