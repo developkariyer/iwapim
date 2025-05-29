@@ -67,24 +67,32 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
         $page = 1;
         $size = 100;
         $this->listings = [];
-        do {
-            $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
-                'query' => [
-                    'Approved' => 'false',
-                    'page' => $page,
-                    'size' => $size
-                ]
-            ]);
-            if ($response->getStatusCode() !== 200) {
-                throw new \Exception('Failed to get offers from Pazarama');
-            }
-            $responseArray = $response->toArray();
-            $data = $responseArray['data'];
-            $dataCount = count($data);
-            echo "Page: $page Data Count: $dataCount \n";
-            $page++;
-            $this->listings = array_merge($this->listings, $data);
-        } while ($dataCount === $size);
+        foreach (['true', 'false'] as $approvedStatus) {
+            $page = 1;
+            $size = 100;
+            do {
+                $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
+                    'query' => [
+                        'Approved' => $approvedStatus,
+                        'page' => $page,
+                        'size' => $size
+                    ],
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->accessToken,
+                        'Accept' => 'application/json'
+                    ]
+                ]);
+                if ($response->getStatusCode() !== 200) {
+                    throw new \Exception("Failed to get offers from Pazarama (Approved = $approvedStatus)");
+                }
+                $responseArray = $response->toArray();
+                $data = $responseArray['data'];
+                $dataCount = count($data);
+                echo "Approved = {$approvedStatus} | Page: {$page} | Data Count: {$dataCount}" . PHP_EOL;
+                $page++;
+                $this->listings = array_merge($this->listings, $data);
+            } while ($dataCount === $size);
+        }
         $index = 1;
         $listingCount = count($this->listings);
         foreach ($this->listings as &$listing) {
@@ -95,8 +103,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
             $index++;
         }
         unset($listing);
-        print_r($this->listings);
-        //$this->putListingsToCache();
+        $this->putListingsToCache();
         // TODO: Implement download() method.
     }
 
