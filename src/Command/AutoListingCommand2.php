@@ -145,25 +145,6 @@ class AutoListingCommand2 extends AbstractCommand
             $this->bus->dispatch($message, $stamps);
             $this->logger->info("[" . __METHOD__ . "] ✅ Created Message for Main Product Code: $mainCode");
         }
-
-        // grouped main product ids
-
-
-
-//        $message = new ProductListingMessage(
-//            'list',
-//            $targetMarketplaceId,
-//            $referenceMarketplaceId,
-//            'admin',
-//            $newProductList,
-//            [],
-//            1,
-//            'test',
-//            $this->logger
-//        );
-//        $stamps = [new TransportNamesStamp(['ciceksepeti'])];
-//        $this->bus->dispatch($message, $stamps);
-//        $this->logger->info("[" . __METHOD__ . "] ✅ NewProductsList sent to Ciceksepeti Queue");
     }
 
     private function processUpdateList($updateProductList, $targetMarketplaceId, $referenceMarketplaceId, $toMarketplace): void

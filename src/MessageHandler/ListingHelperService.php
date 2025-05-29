@@ -13,7 +13,7 @@ class ListingHelperService
 
     public function getPimlistingsInfo(ProductListingMessage $message, $logger)
     {
-        $logger->info("[" . __METHOD__ . "] Processing product listing message");
+        $logger->info("[" . __METHOD__ . "] Processing Product Listing Message");
         $referenceMarketplaceId = $message->getReferenceMarketplaceId();
         $referenceMarketplace = Marketplace::getById($referenceMarketplaceId);
         if (!$referenceMarketplace instanceof Marketplace) {
