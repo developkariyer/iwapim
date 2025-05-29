@@ -20,6 +20,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
 {
     private static array $apiUrl = [
         'loginTokenUrl' => "https://isortagimgiris.pazarama.com/connect/token",
+        'offers' => "product/products"
     ];
 
     public static string $marketplaceType = 'Pazarama';
@@ -57,6 +58,9 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
     public function download(bool $forceDownload = false): void
     {
         $this->prepareToken();
+        $response = $this->httpClient->request('GET', static::$apiUrl['offers']);
+        print_r($response->getContent());
+
         // TODO: Implement download() method.
     }
 
