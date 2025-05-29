@@ -64,8 +64,6 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
         }
         echo "Downloading Pazarama...\n";
         $this->prepareToken();
-        $page = 1;
-        $size = 100;
         $this->listings = [];
         foreach (['true', 'false'] as $approvedStatus) {
             $page = 1;
@@ -76,10 +74,6 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
                         'Approved' => $approvedStatus,
                         'page' => $page,
                         'size' => $size
-                    ],
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $this->accessToken,
-                        'Accept' => 'application/json'
                     ]
                 ]);
                 if ($response->getStatusCode() !== 200) {
