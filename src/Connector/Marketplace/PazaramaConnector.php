@@ -149,8 +149,6 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
         $total = count($this->listings);
         $index = 0;
         foreach ($this->listings as $listing) {
-            print_r($listing);
-            break;
             echo "($index/$total) Processing Listing {$listing['code']}:{$listing['name']} ...";
             $parent = Utility::checkSetPath($marketplaceFolder);
             if ($listing['detail']['groupCode']) {
@@ -162,7 +160,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
             $url = $this->getPazaramaUrlLink($listing['name'], $listing['code'], $listing['brandName']);
             VariantProduct::addUpdateVariant(
                 variant: [
-                    'imageUrl' => Utility::getCachedImage($listing['detail']['images'][0]['imageUrl']) ?? '',
+                    'imageUrl' => $listing['detail']['images'][0]['imageUrl'] ?? '',
                     'urlLink' =>  $this->getUrlLink($url) ?? '',
                     'salePrice' => $listing['salePrice'] ?? 0,
                     'saleCurrency' =>  $this->marketplace->getCurrency(),
