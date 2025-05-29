@@ -70,7 +70,10 @@ class ListingHelperService
                 $logger->error("[" . __METHOD__ . "] ❌ Reference marketplace $referenceMarketplaceKey variant product:$variantId additional data is empty");
                 continue;
             }
-            $additionalData['images'][] = $this->mainProductAllListingImages($referenceMarketplaceMainProduct);
+            $images = $this->mainProductAllListingImages($referenceMarketplaceMainProduct);
+            if (!empty($images)) {
+                $additionalData['images'] = $images;
+            }
             $mergedData = array_merge($baseProductData, $additionalData);
             $result[] = $mergedData;
             break;
@@ -152,6 +155,7 @@ class ListingHelperService
             $image = $hotspotImage->getImage();
             $imageUrl = $host . $image->getFullPath();
             $imageUrl = preg_replace('/^http:/i', 'https:', $imageUrl);
+            print_r($imageUrl);
             $headers = @get_headers($imageUrl);
             if ($headers && strpos($headers[0], '200') !== false) {
                 $images[] = [
@@ -161,6 +165,7 @@ class ListingHelperService
                 ];
             }
         }
+        print_r($images);
         return $images;
     }
 
