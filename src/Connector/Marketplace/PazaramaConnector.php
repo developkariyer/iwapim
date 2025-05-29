@@ -60,6 +60,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
         $this->prepareToken();
         $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
             'query' => [
+                'Approved' => false,
                 'page' => 1,
                 'size' => 100
             ]
