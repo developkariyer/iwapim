@@ -70,11 +70,7 @@ class ListingHelperService
                 $logger->error("[" . __METHOD__ . "] ❌ Reference marketplace $referenceMarketplaceKey variant product:$variantId additional data is empty");
                 continue;
             }
-//            $images = match ($targetMarketplaceType) {
-//                'Ciceksepeti' => $this->ciceksepetiCheckImages($additionalData['images']),
-//                default => null
-//            };
-//            $additionalData['images'] = $images;
+            $additionalData['images'][] = $this->mainProductAllListingImages($referenceMarketplaceMainProduct);
             $mergedData = array_merge($baseProductData, $additionalData);
             $result[] = $mergedData;
             break;
@@ -83,21 +79,6 @@ class ListingHelperService
         $logger->info("[" . __METHOD__ . "] ✅ $resultCount variant products retrieved for product info in reference marketplace: $referenceMarketplaceKey");
         print_r($result);
         return $result;
-    }
-
-    private function ciceksepetiCheckImages($images): array | null
-    {
-        $cleanImages = [];
-        foreach ($images as $image) {
-            // control w | h
-        }
-
-        // control images size
-        // if < 2
-        // get main product listing images
-        // return images ? ? ? ? ? ?? ? ? ? ?
-
-        return null;
     }
 
     private function getShopifyAdditionalData($referenceMarketplaceVariantProduct)
@@ -146,10 +127,51 @@ class ListingHelperService
         return $images;
     }
 
-    private function filterImagesCiceksepeti($images)
+    private function mainProductAllListingImages($referenceMarketplaceMainProduct): array | null
     {
-
+        $images = [];
+        $listingItems = $referenceMarketplaceMainProduct->getListingItems();
+        if (empty($listingItems)) {
+            return null;
+        }
+        foreach ($listingItems as $listingItem) {
+            if (!$listingItem instanceof VariantProduct) {
+                continue;
+            }
+            $images = array_merge($images, $this->getImages($listingItem));
+        }
+        return $images;
     }
+
+    private function getImages($listingItem): array
+    {
+        $images = [];
+        $imageGallery = $listingItem->getImageGallery();
+        $host = \Pimcore\Tool::getHostUrl();
+        foreach ($imageGallery as $hotspotImage) {
+            $image = $hotspotImage->getImage();
+            $imageUrl = $host . $image->getFullPath();
+            $imageUrl = preg_replace('/^http:/i', 'https:', $imageUrl);
+            $headers = @get_headers($imageUrl);
+            if ($headers && strpos($headers[0], '200') !== false) {
+                $images[] = [
+                    'url' => $imageUrl,
+                    'width' => $image->getWidth(),
+                    'height' => $image->getHeight()
+                ];
+            }
+        }
+        return $images;
+    }
+
+
+
+
+
+
+
+
+
 
     public function getPimListingsInfo2(ProductListingMessage $message)
     {
@@ -442,22 +464,7 @@ class ListingHelperService
         return $map[trim($currency)] ?? strtoupper(trim($currency));
     }
 
-    private function getImages($listingItem): array
-    {
-        $images = [];
-        $imageGallery = $listingItem->getImageGallery();
-        foreach ($imageGallery as $hotspotImage) {
-            $image = $hotspotImage->getImage();
-            $width = $image->getWidth();
-            $height = $image->getHeight();
-            if ($width >= 500 && $width <= 2000 && $height >= 500 && $height <= 2000) {
-                $imageUrl = $image->getFullPath();
-                $host = \Pimcore\Tool::getHostUrl();
-                $images[] = $host . $imageUrl;
-            }
-        }
-        return $images;
-    }
+
 
     private function calculatePrice($price, $fromCurrency, $toCurrency): ?string
     {
