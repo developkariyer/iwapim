@@ -185,7 +185,11 @@ class ListingHelperService
 
     private function setSizeLabel($referenceMarketplaceMainProduct)
     {
-        echo $referenceMarketplaceMainProduct->getVariationSizeList() . "\n";
+        $parentProduct = $referenceMarketplaceMainProduct->getParent();
+        if (!$parentProduct instanceof Product) {
+            return;
+        }
+        echo $parentProduct->getVariationSizeList() . "\n";
 
 
 
