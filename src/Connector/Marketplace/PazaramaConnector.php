@@ -87,7 +87,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
 
     private function getProductDetail($code)
     {
-        $response = $this->httpClient->request('GET', static::$apiUrl['productDetail'], [
+        $response = $this->httpClient->request('POST', static::$apiUrl['productDetail'], [
             'query' => [
                 'Code' => $code
             ]
