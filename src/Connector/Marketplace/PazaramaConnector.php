@@ -26,8 +26,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
 
     protected function prepareToken(): void
     {
-
-        try {
+        if (!Utility::checkJwtTokenValidity($this->marketplace->getPazaramaAccessToken())) {
             $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
                 'headers' => [
                     'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getPazaramaClientId()}:{$this->marketplace->getPazaramaClientSecret()}"),
@@ -38,56 +37,20 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
                     'scope' => 'merchantgatewayapi.fullaccess'
                 ]
             ]);
-
-            // Durum kodunu kontrol et
-            $statusCode = $response->getStatusCode();
-            echo "Status Code: " . $statusCode . "\n"; // Durum kodunu yazdır
-
-            // Yanıtın içeriğini al ve yazdır
-            $responseContent = $response->getContent();
-            echo "Response Content: " . $responseContent . "\n"; // Yanıtı yazdır
-
-            // JSON formatında yanıtı işlemek
-            $decodedResponse = json_decode($responseContent, true);
-            if ($decodedResponse === null) {
-                echo "JSON decode hatası: " . json_last_error_msg(); // JSON çözümlemede hata varsa
-            } else {
-                print_r($decodedResponse);  // JSON verisini yazdır
+            print_r($response->getContent());
+            if ($response->getStatusCode() !== 200) {
+                throw new \Exception('Failed to get JWT token from Bol.com');
             }
-
-        } catch (\Exception $e) {
-            // Hata durumunda yakalanan mesajı yazdır
-            echo "Hata: " . $e->getMessage(); // Hata mesajını yazdır
-            echo "Hata kodu: " . $e->getCode(); // Hata kodunu yazdır
-            // Eğer hata geçmişi isteniyorsa:
-            echo "Stack Trace: " . $e->getTraceAsString(); // Hata izini yazdır
+            $decodedResponse = json_decode($response->getContent(), true);
+            $this->marketplace->setPazaramaAccessToken($decodedResponse['data']['accessToken']);
+            $this->marketplace->save();
         }
-//        print_r($response->getContent());
-//        if (!Utility::checkJwtTokenValidity($this->marketplace->getPazaramaAccessToken())) {
-//            $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
-//                'headers' => [
-//                    'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getPazaramaClientId()}:{$this->marketplace->getPazaramaClientSecret()}"),
-//                    'Accept' => 'application/json'
-//                ],
-//                'form_params' => [
-//                    'grant_type' => 'client_credentials',
-//                    'scope' => 'merchantgatewayapi.fullaccess'
-//                ]
-//            ]);
-//            print_r($response->getContent());
-//            if ($response->getStatusCode() !== 200) {
-//                throw new \Exception('Failed to get JWT token from Bol.com');
-//            }
-//            $decodedResponse = json_decode($response->getContent(), true);
-//            $this->marketplace->setPazaramaAccessToken($decodedResponse['data']['accessToken']);
-//            $this->marketplace->save();
-//        }
-//        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://isortagimapi.pazarama.com/', [
-//            'headers' => [
-//                'Authorization' => 'Bearer ' . $this->marketplace->getPazaramaAccessToken(),
-//                'Content-Type' => 'application/json'
-//            ],
-//        ]);
+        $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://isortagimapi.pazarama.com/', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->marketplace->getPazaramaAccessToken(),
+                'Content-Type' => 'application/json'
+            ],
+        ]);
     }
 
     public function download(bool $forceDownload = false): void
