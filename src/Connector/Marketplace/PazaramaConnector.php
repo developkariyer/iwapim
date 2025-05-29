@@ -26,19 +26,18 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
 
     protected function prepareToken(): void
     {
-        echo $this->marketplace->getPazaramaClientId() . "\n";
-        echo $this->marketplace->getPazaramaClientSecret() ." \n";
 
-//        $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
-//            'headers' => [
-//                'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getPazaramaClientId()}:{$this->marketplace->getPazaramaClientSecret()}"),
-//                'Accept' => 'application/json'
-//            ],
-//            'form_params' => [
-//                'grant_type' => 'client_credentials',
-//                'scope' => 'merchantgatewayapi.fullaccess'
-//            ]
-//        ]);
+        $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
+            'headers' => [
+                'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getPazaramaClientId()}:{$this->marketplace->getPazaramaClientSecret()}"),
+                'Accept' => 'application/json'
+            ],
+            'form_params' => [
+                'grant_type' => 'client_credentials',
+                'scope' => 'merchantgatewayapi.fullaccess'
+            ]
+        ]);
+        print_r($response);
 //        print_r($response->getContent());
 //        if (!Utility::checkJwtTokenValidity($this->marketplace->getPazaramaAccessToken())) {
 //            $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
