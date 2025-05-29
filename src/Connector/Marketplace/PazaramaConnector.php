@@ -132,7 +132,47 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
 
     public function import($updateFlag, $importFlag): void
     {
-
+        if (empty($this->listings)) {
+            echo "Nothing to import\n";
+        }
+        $marketplaceFolder = Utility::checkSetPath(
+            Utility::sanitizeVariable($this->marketplace->getKey(), 190),
+            Utility::checkSetPath('Pazaryerleri')
+        );
+        $total = count($this->listings);
+        $index = 0;
+        foreach ($this->listings as $listing) {
+            print_r($listing);
+//            echo "($index/$total) Processing Listing {$listing['barcode']}:{$listing['productName']} ...";
+//            $parent = Utility::checkSetPath($marketplaceFolder);
+//            if ($listing['mainProductCode']) {
+//                $parent = Utility::checkSetPath(
+//                    Utility::sanitizeVariable($listing['mainProductCode']),
+//                    $parent
+//                );
+//            }
+//            VariantProduct::addUpdateVariant(
+//                variant: [
+//                    'imageUrl' => Utility::getCachedImage($listing['images'][0]) ?? '',
+//                    'urlLink' =>  $this->getUrlLink($listing['link']) ?? '',
+//                    'salePrice' => $listing['salesPrice'] ?? 0,
+//                    'saleCurrency' =>  $this->marketplace->getCurrency(),
+//                    'title' => $listing['productName'] ?? '',
+//                    'quantity' => $listing['stockQuantity'] ?? 0,
+//                    'attributes' => $listing['variantName']  ?? '',
+//                    'uniqueMarketplaceId' =>  $listing['productCode'] ?? '',
+//                    'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
+//                    'published' => $listing['productStatusType'] === 'YAYINDA' ? 1 : 0,
+//                    'sku' => $listing['stockCode'] ?? '',
+//                ],
+//                importFlag: $importFlag,
+//                updateFlag: $updateFlag,
+//                marketplace: $this->marketplace,
+//                parent: $parent
+            );
+            echo "OK\n";
+            $index++;
+        }
     }
 
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null): void
