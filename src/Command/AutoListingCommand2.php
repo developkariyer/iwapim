@@ -114,7 +114,19 @@ class AutoListingCommand2 extends AbstractCommand
 
     private function processNewList($newProductList, $targetMarketplaceId, $referenceMarketplaceId): void
     {
-        print_r($newProductList);
+        $grouped = [];
+
+        foreach ($newProductList as $item) {
+            $mainCode = $item['maincode'];
+            $id = $item['id'];
+
+            if (!isset($grouped[$mainCode])) {
+                $grouped[$mainCode] = [];
+            }
+
+            $grouped[$mainCode][] = $id;
+        }
+        print_r($grouped);
         // grouped main product ids
 
 
