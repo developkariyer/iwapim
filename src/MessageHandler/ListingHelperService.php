@@ -67,7 +67,7 @@ class ListingHelperService
                 default => null,
             };
             if (empty($additionalData)) {
-                $this->logger->error("[" . __METHOD__ . "] ❌ Reference marketplace $referenceMarketplaceKey variant product:$variantId additional data is empty");
+                $logger->error("[" . __METHOD__ . "] ❌ Reference marketplace $referenceMarketplaceKey variant product:$variantId additional data is empty");
                 continue;
             }
 //            $images = match ($targetMarketplaceType) {
@@ -80,7 +80,7 @@ class ListingHelperService
             break;
         }
         $resultCount = count($result);
-        $this->logger->info("[" . __METHOD__ . "] ✅ $resultCount variant products retrieved for product info in reference marketplace: $referenceMarketplaceKey");
+        $logger->info("[" . __METHOD__ . "] ✅ $resultCount variant products retrieved for product info in reference marketplace: $referenceMarketplaceKey");
         print_r($result);
         return $result;
     }
