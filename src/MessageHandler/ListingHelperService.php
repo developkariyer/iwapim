@@ -80,7 +80,6 @@ class ListingHelperService
         }
         $resultCount = count($result);
         $logger->info("[" . __METHOD__ . "] ✅ $resultCount variant products retrieved for product info in reference marketplace: $referenceMarketplaceKey");
-        print_r($result);
         return $result;
     }
 
@@ -141,12 +140,12 @@ class ListingHelperService
             if (!$listingItem instanceof VariantProduct) {
                 continue;
             }
-            $images = array_merge($images, $this->getImages($listingItem));
+            $images = array_merge($images, $this->getListingImages($listingItem));
         }
         return $images;
     }
 
-    private function getImages($listingItem): array
+    private function getListingImages($listingItem): array
     {
         $images = [];
         $imageGallery = $listingItem->getImageGallery();
@@ -173,19 +172,6 @@ class ListingHelperService
                     'height' => $image->getHeight()
                 ];
             }
-//            $images[] = [
-//                'url' => $imageUrl,
-//                'width' => $image->getWidth(),
-//                'height' => $image->getHeight()
-//            ];
-//            $headers = @get_headers($imageUrl);
-//            if ($headers && strpos($headers[0], '200') !== false) {
-//                $images[] = [
-//                    'url' => $imageUrl,
-//                    'width' => $image->getWidth(),
-//                    'height' => $image->getHeight()
-//                ];
-//            }
         }
         return $images;
     }
