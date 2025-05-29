@@ -35,6 +35,7 @@ class CacheImagesCommand extends AbstractCommand
     static ?Folder $wallmartFolder;
     static ?Folder $ciceksepetiFolder;
     static ?Folder $takealotFolder;
+    static ?Folder $pazaramaFolder;
 
     protected function configure(): void
     {
@@ -48,6 +49,7 @@ class CacheImagesCommand extends AbstractCommand
             ->addOption('wallmart', null, InputOption::VALUE_NONE, 'If set, Wallmart objects will be processed.')
             ->addOption('ciceksepeti', null, InputOption::VALUE_NONE, 'If set, Ciceksepeti objects will be processed.')
             ->addOption('takealot', null, InputOption::VALUE_NONE, 'If set, Takealot objects will be processed.')
+            ->addOption('pazarama', null, InputOption::VALUE_NONE, 'If set, Pazarama objects will be processed.')
             ->addOption('all', null, InputOption::VALUE_NONE, 'If set, all objects will be processed.');
     }
 
@@ -66,6 +68,7 @@ class CacheImagesCommand extends AbstractCommand
         static::$wallmartFolder = Utility::checkSetAssetPath('Wallmart', static::$cacheFolder);
         static::$ciceksepetiFolder = Utility::checkSetAssetPath('Ciceksepeti', static::$cacheFolder);
         static::$takealotFolder = Utility::checkSetAssetPath('Takealot', static::$cacheFolder);
+        static::$pazaramaFolder = Utility::checkSetAssetPath('Pazarama', static::$cacheFolder);
 
         $listingObject = new VariantProduct\Listing();
         $listingObject->setUnpublished(false);
@@ -90,7 +93,7 @@ class CacheImagesCommand extends AbstractCommand
                     echo "Variant {$variant->getId()} has no marketplace->type.\n";
                     continue;
                 }
-                if (in_array($variantType, ['Amazon', 'Etsy', 'Shopify', 'Trendyol', 'Bol.com', 'Hepsiburada', 'Wallmart', 'Ciceksepeti', 'Takealot'])) {
+                if (in_array($variantType, ['Amazon', 'Etsy', 'Shopify', 'Trendyol', 'Bol.com', 'Hepsiburada', 'Wallmart', 'Ciceksepeti', 'Takealot', 'Pazarama'])) {
                     echo " $variantType ";
                 } else {
                     continue;
@@ -123,6 +126,9 @@ class CacheImagesCommand extends AbstractCommand
                     case 'Takealot':
                         if ($input->getOption('takealot') || $input->getOption('all')) self::processTakealot($variant);
                         break;
+                    case 'Pazarama':
+                        if ($input->getOption('pazarama') || $input->getOption('all')) self::processPazarama($variant);
+                        break;
                     default:
                         break;
                 }
@@ -143,6 +149,18 @@ class CacheImagesCommand extends AbstractCommand
         $listingImageList = [];
         foreach ($json['images'] ?? [] as $image) {
             $listingImageList[] = static::processImage($image['url'], static::$trendyolFolder, "Trendyol_".str_replace(["https:", "/", ".", "_", "jpg"], '', $image['url']).".jpg");
+        }
+        $listingImageList = array_unique($listingImageList);
+        $variant->fixImageCache($listingImageList);
+        echo "{$variant->getId()} ";
+    }
+
+    protected static function processPazarama(VariantProduct $variant): void
+    {
+        $json = json_decode($variant->jsonRead('apiResponseJson'), true);
+        $listingImageList = [];
+        foreach ($json['detail']['images'] ?? [] as $image) {
+            $listingImageList[] = static::processImage($image['imageUrl'], static::$pazaramaFolder, "Pazarama_".str_replace(["https:", "/", ".", "_", "jpg"], '', $image['url']).".jpg");
         }
         $listingImageList = array_unique($listingImageList);
         $variant->fixImageCache($listingImageList);
