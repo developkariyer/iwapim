@@ -47,13 +47,12 @@ class ListingHelperService
                 $logger->error("[" . __METHOD__ . "] ❌ Reference marketplace $referenceMarketplaceKey variant product not found $variantId");
                 continue;
             }
-
-            $this->setSizeLabel($referenceMarketplaceMainProduct);
-
+            $sizesAndLabels = $this->getSizeLabelFromParent($referenceMarketplaceMainProduct);
             $referenceMarketplaceMainProductIdentifier = $referenceMarketplaceMainProduct->getProductIdentifier();
             $referenceMarketplaceMainProductIwasku = $referenceMarketplaceMainProduct->getIwasku();
             echo $referenceMarketplaceMainProductIwasku . "\n";
             $referenceMarketplaceMainProductSize = $referenceMarketplaceMainProduct->getVariationSize();
+            $referenceMarketplaceMainProductSizeLabel = $sizesAndLabels[$referenceMarketplaceMainProductSize] ?? null;
             $referenceMarketplaceMainProductColor = $referenceMarketplaceMainProduct->getVariationColor();
             $referenceMarketplaceMainProductEanGtin = $referenceMarketplaceMainProduct->getEanGtin() ?? '';
             if (empty($referenceMarketplaceMainProductIdentifier) || empty($referenceMarketplaceMainProductIwasku) || empty($referenceMarketplaceMainProductSize) || empty($referenceMarketplaceMainProductColor)) {
@@ -64,8 +63,10 @@ class ListingHelperService
               'mainProductCode' => $referenceMarketplaceMainProductIdentifier,
               'stockCode' => $referenceMarketplaceMainProductIwasku,
               'size' => $referenceMarketplaceMainProductSize,
+              'sizeLabel' => $referenceMarketplaceMainProductSizeLabel,
               'color' => $referenceMarketplaceMainProductColor,
               'ean' => $referenceMarketplaceMainProductEanGtin,
+              'sizeLabelMap' => $sizesAndLabels,
             ];
             $additionalData = match ($referenceMarketplaceType) {
                 'Shopify' => $this->getShopifyAdditionalData($referenceMarketplaceVariantProduct),
@@ -82,7 +83,6 @@ class ListingHelperService
             $mergedData = array_merge($baseProductData, $additionalData);
             $result[] = $mergedData;
         }
-        //$this->setSizeLabel($result);
         $resultCount = count($result);
         $mainProductCodes = array_column($result, 'mainProductCode');
         $mainProductCode = !empty($mainProductCodes) ? $mainProductCodes[0] : 'N/A';
@@ -184,7 +184,7 @@ class ListingHelperService
         return $images;
     }
 
-    private function setSizeLabel($referenceMarketplaceMainProduct)
+    private function getSizeLabelFromParent($referenceMarketplaceMainProduct)
     {
         $parentProduct = $referenceMarketplaceMainProduct->getParent();
         if (!$parentProduct instanceof Product) {
@@ -212,9 +212,7 @@ class ListingHelperService
                 $autoIndex++;
             }
         }
-        foreach ($parsed as $item) {
-            echo "Orijinal: {$item['original']} → Etiket: {$item['label']}\n";
-        }
+        return $parsed;
     }
 
 
