@@ -90,7 +90,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
     {
         try {
             $response = $this->httpClient->request('POST', static::$apiUrl['productDetail'], [
-                'query' => [
+                'json' => [
                     'Code' => $code
                 ]
             ]);
