@@ -73,6 +73,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
             $responseArray = $response->toArray();
             $data = $responseArray['data'];
             $dataCount = count($data);
+            echo "Page: $page Data Count: $dataCount \n";
             $page++;
             $result = array_merge($result, $data);
         } while ($dataCount === $size);
