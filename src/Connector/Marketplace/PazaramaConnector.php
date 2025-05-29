@@ -58,7 +58,12 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
     public function download(bool $forceDownload = false): void
     {
         $this->prepareToken();
-        $response = $this->httpClient->request('GET', static::$apiUrl['offers']);
+        $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
+            'query' => [
+                'page' => 1,
+                'size' => 5
+            ]
+        ]);
         print_r($response->getContent());
 
         // TODO: Implement download() method.
