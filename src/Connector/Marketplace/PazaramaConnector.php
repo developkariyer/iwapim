@@ -89,12 +89,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
     {
         try {
             $response = $this->httpClient->request('POST', static::$apiUrl['productDetail'], [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->accessToken,
-                    'Accept' => 'application/json',
-                    'Content-Type' => 'application/json',
-                ],
-                'json' => [
+                'query' => [
                     'Code' => $code
                 ]
             ]);
