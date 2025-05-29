@@ -87,13 +87,26 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
 
     private function getProductDetail($code)
     {
-        $response = $this->httpClient->request('POST', static::$apiUrl['productDetail'], [
-            'json' => [
-                'Code' => $code
-            ]
-        ]);
-        $responseArray = $response->toArray();
-        print_r($responseArray);
+        try {
+            $response = $this->httpClient->request('POST', static::$apiUrl['productDetail'], [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->accessToken,
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => [
+                    'Code' => $code
+                ]
+            ]);
+
+            $responseArray = $response->toArray();
+            print_r($responseArray);
+
+        } catch (\Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface $e) {
+            echo "İstemci hatası: " . $e->getMessage();
+        } catch (\Exception $e) {
+            echo "Genel hata: " . $e->getMessage();
+        }
     }
 
     public function downloadOrders(): void
