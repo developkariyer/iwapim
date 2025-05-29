@@ -169,7 +169,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
 //                updateFlag: $updateFlag,
 //                marketplace: $this->marketplace,
 //                parent: $parent
-            );
+        //    );
             echo "OK\n";
             $index++;
         }
