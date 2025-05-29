@@ -139,54 +139,47 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
 
     public function import($updateFlag, $importFlag): void
     {
-        foreach ($this->listings as $listing) {
-            if (!is_array($listing)){
-                continue;
-            };
-            $url = $this->getPazaramaUrlLink($listing['name'], $listing['code'], $listing['brandName']);;
-            echo $url . "\n";
+        if (empty($this->listings)) {
+            echo "Nothing to import\n";
         }
-//        if (empty($this->listings)) {
-//            echo "Nothing to import\n";
-//        }
-//        $marketplaceFolder = Utility::checkSetPath(
-//            Utility::sanitizeVariable($this->marketplace->getKey(), 190),
-//            Utility::checkSetPath('Pazaryerleri')
-//        );
-//        $total = count($this->listings);
-//        $index = 0;
-//        foreach ($this->listings as $listing) {
-//            print_r($listing);
-//            echo "($index/$total) Processing Listing {$listing['code']}:{$listing['name']} ...";
-//            $parent = Utility::checkSetPath($marketplaceFolder);
-//            if ($listing['detail']['groupCode']) {
-//                $parent = Utility::checkSetPath(
-//                    Utility::sanitizeVariable($listing['detail']['groupCode']),
-//                    $parent
-//                );
-//            }
-//            VariantProduct::addUpdateVariant(
-//                variant: [
-//                    'imageUrl' => Utility::getCachedImage($listing['detail']['images'][0]) ?? '',
-//                    'urlLink' =>  $this->getPazaramaUrlLink($listing['name'], $listing['code']) ?? '',
-//                    'salePrice' => $listing['salesPrice'] ?? 0,
-//                    'saleCurrency' =>  $this->marketplace->getCurrency(),
-//                    'title' => $listing['productName'] ?? '',
-//                    'quantity' => $listing['stockQuantity'] ?? 0,
-//                    'attributes' => $listing['variantName']  ?? '',
-//                    'uniqueMarketplaceId' =>  $listing['productCode'] ?? '',
-//                    'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
-//                    'published' => $listing['productStatusType'] === 'YAYINDA' ? 1 : 0,
-//                    'sku' => $listing['stockCode'] ?? '',
-//                ],
-//                importFlag: $importFlag,
-//                updateFlag: $updateFlag,
-//                marketplace: $this->marketplace,
-//                parent: $parent
-//            );
-//            echo "OK\n";
-//            $index++;
-//        }
+        $marketplaceFolder = Utility::checkSetPath(
+            Utility::sanitizeVariable($this->marketplace->getKey(), 190),
+            Utility::checkSetPath('Pazaryerleri')
+        );
+        $total = count($this->listings);
+        $index = 0;
+        foreach ($this->listings as $listing) {
+            print_r($listing);
+            echo "($index/$total) Processing Listing {$listing['code']}:{$listing['name']} ...";
+            $parent = Utility::checkSetPath($marketplaceFolder);
+            if ($listing['detail']['groupCode']) {
+                $parent = Utility::checkSetPath(
+                    Utility::sanitizeVariable($listing['detail']['groupCode']),
+                    $parent
+                );
+            }
+            VariantProduct::addUpdateVariant(
+                variant: [
+                    'imageUrl' => Utility::getCachedImage($listing['detail']['images'][0]) ?? '',
+                    'urlLink' =>  $this->getPazaramaUrlLink($listing['name'], $listing['code'], $listing['brandName']) ?? '',
+                    'salePrice' => $listing['salePrice'] ?? 0,
+                    'saleCurrency' =>  $this->marketplace->getCurrency(),
+                    'title' => $listing['detail']['displayName'] ?? '',
+                    'quantity' => $listing['detail']['stockCount'] ?? 0,
+                    'attributes' => $listing['name']  ?? '',
+                    'uniqueMarketplaceId' =>  $listing['code'] ?? '',
+                    'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
+                    'published' => $listing['listingStatus'] === 'true' ? 1 : 0,
+                    'sku' => $listing['stockCode'] ?? '',
+                ],
+                importFlag: $importFlag,
+                updateFlag: $updateFlag,
+                marketplace: $this->marketplace,
+                parent: $parent
+            );
+            echo "OK\n";
+            $index++;
+        }
     }
 
     private function getPazaramaUrlLink($title, $code, $brand): string
