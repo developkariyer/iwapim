@@ -157,10 +157,11 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
                     $parent
                 );
             }
+            $url = $this->getPazaramaUrlLink($listing['name'], $listing['code'], $listing['brandName']);
             VariantProduct::addUpdateVariant(
                 variant: [
-                    'imageUrl' => Utility::getCachedImage($listing['detail']['images'][0]) ?? '',
-                    'urlLink' =>  $this->getUrlLink($this->getPazaramaUrlLink($listing['name'], $listing['code'], $listing['brandName'])) ?? '',
+                    'imageUrl' => Utility::getCachedImage($listing['detail']['images']['imageUrl'][0]) ?? '',
+                    'urlLink' =>  $this->getUrlLink($url) ?? '',
                     'salePrice' => $listing['salePrice'] ?? 0,
                     'saleCurrency' =>  $this->marketplace->getCurrency(),
                     'title' => $listing['detail']['displayName'] ?? '',
