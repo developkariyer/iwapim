@@ -91,10 +91,14 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
         $index = 1;
         $listingCount = count($this->listings);
         foreach ($this->listings as &$listing) {
-            echo "Processing: {$index}/{$listingCount} Code: {$listing['code']}" . PHP_EOL;
-            $code = $listing['code'];
-            $productDetail = $this->getProductDetail($code);
-            $listing['detail'] = $productDetail;
+            if (is_array($listing) && isset($listing['code'])) {
+                echo "Processing: {$index}/{$listingCount} Code: {$listing['code']}" . PHP_EOL;
+                $code = $listing['code'];
+                $productDetail = $this->getProductDetail($code);
+                $listing['detail'] = $productDetail;
+            } else {
+                echo "Skipping invalid listing at index {$index}" . PHP_EOL;
+            }
             $index++;
         }
         unset($listing);
@@ -133,7 +137,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
     public function import($updateFlag, $importFlag): void
     {
         foreach ($this->listings as $listing) {
-            $url = $this->getPazaramaUrlLink($listing['name'], $listing['code']);
+            $url = $this->getPazaramaUrlLink($listing['name'], $listing['code'], $listing['brandName']);;
             echo $url . "\n";
         }
 //        if (empty($this->listings)) {
@@ -179,7 +183,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
 //        }
     }
 
-    private function getPazaramaUrlLink($title, $code)
+    private function getPazaramaUrlLink($title, $code, $brand)
     {
         $title = mb_strtolower($title, 'UTF-8');
         $turkish = ['ç', 'ğ', 'ı', 'ö', 'ş', 'ü'];
@@ -187,7 +191,11 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
         $title = str_replace($turkish, $english, $title);
         $title = preg_replace('/[^a-z0-9\s-]/', '', $title);
         $title = preg_replace('/[\s]+/', '-', trim($title));
-        $url = "https://www.pazarama.com/{$title}-p-{$code}";
+        $brand = mb_strtolower($brand, 'UTF-8');
+        $brand = str_replace($turkish, $english, $brand);
+        $brand = preg_replace('/[^a-z0-9\s-]/', '', $brand);
+        $brand = preg_replace('/[\s]+/', '-', trim($brand));
+        $url = "https://www.pazarama.com/{$title}-p-{$code}?magaza={$brand}";
         return $url;
     }
 
