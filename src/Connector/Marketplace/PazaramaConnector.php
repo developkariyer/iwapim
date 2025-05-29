@@ -27,6 +27,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
     protected function prepareToken(): void
     {
         if (!Utility::checkJwtTokenValidity($this->marketplace->getPazaramaAccessToken())) {
+            echo "Token is invalid. Regenerating...\n";
             $response = $this->httpClient->request('POST', static::$apiUrl['loginTokenUrl'], [
                 'headers' => [
                     'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getPazaramaClientId()}:{$this->marketplace->getPazaramaClientSecret()}"),
@@ -45,6 +46,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
             $this->marketplace->setPazaramaAccessToken($decodedResponse['data']['accessToken']);
             $this->marketplace->save();
         }
+        echo "Token is valid \n";
         $this->httpClient = ScopingHttpClient::forBaseUri($this->httpClient, 'https://isortagimapi.pazarama.com/', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->marketplace->getPazaramaAccessToken(),
