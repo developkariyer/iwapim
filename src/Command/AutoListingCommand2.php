@@ -108,7 +108,7 @@ class AutoListingCommand2 extends AbstractCommand
         $this->processNewList($newProductList, $this->marketplaceConfig[$toMarketplace], $this->marketplaceConfig[$fromMarketplace]);
     }
 
-    private function processNewList($newProductList, $targetMarketplaceId, $referenceMarketplaceId)
+    private function processNewList($newProductList, $targetMarketplaceId, $referenceMarketplaceId): void
     {
         $message = new ProductListingMessage(
             'list',
@@ -126,7 +126,7 @@ class AutoListingCommand2 extends AbstractCommand
         $this->logger->info("[" . __METHOD__ . "] ✅ NewProductsList sent to Ciceksepeti Queue");
     }
 
-    private function processUpdateList($updateProductList, $targetMarketplaceId, $referenceMarketplaceId)
+    private function processUpdateList($updateProductList, $targetMarketplaceId, $referenceMarketplaceId): void
     {
         $message = new ProductListingMessage(
             'update_list',
