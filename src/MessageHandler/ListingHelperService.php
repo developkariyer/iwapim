@@ -52,6 +52,7 @@ class ListingHelperService
 
             $referenceMarketplaceMainProductIdentifier = $referenceMarketplaceMainProduct->getProductIdentifier();
             $referenceMarketplaceMainProductIwasku = $referenceMarketplaceMainProduct->getIwasku();
+            echo $referenceMarketplaceMainProductIwasku . "\n";
             $referenceMarketplaceMainProductSize = $referenceMarketplaceMainProduct->getVariationSize();
             $referenceMarketplaceMainProductColor = $referenceMarketplaceMainProduct->getVariationColor();
             $referenceMarketplaceMainProductEanGtin = $referenceMarketplaceMainProduct->getEanGtin() ?? '';
@@ -189,11 +190,31 @@ class ListingHelperService
         if (!$parentProduct instanceof Product) {
             return;
         }
-        echo $parentProduct->getVariationSizeList() . "\n";
-
-
-
-
+        $variationSizeList = $parentProduct->getVariationSizeList();
+        $lines = explode("\n", trim($variationSizeList));
+        $parsed = [];
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '') continue;
+            if (preg_match('/^([A-Z]{1,3})[-\s]+(.+)$/i', $line, $matches)) {
+                $label = strtoupper($matches[1]);
+                $value = trim($matches[2]);
+                $parsed[] = ['original' => $line, 'label' => $label, 'value' => $value];
+            } else {
+                $parsed[] = ['original' => $line, 'label' => null, 'value' => $line];
+            }
+        }
+        $autoLabels = ['M', 'L', 'XL', '2XL', '3XL', '4XL'];
+        $autoIndex = 0;
+        foreach ($parsed as &$item) {
+            if ($item['label'] === null) {
+                $item['label'] = $autoLabels[$autoIndex] ?? ('+' . end($autoLabels));
+                $autoIndex++;
+            }
+        }
+        foreach ($parsed as $item) {
+            echo "Orijinal: {$item['original']} → Etiket: {$item['label']}\n";
+        }
     }
 
 
