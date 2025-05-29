@@ -92,7 +92,6 @@ class AutoListingCommand2 extends AbstractCommand
                     'id' => $fromMarketplaceVariantProduct->getId(),
                     'maincode' => $fromMarketplaceMainProduct->getProductIdentifier()
                 ];
-                break;
             }
             else {
                 $updateProductList[] = [
