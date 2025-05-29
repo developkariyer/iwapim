@@ -42,7 +42,6 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
                 throw new \Exception('Failed to get JWT token from Bol.com');
             }
             $decodedResponse = json_decode($response->getContent(), true);
-            print_r($decodedResponse['data']['accessToken']);
             $this->marketplace->setPazaramaAccessToken($decodedResponse['data']['accessToken']);
             $this->marketplace->save();
         }
