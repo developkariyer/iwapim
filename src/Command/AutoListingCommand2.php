@@ -90,7 +90,7 @@ class AutoListingCommand2 extends AbstractCommand
             if (!$targetMarketplaceVariantProduct instanceof VariantProduct) {
                 $newProductList[] = [
                     'id' => $fromMarketplaceVariantProduct->getId(),
-                    'identifier' => $fromMarketplaceMainProduct->getProductIdentifier()
+                    'mainCode' => $fromMarketplaceMainProduct->getProductIdentifier()
                 ];
             }
             else {
@@ -117,7 +117,7 @@ class AutoListingCommand2 extends AbstractCommand
     {
         $grouped = [];
         foreach ($newProductList as $item) {
-            $mainCode = $item['identifier'];
+            $mainCode = $item['mainCode'];
             $id = $item['id'];
             if (!isset($grouped[$mainCode])) {
                 $grouped[$mainCode] = [];
@@ -129,7 +129,9 @@ class AutoListingCommand2 extends AbstractCommand
 
     private function processNewList($groupedByMainCode, $targetMarketplaceId, $referenceMarketplaceId): void
     {
-        print_r($groupedByMainCode);
+        foreach ($groupedByMainCode as $mainCode => $variantIds) {
+            $this->logger->info("[" . __METHOD__ . "] ✅ Created Message for main product code: $mainCode");;
+        }
 
         // grouped main product ids
 
