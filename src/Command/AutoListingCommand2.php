@@ -89,9 +89,10 @@ class AutoListingCommand2 extends AbstractCommand
             $targetMarketplaceVariantProduct = $this->getTargetMarketplaceVariantProduct($toMarketplace, $iwasku);
             if (!$targetMarketplaceVariantProduct instanceof VariantProduct) {
                 $newProductList[] = [
-                    'ids' => $fromMarketplaceVariantProduct->getId(),
+                    'id' => $fromMarketplaceVariantProduct->getId(),
                     'maincode' => $fromMarketplaceMainProducts->getProductIdentifier()
                 ];
+                break;
             }
             else {
                 $updateProductList[] = [
@@ -99,7 +100,6 @@ class AutoListingCommand2 extends AbstractCommand
                     'to' => $targetMarketplaceVariantProduct->getId()
                 ];
             }
-            break;
         }
         $toMarketplaceNewProductCount = count($newProductList);
         $toMarketplaceUpdateProductCount = count($updateProductList);
