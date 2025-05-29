@@ -98,7 +98,6 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
         }
         unset($listing);
         $this->putListingsToCache();
-        // TODO: Implement download() method.
     }
 
     private function getProductDetail($code)
