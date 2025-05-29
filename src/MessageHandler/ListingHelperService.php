@@ -50,7 +50,6 @@ class ListingHelperService
             $sizesAndLabels = $this->getSizeLabelFromParent($referenceMarketplaceMainProduct);
             $referenceMarketplaceMainProductIdentifier = $referenceMarketplaceMainProduct->getProductIdentifier();
             $referenceMarketplaceMainProductIwasku = $referenceMarketplaceMainProduct->getIwasku();
-            echo $referenceMarketplaceMainProductIwasku . "\n";
             $referenceMarketplaceMainProductSize = $referenceMarketplaceMainProduct->getVariationSize();
             $referenceMarketplaceMainProductSizeLabel = $sizesAndLabels[$referenceMarketplaceMainProductSize] ?? null;
             $referenceMarketplaceMainProductColor = $referenceMarketplaceMainProduct->getVariationColor();
