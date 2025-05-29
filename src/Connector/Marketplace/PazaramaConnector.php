@@ -58,7 +58,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
 
     public function download(bool $forceDownload = false): void
     {
-         $this->getProductDetail("SC00200S0RH3");
+         $this->getProductDetail("BESMELEBAKIR");
 //        echo "Downloading Pazarama...\n";
 //        $this->prepareToken();
 //        $page = 1;
