@@ -58,16 +58,19 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
 
     public function download(bool $forceDownload = false): void
     {
-        $this->prepareToken();
+        if (!$forceDownload && $this->getListingsFromCache()) {
+            echo "Using cached listings\n";
+            return;
+        }
         echo "Downloading Pazarama...\n";
         $this->prepareToken();
         $page = 1;
         $size = 100;
-        $result = [];
+        $this->listings = [];
         do {
             $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
                 'query' => [
-                    'Approved' => 'true',
+                    'Approved' => 'false',
                     'page' => $page,
                     'size' => $size
                 ]
@@ -80,15 +83,20 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
             $dataCount = count($data);
             echo "Page: $page Data Count: $dataCount \n";
             $page++;
-            $result = array_merge($result, $data);
+            $this->listings = array_merge($this->listings, $data);
         } while ($dataCount === $size);
-        foreach ($result as &$listing) {
+        $index = 1;
+        $listingCount = count($this->listings);
+        foreach ($this->listings as &$listing) {
+            echo "Processing: {$index}/{$listingCount} Code: {$listing['code']}" . PHP_EOL;
             $code = $listing['code'];
             $productDetail = $this->getProductDetail($code);
             $listing['detail'] = $productDetail;
+            $index++;
         }
         unset($listing);
-        print_r(json_encode($result, JSON_PRETTY_PRINT));;
+        print_r($this->listings);
+        //$this->putListingsToCache();
         // TODO: Implement download() method.
     }
 
@@ -103,7 +111,6 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
             throw new \Exception('Failed to get product detail from Pazarama');
         }
         $responseArray = $response->toArray();
-        echo "Success $code product detail \n";
         return $responseArray['data'];
     }
 
