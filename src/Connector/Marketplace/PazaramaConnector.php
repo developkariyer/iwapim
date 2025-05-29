@@ -200,8 +200,8 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
             return '';
         }
         $title = mb_strtolower($title, 'UTF-8');
-        $turkish = ['ç', 'ğ', 'ı', 'ö', 'ş', 'ü'];
-        $english = ['c', 'g', 'i', 'o', 's', 'u'];
+        $turkish = ['ç', 'ğ', 'ı', 'ö', 'ş', 'ü', 'Ç', 'Ğ', 'İ', 'Ö', 'Ş', 'Ü'];
+        $english = ['c', 'g', 'i', 'o', 's', 'u', 'C', 'G', 'I', 'O', 'S', 'U'];
         $title = str_replace($turkish, $english, $title);
         $title = preg_replace('/[^a-z0-9\s-]/', '', $title);
         $title = preg_replace('/[\s]+/', '-', trim($title));
@@ -209,6 +209,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
         $brand = str_replace($turkish, $english, $brand);
         $brand = preg_replace('/[^a-z0-9\s-]/', '', $brand);
         $brand = preg_replace('/[\s]+/', '-', trim($brand));
+        $code = str_replace($turkish, $english, $code);
         return "https://www.pazarama.com/{$title}-p-{$code}?magaza={$brand}";
     }
 
