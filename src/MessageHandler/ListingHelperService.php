@@ -77,6 +77,7 @@ class ListingHelperService
 //            $additionalData['images'] = $images;
             $mergedData = array_merge($baseProductData, $additionalData);
             $result[] = $mergedData;
+            break;
         }
         $resultCount = count($result);
         $this->logger->info("[" . __METHOD__ . "] ✅ $resultCount variant products retrieved for product info in reference marketplace: $referenceMarketplaceKey");
