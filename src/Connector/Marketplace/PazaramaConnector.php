@@ -149,6 +149,8 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
         $total = count($this->listings);
         $index = 0;
         foreach ($this->listings as $listing) {
+            print_r($listing);
+            break;
             echo "($index/$total) Processing Listing {$listing['code']}:{$listing['name']} ...";
             $parent = Utility::checkSetPath($marketplaceFolder);
             if ($listing['detail']['groupCode']) {
