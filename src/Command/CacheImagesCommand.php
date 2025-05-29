@@ -160,7 +160,7 @@ class CacheImagesCommand extends AbstractCommand
         $json = json_decode($variant->jsonRead('apiResponseJson'), true);
         $listingImageList = [];
         foreach ($json['detail']['images'] ?? [] as $image) {
-            $listingImageList[] = static::processImage($image['imageUrl'], static::$pazaramaFolder, "Pazarama_".str_replace(["https:", "/", ".", "_", "jpg"], '', $image['url']).".jpg");
+            $listingImageList[] = static::processImage($image['imageUrl'], static::$pazaramaFolder, "Pazarama_".str_replace(["https:", "/", ".", "_", "jpg"], '', $image['imageUrl']).".jpg");
         }
         $listingImageList = array_unique($listingImageList);
         $variant->fixImageCache($listingImageList);
