@@ -32,7 +32,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
                     'Authorization' => 'Basic ' . base64_encode("{$this->marketplace->getPazaramaClientId()}:{$this->marketplace->getPazaramaClientSecret()}"),
                     'Accept' => 'application/json'
                 ],
-                'form_params' => [
+                'body' => [
                     'grant_type' => 'client_credentials',
                     'scope' => 'merchantgatewayapi.fullaccess'
                 ]
