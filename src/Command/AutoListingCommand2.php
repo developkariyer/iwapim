@@ -90,7 +90,7 @@ class AutoListingCommand2 extends AbstractCommand
             if (!$targetMarketplaceVariantProduct instanceof VariantProduct) {
                 $newProductList[] = [
                     'id' => $fromMarketplaceVariantProduct->getId(),
-                    'maincode' => $fromMarketplaceMainProduct->getProductIdentifier()
+                    'identifier' => $fromMarketplaceMainProduct->getProductIdentifier()
                 ];
             }
             else {
@@ -100,32 +100,37 @@ class AutoListingCommand2 extends AbstractCommand
                 ];
             }
         }
-        $toMarketplaceNewProductCount = count($newProductList);
+        $groupedByMainCode = $this->groupByMainCode($newProductList);
+        $mainProductCount = count($groupedByMainCode);
+        $variantCount = count($newProductList);
         $toMarketplaceUpdateProductCount = count($updateProductList);
         $this->logger->warning("[" . __METHOD__ . "] ⚠️ From Marketplace $fromMarketplace Count: $fromMarketplaceNoMainProductCount products find has no main product ");
         $this->logger->warning("[" . __METHOD__ . "] ⚠️ From Marketplace $fromMarketplace Count: $fromMarketplaceManyMainProductCount products find main product count is more than 1 ");
         $this->logger->info("[" . __METHOD__ . "] ✅ From Marketplace $fromMarketplace Count: $fromMarketplaceVariantCountWithMainProduct products find has main product  ");
-        $this->logger->info("[" . __METHOD__ . "] ✅ Target Marketplace $toMarketplace Count: $toMarketplaceNewProductCount to marketplace find new products ");
+        $this->logger->info("[" . __METHOD__ . "] ✅ Target Marketplace $toMarketplace contains $mainProductCount main products and $variantCount variants found for syncing.");
         $this->logger->info("[" . __METHOD__ . "] ✅ Target Marketplace $toMarketplace Count: $toMarketplaceUpdateProductCount to marketplace find update products ");
         $this->processUpdateList($updateProductList, $this->marketplaceConfig[$toMarketplace], $this->marketplaceConfig[$fromMarketplace]);
-        $this->processNewList($newProductList, $this->marketplaceConfig[$toMarketplace], $this->marketplaceConfig[$fromMarketplace]);
+        $this->processNewList($groupedByMainCode, $this->marketplaceConfig[$toMarketplace], $this->marketplaceConfig[$fromMarketplace]);
     }
 
-    private function processNewList($newProductList, $targetMarketplaceId, $referenceMarketplaceId): void
+    private function groupByMainCode(array $newProductList): array
     {
         $grouped = [];
-
         foreach ($newProductList as $item) {
-            $mainCode = $item['maincode'];
+            $mainCode = $item['identifier'];
             $id = $item['id'];
-
             if (!isset($grouped[$mainCode])) {
                 $grouped[$mainCode] = [];
             }
-
             $grouped[$mainCode][] = $id;
         }
-        print_r($grouped);
+        return $grouped;
+    }
+
+    private function processNewList($groupedByMainCode, $targetMarketplaceId, $referenceMarketplaceId): void
+    {
+        print_r($groupedByMainCode);
+
         // grouped main product ids
 
 
