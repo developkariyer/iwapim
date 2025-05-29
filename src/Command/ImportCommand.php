@@ -10,6 +10,7 @@ use App\Connector\Marketplace\EbayConnector;
 use App\Connector\Marketplace\EtsyConnector;
 use App\Connector\Marketplace\HepsiburadaConnector;
 use App\Connector\Marketplace\Ozon\Connector as OzonConnector;
+use App\Connector\Marketplace\PazaramaConnector;
 use App\Connector\Marketplace\ShopifyConnector;
 use App\Connector\Marketplace\TakealotConnector;
 use App\Connector\Marketplace\TrendyolConnector;
@@ -69,6 +70,7 @@ class ImportCommand extends AbstractCommand
             ->addOption('hepsiburada', null, InputOption::VALUE_NONE, 'If set, processes hepsiburada objects.')
             ->addOption('wayfair', null, InputOption::VALUE_NONE, 'If set, processes wayfair objects.')
             ->addOption('ozon', null, InputOption::VALUE_NONE, 'If set, processes ozon objects.')
+            ->addOption('pazarama', null, InputOption::VALUE_NONE, 'If set, processes pazarama objects.')
             ->addOption('iwabot', null, InputOption::VALUE_NONE, 'Downloads inventory from iwabot/USA warehouse')
 
             ->addOption('list', null, InputOption::VALUE_NONE, 'Lists all possible objects for processing.')
@@ -142,6 +144,7 @@ class ImportCommand extends AbstractCommand
         $hepsiburadaFlag = $input->getOption('hepsiburada');
         $wayfairFlag = $input->getOption('wayfair');
         $ozonFlag = $input->getOption('ozon');
+        $pazaramaFlag = $input->getOption('pazarama');
         $allFlag = $input->getOption('all');
 
         $this->removeListeners();
@@ -205,6 +208,9 @@ class ImportCommand extends AbstractCommand
                         if (!$ozonFlag && $marketplaceType === 'Ozon') {
                             continue;
                         }
+                        if (!$pazaramaFlag && $marketplaceType === 'Pazarama') {
+                            continue;
+                        }
                     }
                 }
 
@@ -223,6 +229,7 @@ class ImportCommand extends AbstractCommand
                     'Hepsiburada' => new HepsiburadaConnector($marketplace),
                     'Wayfair' => new WayfairConnector($marketplace),
                     'Ozon' => new OzonConnector($marketplace),
+                    'Pazarama' => new PazaramaConnector($marketplace),
                     default => null,
                 };
                 if (!$connector) {
