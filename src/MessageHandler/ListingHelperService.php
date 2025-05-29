@@ -70,11 +70,11 @@ class ListingHelperService
                 $this->logger->error("[" . __METHOD__ . "] ❌ Reference marketplace $referenceMarketplaceKey variant product:$variantId additional data is empty");
                 continue;
             }
-            $images = match ($targetMarketplaceType) {
-                'Ciceksepeti' => $this->ciceksepetiCheckImages($additionalData['images']),
-                default => null
-            };
-            $additionalData['images'] = $images;
+//            $images = match ($targetMarketplaceType) {
+//                'Ciceksepeti' => $this->ciceksepetiCheckImages($additionalData['images']),
+//                default => null
+//            };
+//            $additionalData['images'] = $images;
             $mergedData = array_merge($baseProductData, $additionalData);
             $result[] = $mergedData;
         }

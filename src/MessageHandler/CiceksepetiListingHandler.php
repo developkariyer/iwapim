@@ -66,7 +66,7 @@ class CiceksepetiListingHandler
     {
         $this->logger->info("[" . __METHOD__ . "] ✅ Processing new listing ");
         $listingInfo = $this->listingHelper->getPimListingsInfo($message, $this->logger);
-        return $listingInfo;
+
         // referans alınan marketplace biligisi variant id bilgisi gönderilir variant id ler referansa ait zaten
         // referans kullanılarak her mağaza için alınacak bilgileri alacağız
 
