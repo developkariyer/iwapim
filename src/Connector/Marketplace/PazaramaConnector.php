@@ -58,13 +58,38 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
     public function download(bool $forceDownload = false): void
     {
         $this->prepareToken();
-        $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
-            'query' => [
-                'Approved' => true,
-                'page' => 1,
-                'size' => 100
-            ]
-        ]);
+
+        try {
+            $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->accessToken,
+                    'Accept' => 'application/json'
+                ],
+                'query' => [
+                    'Approved' => true,
+                    'page' => 1,
+                    'size' => 100
+                ]
+            ]);
+
+            $statusCode = $response->getStatusCode();
+            echo "Status: " . $statusCode . PHP_EOL;
+
+            $data = json_decode($response->getContent(), true);
+
+            print_r($data);
+
+        } catch (\Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface $e) {
+            echo "İletişim hatası: " . $e->getMessage();
+        } catch (\Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface $e) {
+            echo "İstemci hatası (4xx): " . $e->getMessage();
+        } catch (\Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface $e) {
+            echo "Sunucu hatası (5xx): " . $e->getMessage();
+        } catch (\Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface $e) {
+            echo "Yönlendirme hatası: " . $e->getMessage();
+        } catch (\Exception $e) {
+            echo "Genel hata: " . $e->getMessage();
+        }
         print_r($response->getContent());
 
         // TODO: Implement download() method.
