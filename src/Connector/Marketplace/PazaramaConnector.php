@@ -159,6 +159,8 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
                 );
             }
             $url = $this->getPazaramaUrlLink($listing['name'], $listing['code'], $listing['brandName']);
+            echo $url . "\n";
+            print_r($listing);
             $imageUrl = '';
             if (
                 isset($listing['detail']['images']) &&
@@ -194,6 +196,9 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
 
     private function getPazaramaUrlLink($title, $code, $brand): string
     {
+        if ($title === '' | $code === '' | $brand === '') {
+            return '';
+        }
         $title = mb_strtolower($title, 'UTF-8');
         $turkish = ['ç', 'ğ', 'ı', 'ö', 'ş', 'ü'];
         $english = ['c', 'g', 'i', 'o', 's', 'u'];
@@ -204,8 +209,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
         $brand = str_replace($turkish, $english, $brand);
         $brand = preg_replace('/[^a-z0-9\s-]/', '', $brand);
         $brand = preg_replace('/[\s]+/', '-', trim($brand));
-        $url = "https://www.pazarama.com/{$title}-p-{$code}?magaza={$brand}";
-        return $url;
+        return "https://www.pazarama.com/{$title}-p-{$code}?magaza={$brand}";
     }
 
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null): void
