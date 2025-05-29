@@ -150,36 +150,45 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
         $index = 0;
         foreach ($this->listings as $listing) {
             echo $listing['detail']['images'][0]['imageUrl'] . "\n";
-//            echo "($index/$total) Processing Listing {$listing['code']}:{$listing['name']} ...";
-//            $parent = Utility::checkSetPath($marketplaceFolder);
-//            if ($listing['detail']['groupCode']) {
-//                $parent = Utility::checkSetPath(
-//                    Utility::sanitizeVariable($listing['detail']['groupCode']),
-//                    $parent
-//                );
-//            }
-//            $url = $this->getPazaramaUrlLink($listing['name'], $listing['code'], $listing['brandName']);
-//            VariantProduct::addUpdateVariant(
-//                variant: [
-//                    'imageUrl' => Utility::getCachedImage($listing['detail']['images'][0]['imageUrl']) ?? '',
-//                    'urlLink' =>  $this->getUrlLink($url) ?? '',
-//                    'salePrice' => $listing['salePrice'] ?? 0,
-//                    'saleCurrency' =>  $this->marketplace->getCurrency(),
-//                    'title' => $listing['detail']['displayName'] ?? '',
-//                    'quantity' => $listing['detail']['stockCount'] ?? 0,
-//                    'attributes' => $listing['name']  ?? '',
-//                    'uniqueMarketplaceId' =>  $listing['code'] ?? '',
-//                    'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
-//                    'published' => $listing['listingStatus'] === 'true' ? 1 : 0,
-//                    'sku' => $listing['stockCode'] ?? '',
-//                ],
-//                importFlag: $importFlag,
-//                updateFlag: $updateFlag,
-//                marketplace: $this->marketplace,
-//                parent: $parent
-//            );
-//            echo "OK\n";
-//            $index++;
+            echo "($index/$total) Processing Listing {$listing['code']}:{$listing['name']} ...";
+            $parent = Utility::checkSetPath($marketplaceFolder);
+            if ($listing['detail']['groupCode']) {
+                $parent = Utility::checkSetPath(
+                    Utility::sanitizeVariable($listing['detail']['groupCode']),
+                    $parent
+                );
+            }
+            $url = $this->getPazaramaUrlLink($listing['name'], $listing['code'], $listing['brandName']);
+            $imageUrl = '';
+            if (
+                isset($listing['detail']['images']) &&
+                is_array($listing['detail']['images']) &&
+                isset($listing['detail']['images'][0]) &&
+                isset($listing['detail']['images'][0]['imageUrl'])
+            ) {
+                $imageUrl = $listing['detail']['images'][0]['imageUrl'];
+            }
+            VariantProduct::addUpdateVariant(
+                variant: [
+                    'imageUrl' => Utility::getCachedImage($imageUrl) ?? '',
+                    'urlLink' =>  $this->getUrlLink($url) ?? '',
+                    'salePrice' => $listing['salePrice'] ?? 0,
+                    'saleCurrency' =>  $this->marketplace->getCurrency(),
+                    'title' => $listing['detail']['displayName'] ?? '',
+                    'quantity' => $listing['detail']['stockCount'] ?? 0,
+                    'attributes' => $listing['name']  ?? '',
+                    'uniqueMarketplaceId' =>  $listing['code'] ?? '',
+                    'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
+                    'published' => $listing['listingStatus'] === 'true' ? 1 : 0,
+                    'sku' => $listing['stockCode'] ?? '',
+                ],
+                importFlag: $importFlag,
+                updateFlag: $updateFlag,
+                marketplace: $this->marketplace,
+                parent: $parent
+            );
+            echo "OK\n";
+            $index++;
         }
     }
 
