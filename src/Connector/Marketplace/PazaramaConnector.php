@@ -59,50 +59,52 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
     public function download(bool $forceDownload = false): void
     {
         $this->prepareToken();
-         $this->getProductDetail("BESMELEBAKIR");
-//        echo "Downloading Pazarama...\n";
-//        $this->prepareToken();
-//        $page = 1;
-//        $size = 100;
-//        $result = [];
-//        do {
-//            $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
-//                'query' => [
-//                    'Approved' => 'true',
-//                    'page' => $page,
-//                    'size' => $size
-//                ]
-//            ]);
-//            $responseArray = $response->toArray();
-//            $data = $responseArray['data'];
-//            $dataCount = count($data);
-//            echo "Page: $page Data Count: $dataCount \n";
-//            $page++;
-//            $result = array_merge($result, $data);
-//        } while ($dataCount === $size);
-//
-//        print_r($result);
-
+        echo "Downloading Pazarama...\n";
+        $this->prepareToken();
+        $page = 1;
+        $size = 100;
+        $result = [];
+        do {
+            $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
+                'query' => [
+                    'Approved' => 'true',
+                    'page' => $page,
+                    'size' => $size
+                ]
+            ]);
+            if ($response->getStatusCode() !== 200) {
+                throw new \Exception('Failed to get offers from Pazarama');
+            }
+            $responseArray = $response->toArray();
+            $data = $responseArray['data'];
+            $dataCount = count($data);
+            echo "Page: $page Data Count: $dataCount \n";
+            $page++;
+            $result = array_merge($result, $data);
+        } while ($dataCount === $size);
+        foreach ($result as &$listing) {
+            $code = $listing['code'];
+            $productDetail = $this->getProductDetail($code);
+            $listing['detail'] = $productDetail;
+        }
+        unset($listing);
+        print_r($result);
         // TODO: Implement download() method.
     }
 
     private function getProductDetail($code)
     {
-        try {
-            $response = $this->httpClient->request('POST', static::$apiUrl['productDetail'], [
-                'json' => [
-                    'Code' => $code
-                ]
-            ]);
-
-            $responseArray = $response->toArray();
-            print_r($responseArray);
-
-        } catch (\Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface $e) {
-            echo "İstemci hatası: " . $e->getMessage();
-        } catch (\Exception $e) {
-            echo "Genel hata: " . $e->getMessage();
+        $response = $this->httpClient->request('POST', static::$apiUrl['productDetail'], [
+            'json' => [
+                'Code' => $code
+            ]
+        ]);
+        if ($response->getStatusCode() !== 200) {
+            throw new \Exception('Failed to get product detail from Pazarama');
         }
+        $responseArray = $response->toArray();
+        echo "Success $code product detail \n";
+        return $responseArray['data'];
     }
 
     public function downloadOrders(): void
