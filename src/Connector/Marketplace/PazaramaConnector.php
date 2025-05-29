@@ -59,16 +59,25 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
     {
         echo "Downloading Pazarama...\n";
         $this->prepareToken();
-        $page = 4;
+        $page = 1;
         $size = 100;
-        $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
-            'query' => [
-                'Approved' => 'true',
-                'page' => $page,
-                'size' => $size
-            ]
-        ]);
-        print_r($response->getContent());
+        $result = [];
+        do {
+            $response = $this->httpClient->request('GET', static::$apiUrl['offers'], [
+                'query' => [
+                    'Approved' => 'true',
+                    'page' => $page,
+                    'size' => $size
+                ]
+            ]);
+            $responseArray = $response->toArray();
+            $data = $responseArray['data'];
+            $dataCount = count($data);
+            $page++;
+            $result = array_merge($result, $data);
+        } while ($dataCount === $size);
+
+        print_r($result);
 
         // TODO: Implement download() method.
     }
