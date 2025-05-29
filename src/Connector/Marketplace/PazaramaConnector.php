@@ -58,6 +58,7 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
 
     public function download(bool $forceDownload = false): void
     {
+        $this->prepareToken();
          $this->getProductDetail("BESMELEBAKIR");
 //        echo "Downloading Pazarama...\n";
 //        $this->prepareToken();
