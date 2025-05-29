@@ -153,19 +153,25 @@ class ListingHelperService
         $host = \Pimcore\Tool::getHostUrl();
         foreach ($imageGallery as $hotspotImage) {
             $image = $hotspotImage->getImage();
+            if (!$image) {
+                continue;
+            }
             $imageUrl = $host . $image->getFullPath();
             $imageUrl = preg_replace('/^http:/i', 'https:', $imageUrl);
-            print_r($imageUrl);
-            $headers = @get_headers($imageUrl);
-            if ($headers && strpos($headers[0], '200') !== false) {
-                $images[] = [
-                    'url' => $imageUrl,
-                    'width' => $image->getWidth(),
-                    'height' => $image->getHeight()
-                ];
-            }
+            $images[] = [
+                'url' => $imageUrl,
+                'width' => $image->getWidth(),
+                'height' => $image->getHeight()
+            ];
+//            $headers = @get_headers($imageUrl);
+//            if ($headers && strpos($headers[0], '200') !== false) {
+//                $images[] = [
+//                    'url' => $imageUrl,
+//                    'width' => $image->getWidth(),
+//                    'height' => $image->getHeight()
+//                ];
+//            }
         }
-        print_r($images);
         return $images;
     }
 
