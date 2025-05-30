@@ -55,8 +55,11 @@ class HelloWorldCommand extends AbstractCommand
             if (!$mainProduct instanceof Product) {
                 continue;
             }
+            echo "*********************************************************************************\n";
+            echo $mainProduct->getIwasku() ."\n";
             $sizeLabelFromParent = $this->getSizeLabelFromParent($mainProduct);
             print_r($sizeLabelFromParent);
+            echo "*********************************************************************************\n";
         }
 
         return Command::SUCCESS;
