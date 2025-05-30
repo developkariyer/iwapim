@@ -43,7 +43,13 @@ class HelloWorldCommand extends AbstractCommand
         $pazaramaVariantProductIds = Utility::fetchFromSql($pazaramaVariantProductSql, ['marketplace_id' => 284396]);
         foreach ($pazaramaVariantProductIds as $pazaramaVariantProductId) {
             $variantProductPazarama = VariantProduct::getById($pazaramaVariantProductId['oo_id']);
-            echo $variantProductPazarama->getSellerSku() . "\n";
+            $mainProductPazarama = $variantProductPazarama->getMainProduct();
+            if (empty($mainProductPazarama)){
+               echo "Main product not found\n";
+            }
+            else {
+                echo $mainProductPazarama[0]->getProductIdentifier() . "\n";
+            }
         }
 
 
