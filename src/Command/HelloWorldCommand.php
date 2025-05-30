@@ -73,14 +73,14 @@ class HelloWorldCommand extends AbstractCommand
         return Command::SUCCESS;
     }
 
-    private function getSizeLabelFromParent($referenceMarketplaceMainProduct)
+    private function getSizeLabelFromChildren($referenceMarketplaceMainProduct)
     {
         $parentProduct = $referenceMarketplaceMainProduct->getParent();
         if (!$parentProduct instanceof \App\Model\DataObject\Product) {
             return;
         }
         $childProducts = $parentProduct->getChildren();
-        $variationSizeList = [];
+        $rawVariationSizes = [];
         foreach ($childProducts as $childProduct) {
             if (!$childProduct instanceof Product) {
                 continue;
@@ -89,18 +89,20 @@ class HelloWorldCommand extends AbstractCommand
             if (empty($controlListings)) {
                 continue;
             }
-            $variationSizeList[] = $childProduct->getVariationSize();
+            $size = $childProduct->getVariationSize();
+            if (!empty($size)) {
+                $rawVariationSizes[] = trim($size);
+            }
         }
-        if (empty($variationSizeList)) {
+        if (empty($rawVariationSizes)) {
             return;
         }
-        $lines = explode("\n", trim($variationSizeList));
         $parsed = [];
-        foreach ($lines as $line) {
+        foreach ($rawVariationSizes as $line) {
             $original = trim($line);
             if ($original === '') continue;
-            $value = $original;
             $label = null;
+            $value = $original;
             $sortKey = null;
             if (preg_match('/^([XSML\d]{1,4})[\s\-:]+(.+)$/iu', $original, $match)) {
                 $label = strtoupper(trim($match[1]));
@@ -112,9 +114,10 @@ class HelloWorldCommand extends AbstractCommand
             }
             elseif (preg_match('/(standart|tek\s*ebat)/iu', $original)) {
                 $label = 'Standart';
+                $value = $original;
             }
-            if (preg_match('/\d+/', $value, $numMatch)) {
-                $sortKey = (int)$numMatch[0];
+            if (preg_match('/(\d+)/', $value, $numMatch)) {
+                $sortKey = (int)$numMatch[1];
             }
             $parsed[] = [
                 'original' => $original,
