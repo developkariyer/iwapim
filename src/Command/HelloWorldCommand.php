@@ -79,10 +79,8 @@ class HelloWorldCommand extends AbstractCommand
         if (!$parentProduct instanceof \App\Model\DataObject\Product) {
             return;
         }
-        $childProducts = array_filter(
-            $parentProduct->getChildren(),
-            fn($child) => $child instanceof Product
-        );
+        $childProducts = $parentProduct->getChildren();
+
         foreach ($childProducts as $childProduct) {
             echo $childProduct->getIwasku() . "\n";
         }
