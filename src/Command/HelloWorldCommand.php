@@ -79,49 +79,57 @@ class HelloWorldCommand extends AbstractCommand
         if (!$parentProduct instanceof \App\Model\DataObject\Product) {
             return;
         }
-        $variationSizeList = $parentProduct->getVariationSizeList();
-        $lines = explode("\n", trim($variationSizeList));
-        $parsed = [];
-        foreach ($lines as $line) {
-            $original = trim($line);
-            if ($original === '') continue;
-            $value = $original;
-            $label = null;
-            $sortKey = null;
-            if (preg_match('/^([A-Z]{1,4})\s*[:\-]\s*(.+)$/i', $original, $match)) {
-                $label = strtoupper($match[1]);
-                $value = trim($match[2]);
-            }
-            elseif (preg_match('/^(XS|S|M|L|XL|2XL|3XL|4XL)$/i', $original, $match)) {
-                $label = strtoupper($match[1]);
-                $value = $original;
-            }
-            elseif (preg_match('/(standart|tek\s*ebat)/iu', $original)) {
-                $label = 'Standart';
-            }
-            if (preg_match('/\d+/', $value, $numMatch)) {
-                $sortKey = (int)$numMatch[0];
-            }
-            $parsed[] = [
-                'original' => $original,
-                'value' => $value,
-                'label' => $label,
-                'sortKey' => $sortKey,
-            ];
+        $childProducts = array_filter(
+            $parentProduct->getChildren(),
+            fn($child) => $child instanceof Product
+        );
+        foreach ($childProducts as $childProduct) {
+            echo $childProduct->getIwasku() . "\n";
         }
-        usort($parsed, function ($a, $b) {
-            return ($a['sortKey'] ?? PHP_INT_MAX) <=> ($b['sortKey'] ?? PHP_INT_MAX);
-        });
-        $autoLabels = ['M', 'L', 'XL', '2XL', '3XL', '4XL'];
-        $autoIndex = 0;
-        foreach ($parsed as &$item) {
-            if ($item['label'] === null) {
-                $item['label'] = $autoLabels[$autoIndex] ?? ('+' . end($autoLabels));
-                $autoIndex++;
-            }
-            unset($item['sortKey']);
-        }
-        return $parsed;
+
+//        $variationSizeList = $parentProduct->getVariationSizeList();
+//        $lines = explode("\n", trim($variationSizeList));
+//        $parsed = [];
+//        foreach ($lines as $line) {
+//            $original = trim($line);
+//            if ($original === '') continue;
+//            $value = $original;
+//            $label = null;
+//            $sortKey = null;
+//            if (preg_match('/^([XSML\d]{1,4})[\s\-:]+(.+)$/iu', $original, $match)) {
+//                $label = strtoupper(trim($match[1]));
+//                $value = trim($match[2]);
+//            }
+//            elseif (preg_match('/^(XS|S|M|L|XL|2XL|3XL|4XL)$/i', $original, $match)) {
+//                $label = strtoupper($match[1]);
+//                $value = $original;
+//            }
+//            elseif (preg_match('/(standart|tek\s*ebat)/iu', $original)) {
+//                $label = 'Standart';
+//            }
+//            if (preg_match('/\d+/', $value, $numMatch)) {
+//                $sortKey = (int)$numMatch[0];
+//            }
+//            $parsed[] = [
+//                'original' => $original,
+//                'value' => $value,
+//                'label' => $label,
+//                'sortKey' => $sortKey,
+//            ];
+//        }
+//        usort($parsed, function ($a, $b) {
+//            return ($a['sortKey'] ?? PHP_INT_MAX) <=> ($b['sortKey'] ?? PHP_INT_MAX);
+//        });
+//        $autoLabels = ['M', 'L', 'XL', '2XL', '3XL', '4XL'];
+//        $autoIndex = 0;
+//        foreach ($parsed as &$item) {
+//            if ($item['label'] === null) {
+//                $item['label'] = $autoLabels[$autoIndex] ?? ('+' . end($autoLabels));
+//                $autoIndex++;
+//            }
+//            unset($item['sortKey']);
+//        }
+//        return $parsed;
     }
 
     private function pazaramaTrendyolMatch()
