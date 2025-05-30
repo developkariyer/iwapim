@@ -64,8 +64,8 @@ class HelloWorldCommand extends AbstractCommand
                $sellerSkuPazarama = $variantProductPazarama->getSellerSku();
                $trendyolVariantProductIds = Utility::fetchFromSql($trendyolControlSql, ['seller_sku' => $sellerSkuPazarama,'marketplace_id' => 169698]);
                if (empty($trendyolVariantProductIds)) {
-                   echo "Trendyol variant product not found\n";
-                   $trendyolPazaramaNoMatchCount;
+                   echo "Trendyol variant product not found : " . $sellerSkuPazarama . "\n";
+                   $trendyolPazaramaNoMatchCount++;
                    continue;
                }
                $variantProductTrendyol = VariantProduct::getById($trendyolVariantProductIds[0]['oo_id']);
@@ -73,7 +73,7 @@ class HelloWorldCommand extends AbstractCommand
                    echo "Invalid variantProductId:$trendyolVariantProductIds[0]\n";
                    continue;
                }
-                $trendyolPazaramaMatchCount;
+                $trendyolPazaramaMatchCount++;
                //echo "Pazarama Seller Sku => " . $variantProductPazarama->getSellerSku() . " Trendyol seller Sku: " . $variantProductTrendyol->getSellerSku() . "\n";
 
 
