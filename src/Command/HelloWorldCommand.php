@@ -42,9 +42,7 @@ class HelloWorldCommand extends AbstractCommand
     {
         $sql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";
         $variantProductIds = Utility::fetchFromSql($sql, ['marketplace_id' => 84124]);
-
-        $processedMainProductIds = [];
-
+        $groupedProducts = [];
         foreach ($variantProductIds as $variantProductId) {
             $variantProduct = VariantProduct::getById($variantProductId['oo_id']);
             if (!$variantProduct instanceof VariantProduct) {
@@ -58,8 +56,13 @@ class HelloWorldCommand extends AbstractCommand
             if (!$mainProduct instanceof Product) {
                 continue;
             }
+            $identifier = $mainProduct->getProductIdentifier();
+            $sku = $mainProduct->getIwasku();
             $ownSize = trim($mainProduct->getVariationSize());
-            $sizeLabelList = $this->getSizeLabelFromParent($mainProduct);
+            if (!isset($groupedProducts[$identifier]['sizeLabelList'])) {
+                $groupedProducts[$identifier]['sizeLabelList'] = $this->getSizeLabelFromParent($mainProduct);
+            }
+            $sizeLabelList = $groupedProducts[$identifier]['sizeLabelList'];
             $matchedLabel = null;
             foreach ($sizeLabelList as $item) {
                 if (trim($item['original']) === $ownSize) {
@@ -67,7 +70,18 @@ class HelloWorldCommand extends AbstractCommand
                     break;
                 }
             }
-            echo $mainProduct->getIwasku() . "  " . $ownSize . " => " . ($matchedLabel ?? 'null') . "\n";
+            $groupedProducts[$identifier]['items'][] = [
+                'sku' => $sku,
+                'ownSize' => $ownSize,
+                'matchedLabel' => $matchedLabel
+            ];
+        }
+        foreach ($groupedProducts as $identifier => $data) {
+            echo "ProductIdentifier: " . $identifier . "\n";
+            foreach ($data['items'] as $item) {
+                echo "  - " . $item['sku'] . "  " . $item['ownSize'] . " => " . ($item['matchedLabel'] ?? 'null') . "\n";
+            }
+            echo "\n";
         }
 
         return Command::SUCCESS;
