@@ -44,6 +44,9 @@ class HelloWorldCommand extends AbstractCommand
         $variantProductIds = Utility::fetchFromSql($sql, ['marketplace_id' => 84124]);
         $sizeLabelFromParent = null;
         foreach ($variantProductIds as $variantProductId) {
+            if ($sizeLabelFromParent) {
+                continue;
+            }
             $variantProduct = VariantProduct::getById($variantProductId['oo_id']);
             if (!$variantProduct instanceof VariantProduct) {
                 continue;
@@ -56,11 +59,8 @@ class HelloWorldCommand extends AbstractCommand
             if (!$mainProduct instanceof Product) {
                 continue;
             }
-            if ($sizeLabelFromParent === null) {
-                $sizeLabelFromParent = $this->getSizeLabelFromParent($mainProduct);
-                print_r($sizeLabelFromParent);
-            }
-
+            $sizeLabelFromParent = $this->getSizeLabelFromParent($mainProduct);
+            print_r($sizeLabelFromParent);
         }
 
         return Command::SUCCESS;
