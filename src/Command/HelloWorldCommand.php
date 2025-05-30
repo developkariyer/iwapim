@@ -60,7 +60,7 @@ class HelloWorldCommand extends AbstractCommand
             $mainProductPazarama = $variantProductPazarama->getMainProduct();
             if (empty($mainProductPazarama)){
                 $pazaramaMainProductNoCount++;
-               echo "Main product not found\n";
+               echo "Main product not found Pazarama\n";
                $sellerSkuPazarama = $variantProductPazarama->getSellerSku();
                $trendyolVariantProductIds = Utility::fetchFromSql($trendyolControlSql, ['seller_sku' => $sellerSkuPazarama,'marketplace_id' => 169698]);
                if (empty($trendyolVariantProductIds)) {
