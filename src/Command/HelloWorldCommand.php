@@ -73,6 +73,12 @@ class HelloWorldCommand extends AbstractCommand
                    echo "Invalid variantProductId:$trendyolVariantProductIds[0]\n";
                    continue;
                }
+               $trendyolMainProduct = $variantProductTrendyol->getMainProduct();
+               if (empty($trendyolMainProduct)) {
+                   echo "Trendyol main product not found\n";
+                   continue;
+               }
+               echo $trendyolMainProduct->getIwasku() ."\n";
                 $trendyolPazaramaMatchCount++;
                //echo "Pazarama Seller Sku => " . $variantProductPazarama->getSellerSku() . " Trendyol seller Sku: " . $variantProductTrendyol->getSellerSku() . "\n";
 
