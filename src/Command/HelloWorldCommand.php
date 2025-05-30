@@ -42,11 +42,7 @@ class HelloWorldCommand extends AbstractCommand
     {
         $sql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";
         $variantProductIds = Utility::fetchFromSql($sql, ['marketplace_id' => 84124]);
-        $sizeLabelFromParent = null;
         foreach ($variantProductIds as $variantProductId) {
-            if ($sizeLabelFromParent) {
-                continue;
-            }
             $variantProduct = VariantProduct::getById($variantProductId['oo_id']);
             if (!$variantProduct instanceof VariantProduct) {
                 continue;
