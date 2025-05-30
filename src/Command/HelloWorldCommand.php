@@ -58,8 +58,6 @@ class HelloWorldCommand extends AbstractCommand
             if (!$mainProduct instanceof Product) {
                 continue;
             }
-            echo "*********************************************************************************\n";
-            echo $mainProduct->getIwasku() . "\n";
             $ownSize = trim($mainProduct->getVariationSize());
             $sizeLabelList = $this->getSizeLabelFromParent($mainProduct);
             $matchedLabel = null;
@@ -69,8 +67,7 @@ class HelloWorldCommand extends AbstractCommand
                     break;
                 }
             }
-            echo $ownSize . " => " . ($matchedLabel ?? 'null') . "\n";
-            echo "*********************************************************************************\n";
+            echo $mainProduct->getIwasku() . "  " . $ownSize . " => " . ($matchedLabel ?? 'null') . "\n";
         }
 
         return Command::SUCCESS;
