@@ -98,6 +98,7 @@ class HelloWorldCommand extends AbstractCommand
             return;
         }
         $parsed = [];
+        $rawVariationSizes = array_unique($rawVariationSizes);
         foreach ($rawVariationSizes as $line) {
             $original = trim($line);
             if ($original === '') continue;
