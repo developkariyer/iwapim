@@ -92,8 +92,9 @@ class ListingHelperService
 
     private function findSizeLabelFromMap($size, $sizesAndLabels)
     {
+        $normalizedSize = trim($size);
         foreach ($sizesAndLabels as $entry) {
-            if (($entry['value'] ?? '') === $size || ($entry['original'] ?? '') === $size) {
+            if (trim($entry['original']) === $normalizedSize) {
                 return $entry['label'] ?? null;
             }
         }
@@ -199,20 +200,57 @@ class ListingHelperService
         if (!$parentProduct instanceof Product) {
             return;
         }
-        $variationSizeList = $parentProduct->getVariationSizeList();
-        $lines = explode("\n", trim($variationSizeList));
-        $parsed = [];
-        foreach ($lines as $line) {
-            $line = trim($line);
-            if ($line === '') continue;
-            if (preg_match('/^([A-Z]{1,3})[-\s]+(.+)$/i', $line, $matches)) {
-                $label = strtoupper($matches[1]);
-                $value = trim($matches[2]);
-                $parsed[] = ['original' => $line, 'label' => $label, 'value' => $value];
-            } else {
-                $parsed[] = ['original' => $line, 'label' => null, 'value' => $line];
+        $childProducts = $parentProduct->getChildren();
+        $rawVariationSizes = [];
+        foreach ($childProducts as $childProduct) {
+            if (!$childProduct instanceof Product) {
+                continue;
+            }
+            $controlListings = $childProduct->getListingItems();
+            if (empty($controlListings)) {
+                continue;
+            }
+            $size = $childProduct->getVariationSize();
+            if (!empty($size)) {
+                $rawVariationSizes[] = trim($size);
             }
         }
+        if (empty($rawVariationSizes)) {
+            return;
+        }
+        $parsed = [];
+        $rawVariationSizes = array_unique($rawVariationSizes);
+        foreach ($rawVariationSizes as $line) {
+            $original = trim($line);
+            if ($original === '') continue;
+            $label = null;
+            $value = $original;
+            $sortKey = null;
+            if (preg_match('/^([XSML\d]{1,4})[\s\-:]+(.+)$/iu', $original, $match)) {
+                $label = strtoupper(trim($match[1]));
+                $value = trim($match[2]);
+            }
+            elseif (preg_match('/^(XS|S|M|L|XL|2XL|3XL|4XL)$/i', $original, $match)) {
+                $label = strtoupper($match[1]);
+                $value = $original;
+            }
+            elseif (preg_match('/(standart|tek\s*ebat)/iu', $original)) {
+                $label = 'Standart';
+                $value = $original;
+            }
+            if (preg_match('/(\d+)/', $value, $numMatch)) {
+                $sortKey = (int)$numMatch[1];
+            }
+            $parsed[] = [
+                'original' => $original,
+                'value' => $value,
+                'label' => $label,
+                'sortKey' => $sortKey,
+            ];
+        }
+        usort($parsed, function ($a, $b) {
+            return ($a['sortKey'] ?? PHP_INT_MAX) <=> ($b['sortKey'] ?? PHP_INT_MAX);
+        });
         $autoLabels = ['M', 'L', 'XL', '2XL', '3XL', '4XL'];
         $autoIndex = 0;
         foreach ($parsed as &$item) {
@@ -220,6 +258,7 @@ class ListingHelperService
                 $item['label'] = $autoLabels[$autoIndex] ?? ('+' . end($autoLabels));
                 $autoIndex++;
             }
+            unset($item['sortKey']);
         }
         return $parsed;
     }
