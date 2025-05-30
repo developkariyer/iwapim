@@ -73,7 +73,7 @@ class HelloWorldCommand extends AbstractCommand
         return Command::SUCCESS;
     }
 
-    private function getSizeLabelFromChildren($referenceMarketplaceMainProduct)
+    private function getSizeLabelFromParent($referenceMarketplaceMainProduct)
     {
         $parentProduct = $referenceMarketplaceMainProduct->getParent();
         if (!$parentProduct instanceof \App\Model\DataObject\Product) {
