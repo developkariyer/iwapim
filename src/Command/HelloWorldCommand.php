@@ -44,13 +44,9 @@ class HelloWorldCommand extends AbstractCommand
         $pazaramaMainProductNoCount = 0;
         $trendyolPazaramaMatchCount = 0;
         $trendyolPazaramaNoMatchCount = 0;
-
-
-
-
         $pazaramaVariantProductSql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";
         $trendyolControlSql = "SELECT oo_id FROM object_query_varyantproduct WHERE sellerSku = :seller_sku and marketplace__id = :marketplace_id";
-        $pazaramaVariantProductIds = Utility::fetchFromSql($pazaramaVariantProductSql, ['marketplace_id' => 284396]);
+        $pazaramaVariantProductIds = Utility::fetchFromSql($pazaramaVariantProductSql, ['marketplace_id' => 279708]);
         foreach ($pazaramaVariantProductIds as $pazaramaVariantProductId) {
             $variantProductPazarama = VariantProduct::getById($pazaramaVariantProductId['oo_id']);
             if (!$variantProductPazarama instanceof VariantProduct) {
@@ -91,9 +87,6 @@ class HelloWorldCommand extends AbstractCommand
                     echo "Error adding variant to trendyol main product\n";
                 }
                 echo "Added variant to trendyol main product" . $result . "\n";
-               //echo "Pazarama Seller Sku => " . $variantProductPazarama->getSellerSku() . " Trendyol seller Sku: " . $variantProductTrendyol->getSellerSku() . "\n";
-
-
             }
             else {
                 $pazaramaMainProductYesCount++;
@@ -102,9 +95,6 @@ class HelloWorldCommand extends AbstractCommand
         }
         echo "Pazarama Main Product Yes: " . $pazaramaMainProductYesCount . " Pazarama Main Product No: " . $pazaramaMainProductNoCount . "\n";
         echo "Trendyol Match Pazarama: " . $trendyolPazaramaMatchCount . " Trendyol No Match Pazarama: " . $trendyolPazaramaNoMatchCount . "\n";
-
-
-
         return Command::SUCCESS;
     }
 
