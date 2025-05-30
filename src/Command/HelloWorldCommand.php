@@ -73,9 +73,14 @@ class HelloWorldCommand extends AbstractCommand
                    echo "Invalid variantProductId:$trendyolVariantProductIds[0]\n";
                    continue;
                }
-               $trendyolMainProduct = $variantProductTrendyol->getMainProduct();
-               if (empty($trendyolMainProduct)) {
+               $trendyolMainProducts = $variantProductTrendyol->getMainProduct();
+               if (empty($trendyolMainProducts)) {
                    echo "Trendyol main product not found\n";
+                   continue;
+               }
+               $trendyolMainProduct = $trendyolMainProducts[0];
+               if (!$trendyolMainProduct instanceof Product) {
+                   echo "Invalid trendyol main product\n";
                    continue;
                }
                echo $trendyolMainProduct->getIwasku() ."\n";
