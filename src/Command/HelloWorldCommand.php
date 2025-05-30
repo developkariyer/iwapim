@@ -10,6 +10,7 @@ use App\Model\DataObject\Marketplace;
 use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Doctrine\DBAL\Exception;
+use LesserPHP\Utils\Util;
 use phpseclib3\File\ASN1\Maps\AttributeValue;
 use Pimcore\Console\AbstractCommand;
 use Pimcore\Db;
@@ -40,15 +41,34 @@ class HelloWorldCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $pazaramaVariantProductSql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";
+        $trendyolControlSql = "SELECT oo_id FROM object_query_varyantproduct WHERE sellerSku = :seller_sku and marketplace__id = :marketplace_id";
         $pazaramaVariantProductIds = Utility::fetchFromSql($pazaramaVariantProductSql, ['marketplace_id' => 284396]);
         foreach ($pazaramaVariantProductIds as $pazaramaVariantProductId) {
             $variantProductPazarama = VariantProduct::getById($pazaramaVariantProductId['oo_id']);
+            if (!$variantProductPazarama instanceof VariantProduct) {
+                echo "Invalid variantProductId:$pazaramaVariantProductId\n";
+                continue;
+            }
             $mainProductPazarama = $variantProductPazarama->getMainProduct();
             if (empty($mainProductPazarama)){
                echo "Main product not found\n";
+               $sellerSkuPazarama = $variantProductPazarama->getSellerSku();
+               $trendyolVariantProductIds = Utility::fetchFromSql($pazaramaVariantProductSql, ['seller_sku' => $sellerSkuPazarama,'marketplace_id' => 169698]);
+               if (empty($trendyolVariantProduct)) {
+                   echo "Trendyol variant product not found\n";
+                   continue;
+               }
+               $variantProductTrendyol = VariantProduct::getById($trendyolVariantProductIds[0]['oo_id']);
+               if (!$variantProductTrendyol instanceof VariantProduct) {
+                   echo "Invalid variantProductId:$trendyolVariantProductIds[0]\n";
+                   continue;
+               }
+               echo "Pazarama Seller Sku => " . $variantProductPazarama->getSellerSku() . " Trendyol seller Sku: " . $variantProductTrendyol->getSellerSku() . "\n";
+
+
             }
             else {
-                echo $mainProductPazarama[0]->getProductIdentifier() . "\n";
+                echo "Main product found \n";
             }
         }
 
