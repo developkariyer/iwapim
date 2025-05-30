@@ -40,6 +40,14 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $pazaramaMainProductYesCount = 0;
+        $pazaramaMainProductNoCount = 0;
+        $trendyolPazaramaMatchCount = 0;
+        $trendyolPazaramaNoMatchCount = 0;
+
+
+
+
         $pazaramaVariantProductSql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";
         $trendyolControlSql = "SELECT oo_id FROM object_query_varyantproduct WHERE sellerSku = :seller_sku and marketplace__id = :marketplace_id";
         $pazaramaVariantProductIds = Utility::fetchFromSql($pazaramaVariantProductSql, ['marketplace_id' => 284396]);
@@ -51,11 +59,13 @@ class HelloWorldCommand extends AbstractCommand
             }
             $mainProductPazarama = $variantProductPazarama->getMainProduct();
             if (empty($mainProductPazarama)){
+                $pazaramaMainProductNoCount++;
                echo "Main product not found\n";
                $sellerSkuPazarama = $variantProductPazarama->getSellerSku();
                $trendyolVariantProductIds = Utility::fetchFromSql($trendyolControlSql, ['seller_sku' => $sellerSkuPazarama,'marketplace_id' => 169698]);
                if (empty($trendyolVariantProductIds)) {
                    echo "Trendyol variant product not found\n";
+                   $trendyolPazaramaNoMatchCount;
                    continue;
                }
                $variantProductTrendyol = VariantProduct::getById($trendyolVariantProductIds[0]['oo_id']);
@@ -63,15 +73,18 @@ class HelloWorldCommand extends AbstractCommand
                    echo "Invalid variantProductId:$trendyolVariantProductIds[0]\n";
                    continue;
                }
-               echo "Pazarama Seller Sku => " . $variantProductPazarama->getSellerSku() . " Trendyol seller Sku: " . $variantProductTrendyol->getSellerSku() . "\n";
+                $trendyolPazaramaMatchCount;
+               //echo "Pazarama Seller Sku => " . $variantProductPazarama->getSellerSku() . " Trendyol seller Sku: " . $variantProductTrendyol->getSellerSku() . "\n";
 
 
             }
             else {
+                $pazaramaMainProductYesCount++;
                 echo "Main product found Pazarama \n";
             }
         }
-
+        echo "Pazarama Main Product Yes: " . $pazaramaMainProductYesCount . " Pazarama Main Product No: " . $pazaramaMainProductNoCount . "\n";
+        echo "Trendyol Match Pazarama: " . $trendyolPazaramaMatchCount . " Trendyol No Match Pazarama: " . $trendyolPazaramaNoMatchCount . "\n";
 
 
 
