@@ -58,15 +58,18 @@ class HelloWorldCommand extends AbstractCommand
             if (!$mainProduct instanceof Product) {
                 continue;
             }
-            $mainProductId = $mainProduct->getId();
-            if (in_array($mainProductId, $processedMainProductIds)) {
-                continue;
-            }
-            $processedMainProductIds[] = $mainProductId;
             echo "*********************************************************************************\n";
             echo $mainProduct->getIwasku() . "\n";
-            $sizeLabelFromParent = $this->getSizeLabelFromParent($mainProduct);
-            print_r($sizeLabelFromParent);
+            $ownSize = trim($mainProduct->getVariationSize());
+            $sizeLabelList = $this->getSizeLabelFromParent($mainProduct);
+            $matchedLabel = null;
+            foreach ($sizeLabelList as $item) {
+                if (trim($item['original']) === $ownSize) {
+                    $matchedLabel = $item['label'];
+                    break;
+                }
+            }
+            echo $ownSize . " => " . ($matchedLabel ?? 'null') . "\n";
             echo "*********************************************************************************\n";
         }
 
