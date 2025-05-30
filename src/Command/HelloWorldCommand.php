@@ -40,6 +40,61 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $sql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";
+        $variantProductIds = Utility::fetchFromSql($sql, ['marketplace_id' => 84124]);
+        foreach ($variantProductIds as $variantProductId) {
+            $variantProduct = VariantProduct::getById($variantProductId['oo_id']);
+            if (!$variantProduct instanceof VariantProduct) {
+                continue;
+            }
+            $mainProduct = $variantProduct->getMainProduct();
+            if (empty($mainProduct)){
+                continue;
+            }
+            $mainProduct = $mainProduct[0];
+            if (!$mainProduct instanceof Product) {
+                continue;
+            }
+            $sizeLabelFromParent = $this->getSizeLabelFromParent($variantProduct);
+            print_r($sizeLabelFromParent);
+        }
+
+        return Command::SUCCESS;
+    }
+
+    private function getSizeLabelFromParent($referenceMarketplaceMainProduct)
+    {
+        $parentProduct = $referenceMarketplaceMainProduct->getParent();
+        if (!$parentProduct instanceof \App\Model\DataObject\Product) {
+            return;
+        }
+        $variationSizeList = $parentProduct->getVariationSizeList();
+        $lines = explode("\n", trim($variationSizeList));
+        $parsed = [];
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '') continue;
+            if (preg_match('/^([A-Z]{1,3})[-\s]+(.+)$/i', $line, $matches)) {
+                $label = strtoupper($matches[1]);
+                $value = trim($matches[2]);
+                $parsed[] = ['original' => $line, 'label' => $label, 'value' => $value];
+            } else {
+                $parsed[] = ['original' => $line, 'label' => null, 'value' => $line];
+            }
+        }
+        $autoLabels = ['M', 'L', 'XL', '2XL', '3XL', '4XL'];
+        $autoIndex = 0;
+        foreach ($parsed as &$item) {
+            if ($item['label'] === null) {
+                $item['label'] = $autoLabels[$autoIndex] ?? ('+' . end($autoLabels));
+                $autoIndex++;
+            }
+        }
+        return $parsed;
+    }
+
+    private function pazaramaTrendyolMatch()
+    {
         $pazaramaMainProductYesCount = 0;
         $pazaramaMainProductNoCount = 0;
         $trendyolPazaramaMatchCount = 0;
@@ -96,7 +151,6 @@ class HelloWorldCommand extends AbstractCommand
         }
 //        echo "Pazarama Main Product Yes: " . $pazaramaMainProductYesCount . " Pazarama Main Product No: " . $pazaramaMainProductNoCount . "\n";
 //        echo "Trendyol Match Pazarama: " . $trendyolPazaramaMatchCount . " Trendyol No Match Pazarama: " . $trendyolPazaramaNoMatchCount . "\n";
-        return Command::SUCCESS;
     }
 
 }
