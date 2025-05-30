@@ -74,11 +74,16 @@ class HelloWorldCommand extends AbstractCommand
         foreach ($lines as $line) {
             $line = trim($line);
             if ($line === '') continue;
-            if (preg_match('/^([A-Z]{1,3})[-\s]+(.+)$/i', $line, $matches)) {
+            if (preg_match('/^(XS|S|M|L|XL|2XL|3XL|4XL|5XL)$/i', $line, $matches)) {
+                $label = strtoupper($matches[1]);
+                $parsed[] = ['original' => $line, 'label' => $label, 'value' => $label];
+            }
+            elseif (preg_match('/^([0-9]*[A-Z]{1,3})[-\s]+(.+)$/i', $line, $matches)) {
                 $label = strtoupper($matches[1]);
                 $value = trim($matches[2]);
                 $parsed[] = ['original' => $line, 'label' => $label, 'value' => $value];
-            } else {
+            }
+            else {
                 $parsed[] = ['original' => $line, 'label' => null, 'value' => $line];
             }
         }
