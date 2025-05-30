@@ -85,6 +85,11 @@ class HelloWorldCommand extends AbstractCommand
                }
                echo $trendyolMainProduct->getIwasku() ."\n";
                 $trendyolPazaramaMatchCount++;
+                $result = $trendyolMainProduct->addVariant($variantProductPazarama);
+                if (!$result) {
+                    echo "Error adding variant to trendyol main product\n";
+                }
+                echo "Added variant to trendyol main product" . $result . "\n";
                //echo "Pazarama Seller Sku => " . $variantProductPazarama->getSellerSku() . " Trendyol seller Sku: " . $variantProductTrendyol->getSellerSku() . "\n";
 
 
