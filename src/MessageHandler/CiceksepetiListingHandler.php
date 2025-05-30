@@ -70,6 +70,11 @@ class CiceksepetiListingHandler
         $categories = $this->getCiceksepetiCategoriesDetails();
         $this->logger->info("[" . __METHOD__ . "] ✅ Category Data Fetched ");
         print_r(json_encode($listingInfo));
+        // normalize ciceksepeti data
+        // gemini (color, description, categoryid)
+        // find attributes
+        // normalize attributes
+        // last control
 
 
 
