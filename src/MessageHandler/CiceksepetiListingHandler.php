@@ -75,6 +75,7 @@ class CiceksepetiListingHandler
         // find attributes
         // normalize attributes
         // last control
+        // ciceksepeti api send
 
 
 
