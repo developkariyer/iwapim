@@ -55,46 +55,47 @@ class HelloWorldCommand extends AbstractCommand
             }
             $mainProductPazarama = $variantProductPazarama->getMainProduct();
             if (empty($mainProductPazarama)){
-                $pazaramaMainProductNoCount++;
-               echo "Main product not found Pazarama\n";
-               $sellerSkuPazarama = $variantProductPazarama->getSellerSku();
-               echo "Pazarama Seller Sku => " . $sellerSkuPazarama . "\n";
-               $trendyolVariantProductIds = Utility::fetchFromSql($trendyolControlSql, ['seller_sku' => $sellerSkuPazarama,'marketplace_id' => 169698]);
-               if (empty($trendyolVariantProductIds)) {
-                   echo "Trendyol variant product not found : " . $sellerSkuPazarama . "\n";
-                   $trendyolPazaramaNoMatchCount++;
-                   continue;
-               }
-               $variantProductTrendyol = VariantProduct::getById($trendyolVariantProductIds[0]['oo_id']);
-               if (!$variantProductTrendyol instanceof VariantProduct) {
-                   echo "Invalid variantProductId:$trendyolVariantProductIds[0]\n";
-                   continue;
-               }
-               $trendyolMainProducts = $variantProductTrendyol->getMainProduct();
-               if (empty($trendyolMainProducts)) {
-                   echo "Trendyol main product not found\n";
-                   continue;
-               }
-               $trendyolMainProduct = $trendyolMainProducts[0];
-               if (!$trendyolMainProduct instanceof Product) {
-                   echo "Invalid trendyol main product\n";
-                   continue;
-               }
-               echo $trendyolMainProduct->getIwasku() ."\n";
-                $trendyolPazaramaMatchCount++;
-                $result = $trendyolMainProduct->addVariant($variantProductPazarama);
-                if (!$result) {
-                    echo "Error adding variant to trendyol main product\n";
-                }
-                echo "Added variant to trendyol main product" . $result . "\n";
+                echo "Main product not found" . $variantProductPazarama->getSellerSku() . "\n";
+//                $pazaramaMainProductNoCount++;
+//               echo "Main product not found Pazarama\n";
+//               $sellerSkuPazarama = $variantProductPazarama->getSellerSku();
+//               echo "Pazarama Seller Sku => " . $sellerSkuPazarama . "\n";
+//               $trendyolVariantProductIds = Utility::fetchFromSql($trendyolControlSql, ['seller_sku' => $sellerSkuPazarama,'marketplace_id' => 169698]);
+//               if (empty($trendyolVariantProductIds)) {
+//                   echo "Trendyol variant product not found : " . $sellerSkuPazarama . "\n";
+//                   $trendyolPazaramaNoMatchCount++;
+//                   continue;
+//               }
+//               $variantProductTrendyol = VariantProduct::getById($trendyolVariantProductIds[0]['oo_id']);
+//               if (!$variantProductTrendyol instanceof VariantProduct) {
+//                   echo "Invalid variantProductId:$trendyolVariantProductIds[0]\n";
+//                   continue;
+//               }
+//               $trendyolMainProducts = $variantProductTrendyol->getMainProduct();
+//               if (empty($trendyolMainProducts)) {
+//                   echo "Trendyol main product not found\n";
+//                   continue;
+//               }
+//               $trendyolMainProduct = $trendyolMainProducts[0];
+//               if (!$trendyolMainProduct instanceof Product) {
+//                   echo "Invalid trendyol main product\n";
+//                   continue;
+//               }
+//               echo $trendyolMainProduct->getIwasku() ."\n";
+//                $trendyolPazaramaMatchCount++;
+//                $result = $trendyolMainProduct->addVariant($variantProductPazarama);
+//                if (!$result) {
+//                    echo "Error adding variant to trendyol main product\n";
+//                }
+//                echo "Added variant to trendyol main product" . $result . "\n";
             }
-            else {
-                $pazaramaMainProductYesCount++;
-                echo "Main product found Pazarama \n";
-            }
+//            else {
+//                $pazaramaMainProductYesCount++;
+//                echo "Main product found Pazarama \n";
+//            }
         }
-        echo "Pazarama Main Product Yes: " . $pazaramaMainProductYesCount . " Pazarama Main Product No: " . $pazaramaMainProductNoCount . "\n";
-        echo "Trendyol Match Pazarama: " . $trendyolPazaramaMatchCount . " Trendyol No Match Pazarama: " . $trendyolPazaramaNoMatchCount . "\n";
+//        echo "Pazarama Main Product Yes: " . $pazaramaMainProductYesCount . " Pazarama Main Product No: " . $pazaramaMainProductNoCount . "\n";
+//        echo "Trendyol Match Pazarama: " . $trendyolPazaramaMatchCount . " Trendyol No Match Pazarama: " . $trendyolPazaramaNoMatchCount . "\n";
         return Command::SUCCESS;
     }
 
