@@ -47,15 +47,15 @@ class HelloWorldCommand extends AbstractCommand
             if (!$variantProduct instanceof VariantProduct) {
                 continue;
             }
-            $mainProduct = $variantProduct->getMainProduct();
-            if (empty($mainProduct)){
+            $mainProducts = $variantProduct->getMainProduct();
+            if (empty($mainProducts)){
                 continue;
             }
-            $mainProduct = $mainProduct[0];
+            $mainProduct = $mainProducts[0];
             if (!$mainProduct instanceof Product) {
                 continue;
             }
-            $sizeLabelFromParent = $this->getSizeLabelFromParent($variantProduct);
+            $sizeLabelFromParent = $this->getSizeLabelFromParent($mainProduct);
             print_r($sizeLabelFromParent);
         }
 
