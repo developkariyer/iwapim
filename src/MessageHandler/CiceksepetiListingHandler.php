@@ -64,8 +64,17 @@ class CiceksepetiListingHandler
 
     private function processNewListing($message)
     {
-        $this->logger->info("[" . __METHOD__ . "] ✅ Processing new listing ");
+        $this->logger->info("[" . __METHOD__ . "] ✅ Processing New Listing ");
         $listingInfo = $this->listingHelper->getPimListingsInfo($message, $this->logger);
+        $this->logger->info("[" . __METHOD__ . "] ✅ Pim Listings Info Fetched ");
+        $categories = $this->getCiceksepetiCategoriesDetails();
+        $this->logger->info("[" . __METHOD__ . "] ✅ Category Data Fetched ");
+        print_r(json_encode($listingInfo));
+
+
+
+
+
         // tum bilgileri aldık alınan bilgiler tüm mağazacalar için geçerli olur
         // getpimlistings info artık tüm pazaryerleine uygundur
         // şimdi çiçeksepetine özel işlemleri bu sınıfta gerçekleştirmekte özgürüz
@@ -84,6 +93,60 @@ class CiceksepetiListingHandler
     {
         //
     }
+
+    private function getCiceksepetiCategoriesDetails(): false|array|string
+    {
+        $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
+        if (empty($categoryIdList)) {
+            return [];
+        }
+        $inClause = implode(',', array_fill(0, count($categoryIdList), '?'));
+        $sql = "SELECT * FROM iwa_ciceksepeti_categories WHERE id IN ($inClause)";
+        $categories = Utility::fetchFromSql($sql, $categoryIdList);
+        if (empty($categories)) {
+            return [];
+        }
+        return json_encode($categories, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    }
+
+    private function getCiceksepetiListingCategoriesIdList(): array
+    {
+        $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
+        $ciceksepetiVariantIds = Utility::fetchFromSql($sql);
+        if (!is_array($ciceksepetiVariantIds) || empty($ciceksepetiVariantIds)) {
+            return [];
+        }
+        $categoryIdList = [];
+        foreach ($ciceksepetiVariantIds as $ciceksepetiVariantId) {
+            $variantProduct = VariantProduct::getById($ciceksepetiVariantId['oo_id']);
+            if (!$variantProduct instanceof VariantProduct) {
+                continue;
+            }
+            $apiData = json_decode($variantProduct->jsonRead('apiResponseJson'), true);
+            $categoryIdList[] = $apiData['categoryId'];
+        }
+        return array_unique($categoryIdList);
+    }
+
+//    private function ciceksepetiNormalizeData($data): array
+//    {
+//
+//
+//    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private function printProductInfoLogger(string $jsonString): void
     {
@@ -569,35 +632,6 @@ class CiceksepetiListingHandler
         echo "Ciceksepeti Category Attributes Updated\n";
     }
 
-    public function getCiceksepetiCategoriesDetails(): false|array|string
-    {
-        $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
-        if (empty($categoryIdList)) {
-            return [];
-        }
-        $inClause = implode(',', array_fill(0, count($categoryIdList), '?'));
-        $sql = "SELECT * FROM iwa_ciceksepeti_categories WHERE id IN ($inClause)";
-        $categories = Utility::fetchFromSql($sql, $categoryIdList);
-        return json_encode($categories, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-    }
 
-    public function getCiceksepetiListingCategoriesIdList(): array
-    {
-        $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
-        $ciceksepetiVariantIds = Utility::fetchFromSql($sql);
-        if (!is_array($ciceksepetiVariantIds) || empty($ciceksepetiVariantIds)) {
-            return [];
-        }
-        $categoryIdList = [];
-        foreach ($ciceksepetiVariantIds as $ciceksepetiVariantId) {
-            $variantProduct = VariantProduct::getById($ciceksepetiVariantId['oo_id']);
-            if (!$variantProduct instanceof VariantProduct) {
-                continue;
-            }
-            $apiData = json_decode($variantProduct->jsonRead('apiResponseJson'), true);
-            $categoryIdList[] = $apiData['categoryId'];
-        }
-        return array_unique($categoryIdList);
-    }
 
 }
