@@ -66,6 +66,13 @@ class CiceksepetiListingHandler
     {
         $this->logger->info("[" . __METHOD__ . "] ✅ Processing new listing ");
         $listingInfo = $this->listingHelper->getPimListingsInfo($message, $this->logger);
+        // tum bilgileri aldık alınan bilgiler tüm mağazacalar için geçerli olur
+        // getpimlistings info artık tüm pazaryerleine uygundur
+        // şimdi çiçeksepetine özel işlemleri bu sınıfta gerçekleştirmekte özgürüz
+        // fieldlar ciceksepeti isterlerine uygun olacak
+        // açıklama içerisinden size bilgisi gemini ile çıkartılacak
+        // size bmap bilgisi açıklamaya eklecenek
+        // title ciceksepeti ilk gönerileni alıyor o yüzden title tüm ürünler için aynı olacak size bilgi renk bilgisi içermeyecek
         print_r($listingInfo);
 
         // referans alınan marketplace biligisi variant id bilgisi gönderilir variant id ler referansa ait zaten

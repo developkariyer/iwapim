@@ -39,8 +39,15 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $marketplace = Marketplace::getById(84124);
-        echo $marketplace->getMarketplaceType();
+        $pazaramaVariantProductSql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";
+        $pazaramaVariantProductIds = Utility::fetchFromSql($pazaramaVariantProductSql, ['marketplace_id' => 284396]);
+        foreach ($pazaramaVariantProductIds as $pazaramaVariantProductId) {
+            $variantProductPazarama = VariantProduct::getById($pazaramaVariantProductId['oo_id']);
+            echo $variantProductPazarama->getSellerSku() . "\n";
+        }
+
+
+
 
         return Command::SUCCESS;
     }
