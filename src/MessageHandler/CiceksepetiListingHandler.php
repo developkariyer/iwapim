@@ -30,6 +30,7 @@ class CiceksepetiListingHandler
      */
     public function __invoke(ProductListingMessage $message): void
     {
+        $this->categoryAttributeUpdate(265384);
         if (method_exists($message, 'getLogger') && $message->getLogger() instanceof LoggerInterface) {
             $this->logger = $message->getLogger();
         }
@@ -164,6 +165,14 @@ class CiceksepetiListingHandler
                     Shiny Silver => Gümüş-Sarı,
                     Shiny Gold => Sarı Altın,
                     Shiny Copper => Bakır- Altın,
+                    Cherry  Black   => 
+                    Cherry  Copper  =>
+                    Cherry  Gold    =>
+                    Cherry  Silver  =>
+                    Naturel Black   =>
+                    Naturel Copper  =>
+                    Naturel Gold    =>
+                    Naturel Silver  =>
                     Bu renkleri olduğu gibi kullan '-' ve boşluklara dikkat et bunları kaldırma.  
             **Veri formatı**: Lütfen yalnızca aşağıdaki **JSON verisini** kullanın ve dışarıya çıkmayın. Çıkışınızı bu veriye dayalı olarak oluşturun:
             İşte veri: $jsonString
