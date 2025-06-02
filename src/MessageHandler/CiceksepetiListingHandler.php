@@ -94,7 +94,6 @@ class CiceksepetiListingHandler
         // açıklama içerisinden size bilgisi gemini ile çıkartılacak
         // size bmap bilgisi açıklamaya eklecenek
         // title ciceksepeti ilk gönerileni alıyor o yüzden title tüm ürünler için aynı olacak size bilgi renk bilgisi içermeyecek
-        print_r($listingInfo);
 
         // referans alınan marketplace biligisi variant id bilgisi gönderilir variant id ler referansa ait zaten
         // referans kullanılarak her mağaza için alınacak bilgileri alacağız
