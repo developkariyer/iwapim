@@ -325,10 +325,10 @@ class CiceksepetiListingHandler
     private function buildProductAttributes(array $product, array $variantAttributes): array
     {
         $attributes = [];
-        if (!empty($variantAttributes['color']) && isset($product['color']) && !empty(trim($product['color']))) {
+        if (!empty($variantAttributes['color']) && isset($product['geminiColor']) && !empty(trim($product['geminiColor']))) {
             $colorAttrId = $variantAttributes['color']['id'];
-            $colorValue = trim($product['color']);
-            $bestColorMatch = $this->findAttributeCiceksepetiAttributeDatabase($colorAttrId, $colorValue, false);
+            $colorValue = trim($product['geminiColor']);
+            $bestColorMatch = $this->findAttributeCiceksepetiAttributeDatabase($colorAttrId, $colorValue);
             if ($bestColorMatch) {
                 $attributes[] = [
                     'id' => $colorAttrId,
@@ -343,7 +343,7 @@ class CiceksepetiListingHandler
         if (!empty($variantAttributes['size']) && isset($product['sizeLabel']) && !empty(trim($product['sizeLabel']))) {
             $sizeAttrId = $variantAttributes['size']['id'];
             $sizeValue = trim($product['sizeLabel']);
-            $bestSizeMatch = $this->findAttributeCiceksepetiAttributeDatabase($sizeAttrId, $sizeValue, true);
+            $bestSizeMatch = $this->findAttributeCiceksepetiAttributeDatabase($sizeAttrId, $sizeValue);
             if ($bestSizeMatch) {
                 $attributes[] = [
                     'id' => $sizeAttrId,
