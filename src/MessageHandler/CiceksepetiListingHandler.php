@@ -70,7 +70,7 @@ class CiceksepetiListingHandler
         $categories = $this->getCiceksepetiCategoriesDetails();
         $this->logger->info("[" . __METHOD__ . "] ✅ Category Data Fetched ");
 
-        $this->geminiProcess($listingInfo);
+        $this->geminiProcess($listingInfo, $categories);
 
 
         //first gemini api call
