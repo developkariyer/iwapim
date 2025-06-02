@@ -79,7 +79,7 @@ class CiceksepetiListingHandler
         $filledAttributeData =  $this->fillAttributeData($geminiFilledData);
         $this->logger->info("[" . __METHOD__ . "] ✅ Filled Attribute Data ");
         $normalizedCiceksepetiData = $this->normalizeCiceksepetiData($filledAttributeData);
-        print_r($normalizedCiceksepetiData);
+        print_r(json_encode($normalizedCiceksepetiData));
 
 
         // fill attribute data
