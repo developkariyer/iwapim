@@ -417,7 +417,7 @@ class CiceksepetiListingHandler
 
         $result = [];
         foreach ($data as $product) {
-            $this->normalizeDescription($product['geminiDescription'], $product['sizeLabelMap'], $product['color'], $product['geminiColor'])
+            $this->normalizeDescription($product['geminiDescription'], $product['sizeLabelMap'], $product['color'], $product['geminiColor']);
 //            $result[] = [
 //                'productName' =>  mb_strlen($product['geminiTitle']) > 255
 //                    ? mb_substr($product['geminiTitle'], 0, 255)
