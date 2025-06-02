@@ -69,7 +69,13 @@ class CiceksepetiListingHandler
         $this->logger->info("[" . __METHOD__ . "] ✅ Pim Listings Info Fetched ");
         $categories = $this->getCiceksepetiCategoriesDetails();
         $this->logger->info("[" . __METHOD__ . "] ✅ Category Data Fetched ");
-        $this->normalizeCiceksepetiData($listingInfo);
+
+        $this->geminiProcess($listingInfo);
+
+
+        //first gemini api call
+        //$this->normalizeCiceksepetiData($listingInfo);
+        //
         // normalize ciceksepeti data
         // gemini (color, description, categoryid)
         // find attributes
@@ -95,8 +101,47 @@ class CiceksepetiListingHandler
 
     }
 
+    private function geminiProcess($data)
+    {
+        $geminiData = [];
+        foreach ($data as $product) {
+            $geminiData[] = [
+                'stockCode'   => $product['stockCode'] ?? null,
+                'categoryId'  => null,
+                'title'       => $product['title'] ?? null,
+                'description' => $product['description'] ?? null,
+                'color'       => $product['color'] ?? null,
+            ];
+        }
+
+        print_r($geminiData);
+
+
+    }
+
     private function normalizeCiceksepetiData($data)
     {
+        $result = [];
+        foreach ($data as $product) {
+            $normalizedProduct = [];
+            $normalizedProduct['productName'] = mb_strlen($product['title']) > 255
+                ? mb_substr($product['title'], 0, 255)
+                : $product['title'];
+            $normalizedProduct['mainProductCode'] = $product['mainProductCode'];
+            $normalizedProduct['stockCode'] = $product['stockCode'];
+            $normalizedProduct['categoryId'] = null;
+            $normalizedProduct['description'] = mb_strlen($product['description']) > 20000
+                ? mb_substr($product['description'], 0, 20000)
+                : $product['description'];
+            $normalizedProduct['deliveryMessageType'] = 5;
+            $normalizedProduct['deliveryType'] = 2;
+            $normalizedProduct['stockQuantity'] = $product['stockQuantity'];
+            $normalizedProduct['salesPrice'] = $product['salesPrice'] * 1.5;
+            $normalizedProduct['Attributes'] = [];
+            $normalizedProduct['images'] = $this->filterCiceksepetiFormatImage($product['images']);
+
+
+        }
         print_r($data);
     }
 
