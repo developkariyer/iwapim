@@ -79,44 +79,12 @@ class CiceksepetiListingHandler
         $filledAttributeData =  $this->fillAttributeData($geminiFilledData);
         $this->logger->info("[" . __METHOD__ . "] ✅ Filled Attribute Data ");
         $normalizedCiceksepetiData = $this->normalizeCiceksepetiData($filledAttributeData);
-        print_r(json_encode($normalizedCiceksepetiData));
-
-
-        // fill attribute data
-        // normalize
-        // send to api
-        // bir variant bile attribute eksikse api göndermeyelim ?
-
-
-
-        // color map ve size map açıklama eklenecek
-
-
-        //first gemini api call
-        //$this->normalizeCiceksepetiData($listingInfo);
-        //
-        // normalize ciceksepeti data
-        // gemini (color, description, categoryid)
-        // find attributes
-        // normalize attributes
-        // last control
-        // ciceksepeti api send
-
-
-
-
-
-        // tum bilgileri aldık alınan bilgiler tüm mağazacalar için geçerli olur
-        // getpimlistings info artık tüm pazaryerleine uygundur
-        // şimdi çiçeksepetine özel işlemleri bu sınıfta gerçekleştirmekte özgürüz
-        // fieldlar ciceksepeti isterlerine uygun olacak
-        // açıklama içerisinden size bilgisi gemini ile çıkartılacak
-        // size bmap bilgisi açıklamaya eklecenek
-        // title ciceksepeti ilk gönerileni alıyor o yüzden title tüm ürünler için aynı olacak size bilgi renk bilgisi içermeyecek
-
-        // referans alınan marketplace biligisi variant id bilgisi gönderilir variant id ler referansa ait zaten
-        // referans kullanılarak her mağaza için alınacak bilgileri alacağız
-
+        $this->logger->info("[" . __METHOD__ . "] ✅ Normalized Ciceksepeti Data ");
+        print_r($normalizedCiceksepetiData);
+//        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
+//        $result = $ciceksepetiConnector->createListing($normalizedCiceksepetiData);
+//        $this->logger->info("✅ [CiceksepetiConnector] Result batch:\n" . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+//        print_r($result);
     }
 
     private function controlGeminiFilledData($data)
@@ -399,7 +367,7 @@ class CiceksepetiListingHandler
     {
         $result = [];
         foreach ($data as $product) {
-            $result[] = [
+            $result['products'] = [
                 'productName' =>  mb_strlen($product['geminiTitle']) > 255
                     ? mb_substr($product['geminiTitle'], 0, 255)
                     : $product['geminiTitle'],
@@ -416,6 +384,12 @@ class CiceksepetiListingHandler
             ];
         }
         $result = $this->removeCommonAttributes($result);
+        $result = json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        if ($result === false) {
+            $this->logger->error("❌ [JSON Encode Error] Failed to encode formatted listing data.");
+            return false;
+        }
+        $this->logger->info("📦 [Listing Data Ready] " . count($result['products']) . " product(s) formatted for Çiçeksepeti listing.");
         return $result;
     }
 
