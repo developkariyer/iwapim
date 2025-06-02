@@ -100,7 +100,7 @@ class CiceksepetiListingHandler
 
     }
 
-    private function geminiProcess($data)
+    private function geminiProcess($data, $categories)
     {
         $firstProduct = $data[0];
         $geminiData = [
@@ -116,10 +116,58 @@ class CiceksepetiListingHandler
             ];
         }
         $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Created Variant Count: " . count($geminiData['variants']));
-        print_r($geminiData);
+        $prompt = $this->generateListingPrompt(json_encode(['products' => $geminiData], JSON_UNESCAPED_UNICODE), $categories);
+        $result = GeminiConnector::chat($prompt, 'ciceksepeti');
+        $parsedResult = $this->parseGeminiResult($result);
+        print_r($parsedResult);
 
 
 
+
+
+
+
+    }
+
+    private function generateListingPrompt($jsonString, $categories): string
+    {
+        return <<<EOD
+            Sen bir e-ticaret uzmanısın ve ÇiçekSepeti pazaryeri için ürün listeleri hazırlıyorsun. 
+            Sana gönderdiğim veri dışına çıkma.
+            Hiçbir açıklama, kod bloğu, yorum ekleme.  
+            Sadece geçerli, düzgün bir JSON üret.
+            Bu JSON'da eksik alan olan kategoriyi verdiğim kategori bilgilerine göre bulmanı istiyorum.
+            Gönderdiğim veri de stockCode yer almaktadır çıktı formatında bunu kullanacaksın.
+            -**title**: Title bilgisini değiştirmeden size veya renk bilgisi içeriyorsa bunu kaldır başka herhangi bir müdahalede bulunma tüm variantlar için aynı.
+            -**description**: Açıklama bilgisini değiştirmeden size bilgilerini kaldır başka herhangi bir müdahalede bulunma tüm variantlar için aynı.
+            -**categoryId**: Kategori verisinden en uygun kategoriyi bul id sini al ve kaydet
+            -**color**: 
+                - renk bilgisi verideki color fieldı Türkçe ye çevir çevirdiğinde çiçeksepetinde bulunan çok bilinen renklerden olsun Eğer iki renk varsa her iki rengi de çevir, teke düşürme iki rengide örneğin:
+                - Altın, Gümüş, Turkuaz, Kırmızı, Mavi, Bordo, Turuncu, Yeşil, Sarı, Pembe, Füme, Kamuflaj, Kahverengi, Mor, Bej, Lacivert, Metal, Lila, Haki, Taba, Beyaz, Magenta, Mürdüm, Karışık, Gri,
+                Antrasit, Açık Mavi, Bakır, Vişne, Açık Pembe, Bronz, Ekru, Taş renklerinden kullan 2 renk varsa ikiside bunlara uyumlu olsun aralarında boşluk olsun.
+                Renk örnekleri:
+                    Mixed => Karışık,
+                    Tuana => Antrasit,
+                    Betül => Açık Meşe,
+                    Dark Brown => Kahverengi,
+                    Light Brown => Ceviz,
+                    Karışık Bordo => Bordo-Siyah,
+                    Karışık Gold => Mavi-Altın,
+                    Karışık Gri => Siyah-Gri-Beyaz,
+                    Crimson => Kırmızı,
+                    Navy => Mavi,
+                    Sage => Yeşil,
+                    Nimbus => Gri,
+                    Terracotta => Turuncu,
+                    Soil => Kahverengi,
+                    Shiny Silver => Gümüş-Sarı,
+                    Shiny Gold => Sarı Altın,
+                    Shiny Copper => Bakır- Altın,
+                    Bu renkleri olduğu gibi kullan '-' ve boşluklara dikkat et bunları kaldırma.  
+            **Veri formatı**: Lütfen yalnızca aşağıdaki **JSON verisini** kullanın ve dışarıya çıkmayın. Çıkışınızı bu veriye dayalı olarak oluşturun:
+            İşte veri: $jsonString
+            Kategori Verisi: $categories
+        EOD;
     }
 
     private function normalizeCiceksepetiData($data)
@@ -146,6 +194,14 @@ class CiceksepetiListingHandler
 
         }
         print_r($data);
+    }
+
+    private function parseGeminiResult($result)
+    {
+        $json = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
+        $json = preg_replace('/[\x00-\x1F\x7F]/u', '', $json);
+        $data = json_decode($json, true);
+        return (json_last_error() === JSON_ERROR_NONE) ? $data : null;
     }
 
     private function processUpdateListing($message)
@@ -385,15 +441,7 @@ class CiceksepetiListingHandler
         return $data;
     }
 
-    private function parseGeminiResult($result)
-    {
-        $json = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
-        $json = preg_replace('/[\x00-\x1F\x7F]/u', '', $json);
-        $data = json_decode($json, true);
-        return (json_last_error() === JSON_ERROR_NONE) ? $data : null;
-    }
-
-    private function generateListingPrompt($jsonString, $categories): string
+    private function generateListingPrompt2($jsonString, $categories): string
     {
         return <<<EOD
             Sen bir e-ticaret uzmanısın ve ÇiçekSepeti pazaryeri için ürün listeleri hazırlıyorsun. 

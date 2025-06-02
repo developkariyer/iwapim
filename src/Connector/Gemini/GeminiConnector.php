@@ -56,19 +56,25 @@ class GeminiConnector
         'stopSequences'    => ["\n\n"],
         'presencePenalty'  => 0.0,
         'frequencyPenalty' => 0.0,
-        'responseSchema'   => [
-            'type'  => 'ARRAY',
-            'items' => [
-                'type'       => 'OBJECT',
-                'properties' => [
-                    'stockCode'       => ['type'=>'STRING'],
-                    'categoryId'      => ['type'=>'INTEGER'],
-                    'color'            => ['type'=>'STRING']
-                ],
-                'required'=>[
-                    'stockCode', 'categoryId','color'
+        'responseSchema' => [
+            'type'       => 'OBJECT',
+            'properties' => [
+                'title'       => ['type' => 'STRING'],
+                'description' => ['type' => 'STRING'],
+                'categoryId' => ['type' => 'INTEGER'],
+                'variants'    => [
+                    'type'  => 'ARRAY',
+                    'items' => [
+                        'type'       => 'OBJECT',
+                        'properties' => [
+                            'stockCode' => ['type' => 'STRING'],
+                            'color'     => ['type' => 'STRING']
+                        ],
+                        'required' => ['stockCode', 'color']
+                    ]
                 ]
-            ]
+            ],
+            'required' => ['title', 'description', 'categoryId', 'variants']
         ]
     ];
 
