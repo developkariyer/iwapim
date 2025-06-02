@@ -39,7 +39,7 @@ class CiceksepetiListingHandler
         echo "action type: $actionType\n";
         $this->logger->info("[" . __METHOD__ . "] ✅ Action Type: $actionType ");
         match ($actionType) {
-            'list' => $this->processNewListing($message),
+            //'list' => $this->processNewListing($message),
             'update_list' => $this->processUpdateListing($message),
             default => throw new \InvalidArgumentException("Unknown Action Type: $actionType")
         };
@@ -452,7 +452,9 @@ class CiceksepetiListingHandler
 
     private function processUpdateListing($message)
     {
-        //
+        $updateProductList = $message->getVariantIds();
+        print_r($updateProductList);
+
     }
 
 }
