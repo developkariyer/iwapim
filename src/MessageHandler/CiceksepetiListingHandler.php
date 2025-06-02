@@ -272,11 +272,11 @@ class CiceksepetiListingHandler
         $categorySql = "SELECT category_name FROM iwa_ciceksepeti_categories WHERE id = :categoryId";
         $categoryData = Utility::fetchFromSql($categorySql, ['categoryId' => $categoryId]);
         if (empty($categoryData)) {
-            $this->logger->error("❌ [Category Error] Category not found for categoryId: {$categoryId}");
+            $this->logger->error("[" . __METHOD__ . "] ❌ Category Error Category Not Found For categoryId: {$categoryId}");
             return null;
         }
         $categoryName = $categoryData[0]['category_name'] ?? null;
-        $this->logger->info("✅ [Category Found] CategoryId: {$categoryId}, Name: {$categoryName}");
+        $this->logger->info("[" . __METHOD__ . "] ✅ Category Found CategoryId: {$categoryId}, Name: {$categoryName}");
         return [
             'id' => $categoryId,
             'name' => $categoryName
