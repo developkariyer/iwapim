@@ -149,6 +149,9 @@ class AutoListingCommand2 extends AbstractCommand
 
     private function processUpdateList($updateProductList, $targetMarketplaceId, $referenceMarketplaceId, $toMarketplace): void
     {
+        // Onay bekleyenler gitmemesi lazim
+        // pimde birden fazla aynı variant product var unique marketplace id leri olmadığı için
+        // update tekrar düzenlenecek
         $message = new ProductListingMessage(
             'update_list',
             $targetMarketplaceId,
