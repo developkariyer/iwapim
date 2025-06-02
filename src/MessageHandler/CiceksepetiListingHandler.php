@@ -368,10 +368,10 @@ class CiceksepetiListingHandler
             ];
         }
         $result = $this->removeCommonAttributes($result);
-        $this->logger->info("📦 [Listing Data Ready] " . count($result['products']) . " product(s) formatted for Çiçeksepeti listing.");
+        $this->logger->info("[" . __METHOD__ . "] 📦 Listing Data Ready " . count($result['products']) . " Product(s) Formatted For Çiçeksepeti Listing.");
         $result = json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         if ($result === false) {
-            $this->logger->error("❌ [JSON Encode Error] Failed to encode formatted listing data.");
+            $this->logger->error("[" . __METHOD__ . "] ❌ JSON Encode Error Failed To Encode Formatted Listing Data.");
             return false;
         }
         return $result;
