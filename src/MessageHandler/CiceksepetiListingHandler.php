@@ -74,7 +74,7 @@ class CiceksepetiListingHandler
         $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Filled ");
         $filledAttributeData =  $this->fillAttributeData($geminiFilledData);
         $this->logger->info("[" . __METHOD__ . "] ✅ Filled Attribute Data ");
-        print_r(json_encode($filledAttributeData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        print_r(json_encode($filledAttributeData));
         // fill attribute data
         // normalize
         // send to api
