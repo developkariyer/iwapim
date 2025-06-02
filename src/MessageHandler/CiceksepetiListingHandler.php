@@ -30,7 +30,6 @@ class CiceksepetiListingHandler
      */
     public function __invoke(ProductListingMessage $message): void
     {
-        $this->categoryAttributeUpdate(265384);
         if (method_exists($message, 'getLogger') && $message->getLogger() instanceof LoggerInterface) {
             $this->logger = $message->getLogger();
         }
@@ -72,6 +71,7 @@ class CiceksepetiListingHandler
         $this->logger->info("[" . __METHOD__ . "] ✅ Category Data Fetched ");
 
         $this->geminiProcess($listingInfo, $categories);
+        // color map ve size map açıklama eklenecek
 
 
         //first gemini api call
@@ -146,7 +146,7 @@ class CiceksepetiListingHandler
             -**color**: 
                 - renk bilgisi verideki color fieldı Türkçe ye çevir çevirdiğinde çiçeksepetinde bulunan çok bilinen renklerden olsun Eğer iki renk varsa her iki rengi de çevir, teke düşürme iki rengide örneğin:
                 - Altın, Gümüş, Turkuaz, Kırmızı, Mavi, Bordo, Turuncu, Yeşil, Sarı, Pembe, Füme, Kamuflaj, Kahverengi, Mor, Bej, Lacivert, Metal, Lila, Haki, Taba, Beyaz, Magenta, Mürdüm, Karışık, Gri,
-                Antrasit, Açık Mavi, Bakır, Vişne, Açık Pembe, Bronz, Ekru, Taş renklerinden kullan 2 renk varsa ikiside bunlara uyumlu olsun aralarında boşluk olsun.
+                Antrasit, Açık Mavi, Bakır, Vişne, Açık Pembe, Bronz, Ekru, Taş renklerinden kullan 2 renk varsa ikiside bunlara uyumlu olsun aralarında boşluk olsun.            
                 Renk örnekleri:
                     Mixed => Karışık,
                     Tuana => Antrasit,
@@ -165,14 +165,15 @@ class CiceksepetiListingHandler
                     Shiny Silver => Gümüş-Sarı,
                     Shiny Gold => Sarı Altın,
                     Shiny Copper => Bakır- Altın,
-                    Cherry  Black   => 
-                    Cherry  Copper  =>
-                    Cherry  Gold    =>
-                    Cherry  Silver  =>
-                    Naturel Black   =>
-                    Naturel Copper  =>
-                    Naturel Gold    =>
-                    Naturel Silver  =>
+                    Tek Renk => Standart,
+                    Cherry  Black   => Siyah,
+                    Cherry  Copper  => Bakır,
+                    Cherry  Gold    => Altın,
+                    Cherry  Silver  => Gümüş,
+                    Naturel Black   => Beyaz-Siyah,
+                    Naturel Copper  => Beyaz-Bakır,
+                    Naturel Gold    => Beyaz-Altın,
+                    Naturel Silver  => Beyaz - Gümüş
                     Bu renkleri olduğu gibi kullan '-' ve boşluklara dikkat et bunları kaldırma.  
             **Veri formatı**: Lütfen yalnızca aşağıdaki **JSON verisini** kullanın ve dışarıya çıkmayın. Çıkışınızı bu veriye dayalı olarak oluşturun:
             İşte veri: $jsonString
