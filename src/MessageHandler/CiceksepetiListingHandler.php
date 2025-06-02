@@ -70,7 +70,12 @@ class CiceksepetiListingHandler
         $categories = $this->getCiceksepetiCategoriesDetails();
         $this->logger->info("[" . __METHOD__ . "] ✅ Category Data Fetched ");
 
-        $this->geminiProcess($listingInfo, $categories);
+        $geminiFilledData = $this->geminiProcess($listingInfo, $categories);
+        print_r(json_encode($geminiFilledData));
+        $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Filled ");
+
+
+
         // color map ve size map açıklama eklenecek
 
 
@@ -116,19 +121,23 @@ class CiceksepetiListingHandler
                 'color'     => $product['color'] ?? null,
             ];
         }
-        print_r($geminiData);
         $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Created Variant Count: " . count($geminiData['variants']));
         $prompt = $this->generateListingPrompt(json_encode(['products' => $geminiData], JSON_UNESCAPED_UNICODE), $categories);
-        $result = GeminiConnector::chat($prompt, 'ciceksepeti');
-        $parsedResult = $this->parseGeminiResult($result);
-        print_r($parsedResult);
-
-
-
-
-
-
-
+        $geminiApiResult = GeminiConnector::chat($prompt, 'ciceksepeti');
+        $geminiResult = $this->parseGeminiResult($geminiApiResult);
+        foreach ($data as &$product) {
+            $product['geminiCategoryId']   = $geminiResult['categoryId'] ?? null;
+            $product['geminiTitle']        = $geminiResult['title'] ?? null;
+            $product['geminiDescription']  = $geminiResult['description'] ?? null;
+            $product['geminiColor'] = null;
+            foreach ($geminiResult['variants'] as $variant) {
+                if ($variant['stockCode'] === $product['stockCode']) {
+                    $product['geminiColor'] = $variant['color'];
+                    break;
+                }
+            }
+        }
+        return $data;
     }
 
     private function generateListingPrompt($jsonString, $categories): string
