@@ -253,15 +253,14 @@ class CiceksepetiListingHandler
                 continue;
             }
             $variantAttributes = $this->getVariantAttributes($product['geminiCategoryId']);
-            print_r($variantAttributes);
-//            if (empty($variantAttributes['color']) && empty($variantAttributes['sizeLabel'])) {
-//                $this->logger->error("[" . __METHOD__ . "] ❌ Missing CategoryId Product {$product['stockCode']} Has No CategoryID ");
-//                continue;
-//            }
-//            $product['Attributes'] = $this->buildProductAttributes(
-//                $product,
-//                $variantAttributes
-//            );
+            if (empty($variantAttributes['color']) && empty($variantAttributes['size'])) {
+                $this->logger->error("[" . __METHOD__ . "] ❌ Size AttributeId Not Found: {$product['stockCode']} ");
+                continue;
+            }
+            $product['Attributes'] = $this->buildProductAttributes(
+                $product,
+                $variantAttributes
+            );
         }
         return $data;
     }
@@ -319,6 +318,87 @@ class CiceksepetiListingHandler
             $this->logger->error("[" . __METHOD__ . "] ❌ [Size Attribute] Not Found For CategoryId: {$categoryId}");
         }
         return $result;
+    }
+
+    private function buildProductAttributes(array $product, array $variantAttributes): array
+    {
+        $attributes = [];
+        if (!empty($variantAttributes['color']) && isset($product['color']) && !empty(trim($product['color']))) {
+            $colorAttrId = $variantAttributes['color']['id'];
+            $colorValue = trim($product['color']);
+            $bestColorMatch = $this->findAttributeCiceksepetiAttributeDatabase($colorAttrId, $colorValue, false);
+            if ($bestColorMatch) {
+                $attributes[] = [
+                    'id' => $colorAttrId,
+                    'ValueId' => $bestColorMatch['attribute_value_id'],
+                    'TextLength' => 0
+                ];
+                $this->logger->info("[" . __METHOD__ . "] ✅ Color Match Found: {$bestColorMatch['name']} (ID: {$bestColorMatch['attribute_value_id']})");
+            } else {
+                $this->logger->error("[" . __METHOD__ . "] ❌ Color Match Not Found For Value: {$colorValue}");
+            }
+        }
+        if (!empty($variantAttributes['size']) && isset($product['sizeLabel']) && !empty(trim($product['sizeLabel']))) {
+            $sizeAttrId = $variantAttributes['size']['id'];
+            $sizeValue = trim($product['sizeLabel']);
+            $bestSizeMatch = $this->findAttributeCiceksepetiAttributeDatabase($sizeAttrId, $sizeValue, true);
+            if ($bestSizeMatch) {
+                $attributes[] = [
+                    'id' => $sizeAttrId,
+                    'ValueId' => $bestSizeMatch['attribute_value_id'],
+                    'TextLength' => 0
+                ];
+                $this->logger->info("[" . __METHOD__ . "] ✅ Size Match Found: {$bestSizeMatch['name']} (ID: {$bestSizeMatch['attribute_value_id']})");
+            } else {
+                $this->logger->error("[" . __METHOD__ . "] ❌ Size Match Not Found For Value: {$sizeValue}");
+            }
+        }
+        if (empty($attributes)) {
+            $this->logger->warning("[" . __METHOD__ . "] ⚠️ No Attributes Could Be Added For Product: {$product['stockCode']}");
+        }
+        return $attributes;
+    }
+
+    private function findAttributeCiceksepetiAttributeDatabase($attributeId, $searchValue): ?array
+    {
+        $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
+            WHERE attribute_id = :attribute_id";
+        $allValues = Utility::fetchFromSql($sql, ['attribute_id' => $attributeId]);
+        if (empty($allValues)) {
+            $this->logger->warning("⚠️ [AttributeMatch] No attribute values found in DB for attributeId: {$attributeId}");
+            return null;
+        }
+        $bestMatch = null;
+        $smallestDiff = PHP_INT_MAX;
+        foreach ($allValues as $value) {
+            //$dbValueNormalized = $this->normalizeAttributeValue($value['name']);
+            if ($searchValue === $value['name']) {
+                $this->logger->info("✅ [AttributeMatch] Exact match: '{$searchValue}' ➜ '{$value['name']}' (ID: {$value['attribute_value_id']})");
+                return $value;
+            }
+//            $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
+//            $searchDims = $isSize ? $this->parseDimensions($searchValueNormalized) : null;
+//            if ($isSize && $searchDims) {
+//                $dbDims = $this->parseDimensions($dbValueNormalized);
+//                if ($dbDims) {
+//                    $widthDiff = $searchDims['width'] - $dbDims['width'];
+//                    $heightDiff = $searchDims['height'] - $dbDims['height'];
+//                    $totalDiff = $widthDiff + $heightDiff;
+//                    $widthOk = $widthDiff >= 0 && $widthDiff <= 25;
+//                    $heightOk = $searchDims['height'] === 0 || ($heightDiff >= 0 && $heightDiff <= 25);
+//                    if ($widthOk && $heightOk && $totalDiff < $smallestDiff) {
+//                        $smallestDiff = $totalDiff;
+//                        $bestMatch = $value;
+//                    }
+//                }
+//            }
+        }
+//        if ($bestMatch) {
+//            $this->logger->info("🔍 [AttributeMatch] Approximate match: '{$searchValue}' ➜ '{$bestMatch['name']}' (ID: {$bestMatch['attribute_value_id']})");
+//        } else {
+//            $this->logger->notice("❌ [AttributeMatch] No match found for: '{$searchValue}' (attributeId: {$attributeId})");
+//        }
+        return $bestMatch;
     }
 
     private function processUpdateListing($message)
@@ -678,7 +758,7 @@ class CiceksepetiListingHandler
      * @param array $variantAttributes Available variant attributes
      * @return array Array of product attributes
      */
-    private function buildProductAttributes(array $product, array $variantAttributes): array
+    private function buildProductAttributes2(array $product, array $variantAttributes): array
     {
         $attributes = [];
         if (!empty($variantAttributes['color']) && isset($product['color']) && !empty(trim($product['color']))) {
@@ -744,7 +824,7 @@ class CiceksepetiListingHandler
      * @param int $threshold
      * @return array|null
      */
-    private function findBestAttributeMatch($attributeId, $searchValue, $isSize): ?array
+    private function findBestAttributeMatch2($attributeId, $searchValue, $isSize): ?array
     {
         $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
             WHERE attribute_id = :attribute_id";
