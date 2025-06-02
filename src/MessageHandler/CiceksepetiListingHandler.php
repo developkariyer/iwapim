@@ -441,24 +441,28 @@ class CiceksepetiListingHandler
     private function normalizeDescription($description, $sizeLabelMap, $color, $geminiColor)
     {
 
-        $html = $description;
+        $html = '';
         if (!empty($sizeLabelMap)) {
             $html .= '<h4>Boyut Bilgileri</h4>';
             $html .= '<ul>';
-            foreach ($sizeLabelMap as $original => $label) {
-                $html .= sprintf('<li>%s → %s</li>', htmlspecialchars($original), htmlspecialchars($label));
+            foreach ($sizeLabelMap as $item) {
+                $original = htmlspecialchars((string) ($item['original'] ?? ''));
+                $label = htmlspecialchars((string) ($item['label'] ?? ''));
+                $html .= "<li>{$original} → {$label}</li>";
             }
             $html .= '</ul>';
         }
         if (!empty($color) || !empty($geminiColor)) {
             $html .= '<h4>Renk Bilgisi</h4>';
             $html .= '<ul>';
-            $html .= sprintf('<li>%s → %s</li>', htmlspecialchars($color), htmlspecialchars($geminiColor));
+            $html .= sprintf(
+                '<li>%s → %s</li>',
+                htmlspecialchars((string) $color),
+                htmlspecialchars((string) $geminiColor)
+            );
             $html .= '</ul>';
         }
         print_r($html);
-
-
 
     }
 
