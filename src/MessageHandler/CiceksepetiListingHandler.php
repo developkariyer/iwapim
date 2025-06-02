@@ -129,6 +129,7 @@ class CiceksepetiListingHandler
         }
         $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Created Variant Count: " . count($geminiData['variants']));
         $prompt = $this->generateListingPrompt(json_encode(['products' => $geminiData], JSON_UNESCAPED_UNICODE), $categories);
+        $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Api Send Data ");
         $geminiApiResult = GeminiConnector::chat($prompt, 'ciceksepeti');
         $geminiResult = $this->parseGeminiResult($geminiApiResult);
         foreach ($data as &$product) {
