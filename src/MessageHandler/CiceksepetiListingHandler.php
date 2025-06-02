@@ -78,8 +78,8 @@ class CiceksepetiListingHandler
         $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Filled ");
         $filledAttributeData =  $this->fillAttributeData($geminiFilledData);
         $this->logger->info("[" . __METHOD__ . "] ✅ Filled Attribute Data ");
-        $this->normalizeCiceksepetiData($filledAttributeData);
-
+        $normalizedCiceksepetiData = $this->normalizeCiceksepetiData($filledAttributeData);
+        print_r($normalizedCiceksepetiData);
 
 
         // fill attribute data
@@ -397,72 +397,109 @@ class CiceksepetiListingHandler
 
     private function normalizeCiceksepetiData($data)
     {
-//        $formattedProduct = [
-//            'productName' => mb_strlen($product['productName']) > 255
-//                ? mb_substr($product['productName'], 0, 255)
-//                : $product['productName'],
-//            'mainProductCode' => $product['mainProductCode'],
-//            'stockCode' => $stockCode,
-//            'categoryId' => $product['categoryId'],
-//            'description' => mb_strlen($description) > 20000
-//                ? mb_substr($description, 0, 20000)
-//                : $description,
-//            'deliveryMessageType' => $product['deliveryMessageType'],
-//            'deliveryType' => $product['deliveryType'],
-//            'stockQuantity' => $product['stockQuantity'],
-//            'salesPrice' => $product['salesPrice'],
-//            'images' => $product['images'],
-//            'Attributes' => $product['Attributes'],
-//        ];
-
         $result = [];
         foreach ($data as $product) {
-            $this->normalizeDescription($product['geminiDescription'], $product['sizeLabelMap'], $product['color'], $product['geminiColor']);
-//            $result[] = [
-//                'productName' =>  mb_strlen($product['geminiTitle']) > 255
-//                    ? mb_substr($product['geminiTitle'], 0, 255)
-//                    : $product['geminiTitle'],
-//                'mainProductCode' => $product['mainProductCode'],
-//                'stockCode' => $product['stockCode'],
-//                'categoryId' => $product['geminiCategoryId'],
-//                'description' => $this->normalizeDescription($product['geminiDescription'], $product['sizeLabelMap'], $product['color'], $product['geminiColor']),
-//                'deliveryMessageType' => 5,
-//                'deliveryType' => 2,
-//                'stockQuantity' => $product['stockQuantity'],
-//                'salesPrice' => $product['salesPrice'] * 1.5,
-//                'images' => ,
-//                'Attributes' => ,
-//            ];
+            $result[] = [
+                'productName' =>  mb_strlen($product['geminiTitle']) > 255
+                    ? mb_substr($product['geminiTitle'], 0, 255)
+                    : $product['geminiTitle'],
+                'mainProductCode' => $product['mainProductCode'],
+                'stockCode' => $product['stockCode'],
+                'categoryId' => $product['geminiCategoryId'],
+                'description' => $this->normalizeDescription($product['geminiDescription'], $product['sizeLabelMap'], $product['color'], $product['geminiColor']),
+                'deliveryMessageType' => 5,
+                'deliveryType' => 2,
+                'stockQuantity' => $product['stockQuantity'],
+                'salesPrice' => $product['salesPrice'] * 1.5,
+                'images' => $this->normalizeImages($product['images']),
+                'Attributes' => $product['Attributes']
+            ];
         }
-
-
+        $result = $this->removeCommonAttributes($result);
+        return $result;
     }
 
     private function normalizeDescription($description, $sizeLabelMap, $color, $geminiColor)
     {
-        $html = '';
+        $appendHtml = '';
         if (!empty($sizeLabelMap)) {
-            $html .= '<h4>Boyut Bilgileri</h4>';
-            $html .= '<ul>';
+            $appendHtml .= '<h4>Boyut Bilgileri</h4>';
+            $appendHtml .= '<ul>';
             foreach ($sizeLabelMap as $item) {
                 $original = htmlspecialchars((string) ($item['original'] ?? ''));
                 $label = htmlspecialchars((string) ($item['label'] ?? ''));
-                $html .= "<li>{$original} → {$label}</li>";
+                $appendHtml .= "<li>{$original} → {$label}</li>";
             }
-            $html .= '</ul>';
+            $appendHtml .= '</ul>';
         }
         if (!empty($color) || !empty($geminiColor)) {
-            $html .= '<h4>Renk Bilgisi</h4>';
-            $html .= '<ul>';
-            $html .= sprintf(
+            $appendHtml .= '<h4>Renk Bilgisi</h4>';
+            $appendHtml .= '<ul>';
+            $appendHtml .= sprintf(
                 '<li>%s → %s</li>',
                 htmlspecialchars((string) $color),
                 htmlspecialchars((string) $geminiColor)
             );
-            $html .= '</ul>';
+            $appendHtml .= '</ul>';
         }
-        print_r($html);
+        $maxLength = 20000;
+        $extraLength = mb_strlen($appendHtml, 'UTF-8');
+        $availableForDescription = $maxLength - $extraLength;
+        $trimmedDescription = mb_substr($description, 0, $availableForDescription, 'UTF-8');
+        $finalHtml = $trimmedDescription . $appendHtml;
+        return $finalHtml;
+    }
 
+    private function normalizeImages($images)
+    {
+        $normalized = [];
+        foreach ($images as $image) {
+            $width = $image['width'] ?? 0;
+            $height = $image['height'] ?? 0;
+            $url = $image['url'] ?? null;
+
+            if (!$url || !is_string($url)) {
+                continue;
+            }
+            if ($width >= 500 && $height >= 500 && $width <= 2000 && $height <= 2000) {
+                $normalized[] = $url;
+            }
+            if (count($normalized) >= 5) {
+                break;
+            }
+        }
+        return $normalized;
+    }
+
+    private function removeCommonAttributes($data): array
+    {
+        $valueIdCount = [];
+        $totalProducts = count($data);
+        foreach ($data as $product) {
+            if (!isset($product['Attributes']) || empty($product['Attributes'])) {
+                continue;
+            }
+            foreach ($product['Attributes'] as $attribute) {
+                $valueId = $attribute['ValueId'];
+                $valueIdCount[$valueId] = ($valueIdCount[$valueId] ?? 0) + 1;
+            }
+        }
+        $commonValueIds = array_filter($valueIdCount, function ($count) use ($totalProducts) {
+            return $count === $totalProducts;
+        });
+        foreach ($data as &$product) {
+            if (!isset($product['Attributes']) || empty($product['Attributes'])) {
+                continue;
+            }
+            $product['Attributes'] = array_filter($product['Attributes'], function ($attribute) use ($commonValueIds) {
+                return !isset($commonValueIds[$attribute['ValueId']]);
+            });
+            $product['Attributes'] = array_values($product['Attributes']);
+            if (empty($product['Attributes'])) {
+                $product['Attributes'] = [];
+            }
+        }
+        return $data;
     }
 
     private function processUpdateListing($message)
@@ -631,7 +668,7 @@ class CiceksepetiListingHandler
         return $result;
     }
 
-    private function removeCommonAttributes($data): array
+    private function removeCommonAttributes2($data): array
     {
         $valueIdCount = [];
         $totalProducts = count($data);
