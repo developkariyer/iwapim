@@ -445,7 +445,7 @@ class CiceksepetiListingHandler
         $commonValueIds = array_filter($valueIdCount, function ($count) use ($totalProducts) {
             return $count === $totalProducts;
         });
-        foreach ($data as &$product) {
+        foreach ($data['products'] as &$product) {
             if (!isset($product['Attributes']) || empty($product['Attributes'])) {
                 continue;
             }
