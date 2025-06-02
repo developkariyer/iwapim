@@ -358,7 +358,7 @@ class CiceksepetiListingHandler
                 'mainProductCode' => $product['mainProductCode'],
                 'stockCode' => $product['stockCode'],
                 'categoryId' => $product['geminiCategoryId'],
-                'description' => $this->normalizeDescription($product['geminiDescription'], $product['sizeLabelMap'], $product['color'], $product['geminiColor']),
+                'description' => $this->normalizeDescription($product['geminiDescription'], $product['sizeLabelMap']),
                 'deliveryMessageType' => 5,
                 'deliveryType' => 2,
                 'stockQuantity' => $product['stockQuantity'],
@@ -377,7 +377,7 @@ class CiceksepetiListingHandler
         return $result;
     }
 
-    private function normalizeDescription($description, $sizeLabelMap, $color, $geminiColor)
+    private function normalizeDescription($description, $sizeLabelMap)
     {
         $appendHtml = '';
         if (!empty($sizeLabelMap)) {
@@ -388,16 +388,6 @@ class CiceksepetiListingHandler
                 $label = htmlspecialchars((string) ($item['label'] ?? ''));
                 $appendHtml .= "<li>{$original} → {$label}</li>";
             }
-            $appendHtml .= '</ul>';
-        }
-        if (!empty($color) || !empty($geminiColor)) {
-            $appendHtml .= '<h4>Renk Bilgisi</h4>';
-            $appendHtml .= '<ul>';
-            $appendHtml .= sprintf(
-                '<li>%s → %s</li>',
-                htmlspecialchars((string) $color),
-                htmlspecialchars((string) $geminiColor)
-            );
             $appendHtml .= '</ul>';
         }
         $maxLength = 20000;
