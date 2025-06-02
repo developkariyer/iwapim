@@ -440,7 +440,6 @@ class CiceksepetiListingHandler
 
     private function normalizeDescription($description, $sizeLabelMap, $color, $geminiColor)
     {
-
         $html = '';
         if (!empty($sizeLabelMap)) {
             $html .= '<h4>Boyut Bilgileri</h4>';
