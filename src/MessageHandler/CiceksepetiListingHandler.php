@@ -69,7 +69,7 @@ class CiceksepetiListingHandler
         $this->logger->info("[" . __METHOD__ . "] ✅ Pim Listings Info Fetched ");
         $categories = $this->getCiceksepetiCategoriesDetails();
         $this->logger->info("[" . __METHOD__ . "] ✅ Category Data Fetched ");
-        print_r(json_encode($listingInfo));
+        $this->normalizeCiceksepetiData($listingInfo);
         // normalize ciceksepeti data
         // gemini (color, description, categoryid)
         // find attributes
@@ -93,6 +93,11 @@ class CiceksepetiListingHandler
         // referans alınan marketplace biligisi variant id bilgisi gönderilir variant id ler referansa ait zaten
         // referans kullanılarak her mağaza için alınacak bilgileri alacağız
 
+    }
+
+    private function normalizeCiceksepetiData($data)
+    {
+        print_r($data);
     }
 
     private function processUpdateListing($message)
