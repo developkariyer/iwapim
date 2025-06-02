@@ -246,7 +246,7 @@ class CiceksepetiListingHandler
         }
         foreach ($data as $sku => &$product) {
             $this->logger->info("[" . __METHOD__ . "] 🔵 IWASKU: {$product['stockCode']} ");
-            if (empty($product['categoryId'])) {
+            if (empty($product['geminiCategoryId'])) {
                 $this->logger->error("[" . __METHOD__ . "] ❌ Missing CategoryId Product {$product['stockCode']} Has No CategoryID ");
                 continue;
             }
