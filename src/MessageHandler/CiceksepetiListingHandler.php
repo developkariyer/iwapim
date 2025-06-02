@@ -69,12 +69,19 @@ class CiceksepetiListingHandler
         $this->logger->info("[" . __METHOD__ . "] ✅ Pim Listings Info Fetched ");
         $categories = $this->getCiceksepetiCategoriesDetails();
         $this->logger->info("[" . __METHOD__ . "] ✅ Category Data Fetched ");
-
         $geminiFilledData = $this->geminiProcess($listingInfo, $categories);
+        $controlGeminiResult = $this->controlGeminiFilledData($geminiFilledData);
+        if (!$controlGeminiResult) {
+            $this->logger->error("[" . __METHOD__ . "] ❌ Gemini Api Data Control Failed  ");
+            return;
+        }
         $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Filled ");
         $filledAttributeData =  $this->fillAttributeData($geminiFilledData);
         $this->logger->info("[" . __METHOD__ . "] ✅ Filled Attribute Data ");
-        print_r(json_encode($filledAttributeData));
+        $this->normalizeCiceksepetiData($filledAttributeData);
+
+
+
         // fill attribute data
         // normalize
         // send to api
@@ -110,6 +117,21 @@ class CiceksepetiListingHandler
         // referans alınan marketplace biligisi variant id bilgisi gönderilir variant id ler referansa ait zaten
         // referans kullanılarak her mağaza için alınacak bilgileri alacağız
 
+    }
+
+    private function controlGeminiFilledData($data)
+    {
+         foreach ($data as $product) {
+             if (
+                 is_null($product['geminiCategoryId']) ||
+                 is_null($product['geminiTitle']) ||
+                 is_null($product['geminiDescription']) ||
+                 is_null($product['geminiColor'])
+             ) {
+                 return false;
+             }
+         }
+         return true;
     }
 
     private function geminiProcess($data, $categories)
@@ -371,6 +393,73 @@ class CiceksepetiListingHandler
             $this->logger->warning("[" . __METHOD__ . "] ⚠️ AttributeMatch No Attribute Values Found In DB For attributeId: {$attributeId} searchValue: {$searchValue} ");
         }
         return $result[0];
+    }
+
+    private function normalizeCiceksepetiData($data)
+    {
+//        $formattedProduct = [
+//            'productName' => mb_strlen($product['productName']) > 255
+//                ? mb_substr($product['productName'], 0, 255)
+//                : $product['productName'],
+//            'mainProductCode' => $product['mainProductCode'],
+//            'stockCode' => $stockCode,
+//            'categoryId' => $product['categoryId'],
+//            'description' => mb_strlen($description) > 20000
+//                ? mb_substr($description, 0, 20000)
+//                : $description,
+//            'deliveryMessageType' => $product['deliveryMessageType'],
+//            'deliveryType' => $product['deliveryType'],
+//            'stockQuantity' => $product['stockQuantity'],
+//            'salesPrice' => $product['salesPrice'],
+//            'images' => $product['images'],
+//            'Attributes' => $product['Attributes'],
+//        ];
+
+        $result = [];
+        foreach ($data as $product) {
+            $this->normalizeDescription($product['geminiDescription'], $product['sizeLabelMap'], $product['color'], $product['geminiColor'])
+//            $result[] = [
+//                'productName' =>  mb_strlen($product['geminiTitle']) > 255
+//                    ? mb_substr($product['geminiTitle'], 0, 255)
+//                    : $product['geminiTitle'],
+//                'mainProductCode' => $product['mainProductCode'],
+//                'stockCode' => $product['stockCode'],
+//                'categoryId' => $product['geminiCategoryId'],
+//                'description' => $this->normalizeDescription($product['geminiDescription'], $product['sizeLabelMap'], $product['color'], $product['geminiColor']),
+//                'deliveryMessageType' => 5,
+//                'deliveryType' => 2,
+//                'stockQuantity' => $product['stockQuantity'],
+//                'salesPrice' => $product['salesPrice'] * 1.5,
+//                'images' => ,
+//                'Attributes' => ,
+//            ];
+        }
+
+
+    }
+
+    private function normalizeDescription($description, $sizeLabelMap, $color, $geminiColor)
+    {
+
+        $html = $description;
+        if (!empty($sizeLabelMap)) {
+            $html .= '<h4>Boyut Bilgileri</h4>';
+            $html .= '<ul>';
+            foreach ($sizeLabelMap as $original => $label) {
+                $html .= sprintf('<li>%s → %s</li>', htmlspecialchars($original), htmlspecialchars($label));
+            }
+            $html .= '</ul>';
+        }
+        if (!empty($color) || !empty($geminiColor)) {
+            $html .= '<h4>Renk Bilgisi</h4>';
+            $html .= '<ul>';
+            $html .= sprintf('<li>%s → %s</li>', htmlspecialchars($color), htmlspecialchars($geminiColor));
+            $html .= '</ul>';
+        }
+        print_r($html);
+
+
+
     }
 
     private function processUpdateListing($message)
