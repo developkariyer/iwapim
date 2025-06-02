@@ -103,18 +103,22 @@ class CiceksepetiListingHandler
 
     private function geminiProcess($data)
     {
-        $geminiData = [];
+        $firstProduct = $data[0];
+        $geminiData = [
+            'title'       => $firstProduct['title'],
+            'description' => $firstProduct['description'] ?? null,
+            'categoryId'  => null,
+            'variants'    => []
+        ];
         foreach ($data as $product) {
-            $geminiData[] = [
-                'stockCode'   => $product['stockCode'] ?? null,
-                'categoryId'  => null,
-                'title'       => $product['title'] ?? null,
-                'description' => $product['description'] ?? null,
-                'color'       => $product['color'] ?? null,
+            $geminiData['variants'][] = [
+                'stockCode' => $product['stockCode'] ?? null,
+                'color'     => $product['color'] ?? null,
             ];
         }
-
+        $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Created Variant Count: " . count($geminiData['variants']));
         print_r($geminiData);
+
 
 
     }
