@@ -129,22 +129,22 @@ class AutoListingCommand2 extends AbstractCommand
 
     private function processNewList($groupedByMainCode, $targetMarketplaceId, $referenceMarketplaceId, $toMarketplace): void
     {
-        foreach ($groupedByMainCode as $mainCode => $variantIds) {
-            $message = new ProductListingMessage(
-                'list',
-                $targetMarketplaceId,
-                $referenceMarketplaceId,
-                'admin',
-                $variantIds,
-                [],
-                1,
-                'test',
-                $this->logger
-            );
-            $stamps = [new TransportNamesStamp([strtolower($toMarketplace)])];
-            $this->bus->dispatch($message, $stamps);
-            $this->logger->info("[" . __METHOD__ . "] ✅ Created Message for Main Product Code: $mainCode");
-        }
+//        foreach ($groupedByMainCode as $mainCode => $variantIds) {
+//            $message = new ProductListingMessage(
+//                'list',
+//                $targetMarketplaceId,
+//                $referenceMarketplaceId,
+//                'admin',
+//                $variantIds,
+//                [],
+//                1,
+//                'test',
+//                $this->logger
+//            );
+//            $stamps = [new TransportNamesStamp([strtolower($toMarketplace)])];
+//            $this->bus->dispatch($message, $stamps);
+//            $this->logger->info("[" . __METHOD__ . "] ✅ Created Message for Main Product Code: $mainCode");
+//        }
     }
 
     private function processUpdateList($updateProductList, $targetMarketplaceId, $referenceMarketplaceId, $toMarketplace): void
