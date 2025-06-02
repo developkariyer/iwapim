@@ -39,7 +39,7 @@ class CiceksepetiListingHandler
         echo "action type: $actionType\n";
         $this->logger->info("[" . __METHOD__ . "] ✅ Action Type: $actionType ");
         match ($actionType) {
-            //'list' => $this->processNewListing($message),
+            'list' => $this->processNewListing($message),
             'update_list' => $this->processUpdateListing($message),
             default => throw new \InvalidArgumentException("Unknown Action Type: $actionType")
         };
@@ -47,23 +47,23 @@ class CiceksepetiListingHandler
 
     private function processNewListing($message)
     {
-        $this->logger->info("[" . __METHOD__ . "] ✅ Processing New Listing ");
-        $listingInfo = $this->listingHelper->getPimListingsInfo($message, $this->logger);
-        $this->logger->info("[" . __METHOD__ . "] ✅ Pim Listings Info Fetched ");
-        $categories = $this->getCiceksepetiCategoriesDetails();
-        $this->logger->info("[" . __METHOD__ . "] ✅ Category Data Fetched ");
-        $geminiFilledData = $this->geminiProcess($listingInfo, $categories);
-        $controlGeminiResult = $this->controlGeminiFilledData($geminiFilledData);
-        if (!$controlGeminiResult) {
-            $this->logger->error("[" . __METHOD__ . "] ❌ Gemini Api Data Control Failed  ");
-            return;
-        }
-        $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Filled ");
-        $filledAttributeData =  $this->fillAttributeData($geminiFilledData);
-        $this->logger->info("[" . __METHOD__ . "] ✅ Filled Attribute Data ");
-        $normalizedCiceksepetiData = $this->normalizeCiceksepetiData($filledAttributeData);
-        $this->logger->info("[" . __METHOD__ . "] ✅ Normalized Ciceksepeti Data ");
-        print_r($normalizedCiceksepetiData);
+//        $this->logger->info("[" . __METHOD__ . "] ✅ Processing New Listing ");
+//        $listingInfo = $this->listingHelper->getPimListingsInfo($message, $this->logger);
+//        $this->logger->info("[" . __METHOD__ . "] ✅ Pim Listings Info Fetched ");
+//        $categories = $this->getCiceksepetiCategoriesDetails();
+//        $this->logger->info("[" . __METHOD__ . "] ✅ Category Data Fetched ");
+//        $geminiFilledData = $this->geminiProcess($listingInfo, $categories);
+//        $controlGeminiResult = $this->controlGeminiFilledData($geminiFilledData);
+//        if (!$controlGeminiResult) {
+//            $this->logger->error("[" . __METHOD__ . "] ❌ Gemini Api Data Control Failed  ");
+//            return;
+//        }
+//        $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Filled ");
+//        $filledAttributeData =  $this->fillAttributeData($geminiFilledData);
+//        $this->logger->info("[" . __METHOD__ . "] ✅ Filled Attribute Data ");
+//        $normalizedCiceksepetiData = $this->normalizeCiceksepetiData($filledAttributeData);
+//        $this->logger->info("[" . __METHOD__ . "] ✅ Normalized Ciceksepeti Data ");
+//        print_r($normalizedCiceksepetiData);
 //        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
 //        $result = $ciceksepetiConnector->createListing($normalizedCiceksepetiData);
 //        $this->logger->info("✅ [CiceksepetiConnector] Result batch:\n" . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
