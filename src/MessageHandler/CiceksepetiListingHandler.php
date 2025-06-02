@@ -115,6 +115,7 @@ class CiceksepetiListingHandler
                 'color'     => $product['color'] ?? null,
             ];
         }
+        print_r($geminiData);
         $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Created Variant Count: " . count($geminiData['variants']));
         $prompt = $this->generateListingPrompt(json_encode(['products' => $geminiData], JSON_UNESCAPED_UNICODE), $categories);
         $result = GeminiConnector::chat($prompt, 'ciceksepeti');
