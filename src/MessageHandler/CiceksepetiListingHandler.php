@@ -245,7 +245,7 @@ class CiceksepetiListingHandler
     {
         $categorySql = "SELECT category_name FROM iwa_ciceksepeti_categories WHERE id = :categoryId";
         $categoryData = Utility::fetchFromSql($categorySql, ['categoryId' => $categoryId]);
-        if (empty($categoryData)) {
+        if (empty($categoryData) || !isset($categoryData[0])) {
             $this->logger->error("[" . __METHOD__ . "] ❌ Category Error Category Not Found For categoryId: {$categoryId}");
             return null;
         }
@@ -269,7 +269,7 @@ class CiceksepetiListingHandler
                           AND attribute_name = 'Renk' 
                           LIMIT 1";
         $colorData = Utility::fetchFromSql($attributeColorSql, ['categoryId' => $categoryId]);
-        if (!empty($colorData)) {
+        if (!empty($colorData) && isset($colorData[0])) {
             $result['color'] = [
                 'id' => $colorData[0]['attribute_id'],
                 'name' => $colorData[0]['attribute_name']
@@ -284,7 +284,7 @@ class CiceksepetiListingHandler
                          AND (attribute_name = 'Ebat' OR attribute_name = 'Boyut' OR attribute_name = 'Beden') 
                          LIMIT 1";
         $sizeData = Utility::fetchFromSql($attributeSizeSql, ['categoryId' => $categoryId]);
-        if (!empty($sizeData)) {
+        if (!empty($sizeData) && isset($sizeData[0])) {
             $result['size'] = [
                 'id' => $sizeData[0]['attribute_id'],
                 'name' => $sizeData[0]['attribute_name']
@@ -342,6 +342,7 @@ class CiceksepetiListingHandler
         $result = Utility::fetchFromSql($sql, ['attribute_id' => $attributeId, 'searchValue' => $searchValue]);
         if (empty($result) || !isset($result[0])) {
             $this->logger->warning("[" . __METHOD__ . "] ⚠️ AttributeMatch No Attribute Values Found In DB For attributeId: {$attributeId} searchValue: {$searchValue} ");
+            return null;
         }
         return $result[0];
     }
