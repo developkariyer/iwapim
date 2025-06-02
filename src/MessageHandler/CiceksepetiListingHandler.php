@@ -71,8 +71,12 @@ class CiceksepetiListingHandler
         $this->logger->info("[" . __METHOD__ . "] ✅ Category Data Fetched ");
 
         $geminiFilledData = $this->geminiProcess($listingInfo, $categories);
-        print_r(json_encode($geminiFilledData));
+        //print_r(json_encode($geminiFilledData));
         $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Filled ");
+        // fill attribute data
+        // normalize
+        // send to api
+        // bir variant bile attribute eksikse api göndermeyelim ?
 
 
 
@@ -190,43 +194,12 @@ class CiceksepetiListingHandler
         EOD;
     }
 
-    private function normalizeCiceksepetiData($data)
-    {
-        $result = [];
-        foreach ($data as $product) {
-            $normalizedProduct = [];
-            $normalizedProduct['productName'] = mb_strlen($product['title']) > 255
-                ? mb_substr($product['title'], 0, 255)
-                : $product['title'];
-            $normalizedProduct['mainProductCode'] = $product['mainProductCode'];
-            $normalizedProduct['stockCode'] = $product['stockCode'];
-            $normalizedProduct['categoryId'] = null;
-            $normalizedProduct['description'] = mb_strlen($product['description']) > 20000
-                ? mb_substr($product['description'], 0, 20000)
-                : $product['description'];
-            $normalizedProduct['deliveryMessageType'] = 5;
-            $normalizedProduct['deliveryType'] = 2;
-            $normalizedProduct['stockQuantity'] = $product['stockQuantity'];
-            $normalizedProduct['salesPrice'] = $product['salesPrice'] * 1.5;
-            $normalizedProduct['Attributes'] = [];
-            $normalizedProduct['images'] = $this->filterCiceksepetiFormatImage($product['images']);
-
-
-        }
-        print_r($data);
-    }
-
     private function parseGeminiResult($result)
     {
         $json = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
         $json = preg_replace('/[\x00-\x1F\x7F]/u', '', $json);
         $data = json_decode($json, true);
         return (json_last_error() === JSON_ERROR_NONE) ? $data : null;
-    }
-
-    private function processUpdateListing($message)
-    {
-        //
     }
 
     private function getCiceksepetiCategoriesDetails(): false|array|string
@@ -263,11 +236,95 @@ class CiceksepetiListingHandler
         return array_unique($categoryIdList);
     }
 
-//    private function ciceksepetiNormalizeData($data): array
-//    {
-//
-//
-//    }
+    public function fillAttributeData(array $data): array
+    {
+        if (empty($data)) {
+            $this->logger->error("[" . __METHOD__ . "] ❌  No product data provided to fill attributes ");
+            return [];
+        }
+        foreach ($data as $sku => &$product) {
+            $this->logger->info("[" . __METHOD__ . "] 🔵 IWASKU: {$product['stockCode']} ");
+            if (empty($product['categoryId'])) {
+                $this->logger->error("[" . __METHOD__ . "] ❌ Missing CategoryId Product {$product['stockCode']} Has No CategoryID ");
+                continue;
+            }
+            $categoryInfo = $this->getCategoryInfo($product['geminiCategoryId']);
+            if (!$categoryInfo) {
+                continue;
+            }
+            $variantAttributes = $this->getVariantAttributes($product['geminiCategoryId']);
+            print_r($variantAttributes);
+//            if (empty($variantAttributes['color']) && empty($variantAttributes['sizeLabel'])) {
+//                $this->logger->error("[" . __METHOD__ . "] ❌ Missing CategoryId Product {$product['stockCode']} Has No CategoryID ");
+//                continue;
+//            }
+//            $product['Attributes'] = $this->buildProductAttributes(
+//                $product,
+//                $variantAttributes
+//            );
+        }
+        return $data;
+    }
+
+    private function getCategoryInfo(int $categoryId): ?array
+    {
+        $categorySql = "SELECT category_name FROM iwa_ciceksepeti_categories WHERE id = :categoryId";
+        $categoryData = Utility::fetchFromSql($categorySql, ['categoryId' => $categoryId]);
+        if (empty($categoryData)) {
+            $this->logger->error("❌ [Category Error] Category not found for categoryId: {$categoryId}");
+            return null;
+        }
+        $categoryName = $categoryData[0]['category_name'] ?? null;
+        $this->logger->info("✅ [Category Found] CategoryId: {$categoryId}, Name: {$categoryName}");
+        return [
+            'id' => $categoryId,
+            'name' => $categoryName
+        ];
+    }
+
+    private function getVariantAttributes(int $categoryId): array
+    {
+        $result = [
+            'color' => null,
+            'size' => null
+        ];
+        $attributeColorSql = "SELECT attribute_id, attribute_name FROM iwa_ciceksepeti_category_attributes 
+                          WHERE category_id = :categoryId 
+                          AND type = 'Variant Özelliği' 
+                          AND attribute_name = 'Renk' 
+                          LIMIT 1";
+        $colorData = Utility::fetchFromSql($attributeColorSql, ['categoryId' => $categoryId]);
+        if (!empty($colorData)) {
+            $result['color'] = [
+                'id' => $colorData[0]['attribute_id'],
+                'name' => $colorData[0]['attribute_name']
+            ];
+            $this->logger->info("[" . __METHOD__ . "] ✅ Color Attribute Found: ID: {$result['color']['id']}, Name: {$result['color']['name']}");
+        } else {
+            $this->logger->error("[" . __METHOD__ . "] ❌ Color Attribute Not Found For CategoryId: {$categoryId}");
+        }
+        $attributeSizeSql = "SELECT attribute_id, attribute_name FROM iwa_ciceksepeti_category_attributes 
+                         WHERE category_id = :categoryId 
+                         AND type = 'Variant Özelliği' 
+                         AND (attribute_name = 'Ebat' OR attribute_name = 'Boyut' OR attribute_name = 'Beden') 
+                         LIMIT 1";
+        $sizeData = Utility::fetchFromSql($attributeSizeSql, ['categoryId' => $categoryId]);
+        if (!empty($sizeData)) {
+            $result['size'] = [
+                'id' => $sizeData[0]['attribute_id'],
+                'name' => $sizeData[0]['attribute_name']
+            ];
+            $this->logger->info("[" . __METHOD__ . "] ✅ Size Attribute Found: ID: {$result['size']['id']}, Name: {$result['size']['name']}");
+        } else {
+            $this->logger->error("[" . __METHOD__ . "] ❌ [Size Attribute] Not Found For CategoryId: {$categoryId}");
+        }
+        return $result;
+    }
+
+    private function processUpdateListing($message)
+    {
+        //
+    }
 
 
 
@@ -519,7 +576,7 @@ class CiceksepetiListingHandler
      * @param array $data Product data from Gemini
      * @return array The product data with filled attributes
      */
-    public function fillAttributeData(array $data): array
+    public function fillAttributeData2(array $data): array
     {
         if (empty($data)) {
             $this->logger->error("❌ [Empty Data] No product data provided to fill attributes");
@@ -553,7 +610,7 @@ class CiceksepetiListingHandler
      * @param int $categoryId The category ID
      * @return array|null Category data or null if not found
      */
-    private function getCategoryInfo(int $categoryId): ?array
+    private function getCategoryInfo2(int $categoryId): ?array
     {
         $categorySql = "SELECT category_name FROM iwa_ciceksepeti_categories WHERE id = :categoryId";
         $categoryData = Utility::fetchFromSql($categorySql, ['categoryId' => $categoryId]);
@@ -575,7 +632,7 @@ class CiceksepetiListingHandler
      * @param int $categoryId The category ID
      * @return array Array with color and size attribute information
      */
-    private function getVariantAttributes(int $categoryId): array
+    private function getVariantAttributes2(int $categoryId): array
     {
         $result = [
             'color' => null,
