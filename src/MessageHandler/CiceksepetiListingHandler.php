@@ -369,8 +369,6 @@ class CiceksepetiListingHandler
         if (empty($result) || !isset($result[0])) {
             $this->logger->warning("[" . __METHOD__ . "] ⚠️ AttributeMatch No Attribute Values Found In DB For attributeId: {$attributeId} searchValue: {$searchValue} ");
         }
-        $value = $result[0];
-        $this->logger->info("[" . __METHOD__ . "] ✅ AttributeMatch Exact Match: '{$searchValue}' ➜ '{$value['name']}' (ID: {$value['attribute_value_id']})");
         return $result[0];
     }
 
