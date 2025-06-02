@@ -448,8 +448,8 @@ class CiceksepetiListingHandler
     private function removeCommonAttributes($data): array
     {
         $valueIdCount = [];
-        $totalProducts = count($data);
-        foreach ($data as $product) {
+        $totalProducts = count($data['products']);
+        foreach ($data['products'] as $product) {
             if (!isset($product['Attributes']) || empty($product['Attributes'])) {
                 continue;
             }
