@@ -71,8 +71,10 @@ class CiceksepetiListingHandler
         $this->logger->info("[" . __METHOD__ . "] ✅ Category Data Fetched ");
 
         $geminiFilledData = $this->geminiProcess($listingInfo, $categories);
-        //print_r(json_encode($geminiFilledData));
         $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Filled ");
+        $filledAttributeData =  $this->fillAttributeData($geminiFilledData);
+        $this->logger->info("[" . __METHOD__ . "] ✅ Filled Attribute Data ");
+        print_r(json_encode($filledAttributeData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         // fill attribute data
         // normalize
         // send to api
@@ -359,46 +361,17 @@ class CiceksepetiListingHandler
         return $attributes;
     }
 
-    private function findAttributeCiceksepetiAttributeDatabase($attributeId, $searchValue): ?array
+    private function findAttributeCiceksepetiAttributeDatabase($attributeId, $searchValue)
     {
         $sql = "SELECT attribute_value_id, name FROM iwa_ciceksepeti_category_attributes_values 
-            WHERE attribute_id = :attribute_id";
-        $allValues = Utility::fetchFromSql($sql, ['attribute_id' => $attributeId]);
-        if (empty($allValues)) {
-            $this->logger->warning("⚠️ [AttributeMatch] No attribute values found in DB for attributeId: {$attributeId}");
-            return null;
+            WHERE attribute_id = :attribute_id and name = :searchValue LIMIT 1";
+        $result = Utility::fetchFromSql($sql, ['attribute_id' => $attributeId, 'searchValue' => $searchValue]);
+        if (empty($result) || !isset($result[0])) {
+            $this->logger->warning("[" . __METHOD__ . "] ⚠️ AttributeMatch No Attribute Values Found In DB For attributeId: {$attributeId} searchValue: {$searchValue} ");
         }
-        $bestMatch = null;
-        $smallestDiff = PHP_INT_MAX;
-        foreach ($allValues as $value) {
-            //$dbValueNormalized = $this->normalizeAttributeValue($value['name']);
-            if ($searchValue === $value['name']) {
-                $this->logger->info("✅ [AttributeMatch] Exact match: '{$searchValue}' ➜ '{$value['name']}' (ID: {$value['attribute_value_id']})");
-                return $value;
-            }
-//            $searchValueNormalized = $this->normalizeAttributeValue($searchValue);
-//            $searchDims = $isSize ? $this->parseDimensions($searchValueNormalized) : null;
-//            if ($isSize && $searchDims) {
-//                $dbDims = $this->parseDimensions($dbValueNormalized);
-//                if ($dbDims) {
-//                    $widthDiff = $searchDims['width'] - $dbDims['width'];
-//                    $heightDiff = $searchDims['height'] - $dbDims['height'];
-//                    $totalDiff = $widthDiff + $heightDiff;
-//                    $widthOk = $widthDiff >= 0 && $widthDiff <= 25;
-//                    $heightOk = $searchDims['height'] === 0 || ($heightDiff >= 0 && $heightDiff <= 25);
-//                    if ($widthOk && $heightOk && $totalDiff < $smallestDiff) {
-//                        $smallestDiff = $totalDiff;
-//                        $bestMatch = $value;
-//                    }
-//                }
-//            }
-        }
-//        if ($bestMatch) {
-//            $this->logger->info("🔍 [AttributeMatch] Approximate match: '{$searchValue}' ➜ '{$bestMatch['name']}' (ID: {$bestMatch['attribute_value_id']})");
-//        } else {
-//            $this->logger->notice("❌ [AttributeMatch] No match found for: '{$searchValue}' (attributeId: {$attributeId})");
-//        }
-        return $bestMatch;
+        $value = $result[0];
+        $this->logger->info("[" . __METHOD__ . "] ✅ AttributeMatch Exact Match: '{$searchValue}' ➜ '{$value['name']}' (ID: {$value['attribute_value_id']})");
+        return $result[0];
     }
 
     private function processUpdateListing($message)
