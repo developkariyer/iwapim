@@ -452,9 +452,119 @@ class CiceksepetiListingHandler
 
     private function processUpdateListing($message)
     {
+        $this->logger->info("[" . __METHOD__ . "] ✅ Update Process Started ");
         $updateProductList = $message->getVariantIds();
-        print_r($updateProductList);
+        $updateCiceksepetiList = [];
+        foreach ($updateProductList as $range) {
+            $fromVariantProductId = $range['from'];
+            $ciceksepetiVariantId = $range['to'];
+            $fromVariantProduct = VariantProduct::getById($fromVariantProductId);
+            if (!$fromVariantProduct instanceof VariantProduct) {
+                $this->logger->error("[" . __METHOD__ . "] ❌ From Variant Product Not Found: $fromVariantProductId  ");
+                continue;
+            }
+            $ciceksepetiVariantProduct = VariantProduct::getById($ciceksepetiVariantId);
+            if (!$ciceksepetiVariantProduct instanceof VariantProduct) {
+                $this->logger->error("[" . __METHOD__ . "] ❌ Ciceksepeti Variant Product Not Found: $ciceksepetiVariantId  ");
+                continue;
+            }
+            $mainProduct = $fromVariantProduct->getMainProduct();
+            if (!$mainProduct instanceof Product) {
+                $this->logger->error("[" . __METHOD__ . "] ❌ From Variant Product Not Found Main Product: $fromVariantProductId  ");
+                continue;
+            }
+            $parentApiJsonShopify = json_decode($fromVariantProduct->jsonRead('parentResponseJson'), true);
+            $apiJsonShopify = json_decode($fromVariantProduct->jsonRead('apiResponseJson'), true);
+            $apiJsonCiceksepeti = json_decode($ciceksepetiVariantProduct->jsonRead('apiResponseJson'), true);
+            $ciceksepetiIsActive = $apiJsonCiceksepeti['isActive'];
+            if (!$ciceksepetiIsActive) {
+                $this->logger->warning("[" . __METHOD__ . "] ⚠️ Ciceksepeti Variant Product Not Active Listing: $ciceksepetiVariantId  ");
+                continue;
+            }
+            $images = $this->getShopifyImages($mainProduct, $parentApiJsonShopify);
+            if (empty($images)) {
+                $images = $apiJsonCiceksepeti['images'] ?? [];
+            }
+            foreach ($images as &$image) {
+                if (is_string($image) && strpos($image, 'http://') === 0) {
+                    $image = preg_replace('/^http:\/\//', 'https://', $image);
+                }
+            }
+            unset($image);
+            $cleanAttributes = [];
+            if (isset($apiJsonCiceksepeti['attributes']) && is_array($apiJsonCiceksepeti['attributes'])) {
+                foreach ($apiJsonCiceksepeti['attributes'] as $attr) {
+                    if (isset($attr['textLength']) && $attr['textLength'] == 0) {
+                        $cleanAttributes[] = [
+                            'ValueId' => $attr['id'],
+                            'Id' => $attr['parentId'],
+                            'textLength' => 0
+                        ];
+                    }
+                }
+            }
+            $iwasku = $mainProduct->getIwasku();
+            if (!$iwasku) {
+                $this->logger->warning("[" . __METHOD__ . "] ⚠️ Main Product No Iwasku: $ciceksepetiVariantId  ");
+                continue;
+            }
+            $updateCiceksepetiList['products'][] = [
+                'productName' => mb_substr($parentApiJsonShopify['title'], 0, 255),
+                'mainProductCode' => $apiJsonCiceksepeti['mainProductCode'],
+                'stockCode' => $iwasku,
+                'categoryId' => $apiJsonCiceksepeti['categoryId'],
+                'description' => mb_substr($parentApiJsonShopify['descriptionHtml'], 0, 20000),
+                'deliveryMessageType' => $apiJsonCiceksepeti['deliveryMessageType'],
+                'deliveryType' => $apiJsonCiceksepeti['deliveryType'],
+                'stockQuantity' => $apiJsonShopify['inventoryQuantity'],
+                'salesPrice' => $apiJsonShopify['price'] * 1.5,
+                'Attributes' => $cleanAttributes,
+                'isActive' => $parentApiJsonShopify['status'] === 'ACTIVE' ? 1 : 0,
+                'images' => array_slice($images, 0, 5)
+            ];
+        }
+        $this->logger->info("[" . __METHOD__ . "] ✅ Update List Created:  " . count($updateCiceksepetiList['products']) . " Products");
+        $productChunks = array_chunk($updateCiceksepetiList['products'], 200);
+        foreach ($productChunks as $index => $productList) {
+            $data = [
+                'products' => $productList,
+            ];
+            $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            $this->logger->info("[" . __METHOD__ . "] 🚀 Sending batch " . ($index + 1) . " with " . count($productList) . " products to Ciceksepeti.");
+            $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
+            $ciceksepetiConnector->updateProduct($json);
+        }
+    }
 
+    private function getShopifyImages($mainProduct, $parentApiJsonShopify)
+    {
+        $images = [];
+        $widthThreshold = 2000;
+        $heightThreshold = 2000;
+        if (isset($parentApiJsonShopify['media']['nodes'])) {
+            foreach ($parentApiJsonShopify['media']['nodes'] as $node) {
+                if (
+                    isset($node['mediaContentType'], $node['preview']['image']['url'], $node['preview']['image']['width'], $node['preview']['image']['height']) &&
+                    $node['mediaContentType'] === 'IMAGE' &&
+                    ($node['preview']['image']['width'] < $widthThreshold || $node['preview']['image']['height'] < $heightThreshold)
+                ) {
+                    $images[] = $node['preview']['image']['url'];
+                }
+            }
+        }
+        if (empty($images) || count($images) <= 2) {
+            $listingItems = $mainProduct->getListingItems();
+            if (empty($listingItems)) {
+                return;
+            }
+            foreach ($listingItems as $listingItem) {
+                if (!$listingItem instanceof VariantProduct) {
+                    continue;
+                }
+                $images = array_merge($images, $this->getImages($listingItem));
+            }
+        }
+        return $images;
     }
 
 }

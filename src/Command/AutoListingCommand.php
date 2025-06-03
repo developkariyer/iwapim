@@ -282,7 +282,6 @@ class AutoListingCommand extends AbstractCommand
                 }
                 $images = array_merge($images, $this->getImages($listingItem));
             }
-
         }
         return $images;
     }
