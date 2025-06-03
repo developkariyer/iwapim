@@ -53,7 +53,7 @@ class HelloWorldCommand extends AbstractCommand
         $name = $product->getInheritedField("name");
         $variationSize = $product->getVariationSize();
         $variationColor = $product->getVariationColor();
-        $wsCategory = $product->getProductCategory();
+        $wsCategory = $product->getInheritedField("productCategory");
         $weight = $product->getInheritedField("packageWeight");
         $width = $product->getInheritedField("packageDimension1");
         $length = $product->getInheritedField("packageDimension2");
