@@ -34,8 +34,17 @@ class AutoListingCommand extends AbstractCommand
     public function __construct(private MessageBusInterface $bus)
     {
         parent::__construct();
-        $this->logger = LoggerFactory::create('ciceksepeti','auto_listing');
     }
+
+    protected function configure(): void
+    {
+        $this
+            ->setDescription('Marketplace Sync Command')
+            ->addOption('source', null, InputOption::VALUE_REQUIRED, 'Source Marketplace Name')
+            ->addOption('target', null, InputOption::VALUE_REQUIRED, 'Targer Marketplace Name');
+    }
+
+
 
     private array $marketplaceConfig = [
         'Ciceksepeti' => 265384,
