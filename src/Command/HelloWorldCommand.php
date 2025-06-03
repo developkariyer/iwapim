@@ -50,9 +50,10 @@ class HelloWorldCommand extends AbstractCommand
         if (!$product instanceof Product) {
             return Command::FAILURE;
         }
-        $name = $product->getName();
+        $name = $product->getInheritedField("name");
         $variationSize = $product->getVariationSize();
         $variationColor = $product->getVariationColor();
+        $wsCategory = $product->getProductCategory();
         $weight = $product->getInheritedField("packageWeight");
         $width = $product->getInheritedField("packageDimension1");
         $length = $product->getInheritedField("packageDimension2");
@@ -60,6 +61,7 @@ class HelloWorldCommand extends AbstractCommand
         echo "Name: $name\n";
         echo "Variation size: $variationSize\n";
         echo "Variation color: $variationColor\n";
+        echo "WS category: $wsCategory\n";
         echo "Weight: $weight\n";
         echo "Width: $width\n";
         echo "Length: $length\n";
