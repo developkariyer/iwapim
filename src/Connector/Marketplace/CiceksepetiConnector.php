@@ -536,6 +536,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 $failCount++;
             }
         }
+        print_r($batchResult);
         echo "✅ Success Product Count: $successCount\n";
         echo "❌ Fail Product Count: $failCount\n";
         $combinedData = [
