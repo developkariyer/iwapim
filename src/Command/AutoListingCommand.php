@@ -23,6 +23,7 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Console\Input\InputOption;
 use App\Model\DataObject\Marketplace;
 use App\Connector\Marketplace\CiceksepetiConnector;
+use App\Logger\LoggerFactory;
 
 #[AsCommand(
     name: 'app:autolisting',
@@ -33,285 +34,187 @@ class AutoListingCommand extends AbstractCommand
     public function __construct(private MessageBusInterface $bus)
     {
         parent::__construct();
+        $this->logger = LoggerFactory::create('ciceksepeti','auto_listing');
     }
 
     private array $marketplaceConfig = [
-        'ciceksepeti' => 265384,
-        'shopifycfwtr' => 84124,
+        'Ciceksepeti' => 265384,
+        'ShopifyCfwTr' => 84124,
     ];
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->syncShopifyCiceksepeti();
+        $source = $input->getOption('source');
+        $target = $input->getOption('target');
+        if (!$source || !$target) {
+            return Command::FAILURE;
+        }
+        if (!isset($this->marketplaceConfig[$source], $this->marketplaceConfig[$target])) {
+            $output->writeln("<error>Invalid Marketplace Name</error>");
+            return Command::FAILURE;
+        }
+        $this->logger = LoggerFactory::create($target, 'auto_listing');
+        $this->logger->info("[" . __METHOD__ . "] Sync Start:  $source → $target");
+        $this->syncMarketplaceProducts($source, $target);
+        $this->logger->info("[" . __METHOD__ . "] Sync Complated .... ");
         return Command::SUCCESS;
     }
 
-    private function syncShopifyCiceksepeti()
+    private function syncMarketplaceProducts($fromMarketplace, $toMarketplace)
     {
-        echo "Starting Ciceksepeti sync for Shopify products...\n";
-        $cfwTrVariantProductsIds = $this->getShopifyCfwTrVariantProductsIds();
+        echo "Syncing $fromMarketplace to $toMarketplace\n";
+        $this->logger->info("[" . __METHOD__ . "] 🚀 Syncing $fromMarketplace to $toMarketplace");
+        $fromMarketplaceVariantIds = $this->getFromMarketplaceVariantIds($fromMarketplace);
         $updateProductList = [];
-        $listProductList = [];
-        foreach ($cfwTrVariantProductsIds as $cfwTrVariantProductsId) {
-            $shopifyProduct = VariantProduct::getById($cfwTrVariantProductsId['oo_id']);
-            if (!$shopifyProduct instanceof VariantProduct) {
-                echo "Invalid Shopify product ID: " . $cfwTrVariantProductsId['oo_id'] . ", skipping...";
+        $newProductList = [];
+        $fromMarketplaceNoMainProductCount = 0;
+        $fromMarketplaceManyMainProductCount = 0;
+        $fromMarketplaceVariantCountWithMainProduct = 0;
+        foreach ($fromMarketplaceVariantIds as $fromMarketplaceVariantId) {
+            $fromMarketplaceVariantProduct = VariantProduct::getById($fromMarketplaceVariantId);
+            if (!$fromMarketplaceVariantProduct instanceof VariantProduct) {
+                echo "Invalid $fromMarketplaceVariantId, skipping...\n";
+                $this->logger->warning("[" . __METHOD__ . "] ⚠️ From Marketplace $fromMarketplace Invalid variantProductId:$fromMarketplaceVariantId, skipping...");
                 continue;
             }
-            $mainProducts = $shopifyProduct->getMainProduct();
-            if (!is_array($mainProducts) || empty($mainProducts) || !$mainProducts[0] instanceof Product) {
-                echo "No main product found for Shopify product ID: " . $cfwTrVariantProductsId['oo_id'] . "\n";
+            $fromMarketplaceMainProducts = $fromMarketplaceVariantProduct->getMainProduct();
+            if (!is_array($fromMarketplaceMainProducts) || empty($fromMarketplaceMainProducts)) {
+                $fromMarketplaceNoMainProductCount++;
+                $this->logger->warning("[" . __METHOD__ . "] ⚠️ From Marketplace $fromMarketplace variantProductId:$fromMarketplaceVariantId has no main product ");
                 continue;
             }
-            $mainProduct = $mainProducts[0];
-            $iwasku = $mainProduct->getIwasku();
+            if (count($fromMarketplaceMainProducts) > 1) {
+                $fromMarketplaceManyMainProductCount++;
+                $this->logger->warning("[" . __METHOD__ . "] ⚠️ From Marketplace $fromMarketplace variantProductId:$fromMarketplaceVariantId has many main products ");
+                continue;
+            }
+            $fromMarketplaceMainProduct = $fromMarketplaceMainProducts[0];
+            if (!$fromMarketplaceMainProduct instanceof Product) {
+                $this->logger->warning("[" . __METHOD__ . "] ⚠️ From Marketplace $fromMarketplace variantProductId:$fromMarketplaceVariantId has invalid main product ");
+                continue;
+            }
+            $iwasku = $fromMarketplaceMainProduct->getIwasku();
             if (!$iwasku) {
-                echo "No iwasku found for main product ID: " . $mainProduct->getId() . "\n";
-                continue;
+                $this->logger->warning("[" . __METHOD__ . "] ⚠️ From Marketplace $fromMarketplace variantProductId:$fromMarketplaceVariantId has no iwasku ");
             }
-            $ciceksepetiProduct = $this->getCiceksepetiProduct($iwasku);
-            if (!$ciceksepetiProduct) {
-                echo "No Ciceksepeti product found for iwasku: $iwasku, adding to list for creation.\n";
-                $listProductList[] = $mainProduct;
-                continue;
+            $fromMarketplaceVariantCountWithMainProduct++;
+            $targetMarketplaceVariantProduct = $this->getTargetMarketplaceVariantProduct($toMarketplace, $iwasku);
+            if (!$targetMarketplaceVariantProduct instanceof VariantProduct) {
+                $newProductList[] = [
+                    'id' => $fromMarketplaceVariantProduct->getId(),
+                    'mainCode' => $fromMarketplaceMainProduct->getProductIdentifier()
+                ];
             }
-            echo "Ciceksepeti product found for iwasku: $iwasku, preparing for update.\n";
-            $preparedProduct = $this->prepareUpdateCiceksepetiProduct($mainProduct, $ciceksepetiProduct, $shopifyProduct, $iwasku);
-            if ($preparedProduct) {
-                $updateProductList[] = $preparedProduct;
-            }
-            if (count($updateProductList) >= 200) {
-                $this->updateCiceksepetiProduct($updateProductList);
-                $updateProductList = [];
+            else {
+                $updateProductList[] = [
+                    'from' => $fromMarketplaceVariantProduct->getId(),
+                    'to' => $targetMarketplaceVariantProduct->getId()
+                ];
             }
         }
-        if (!empty($updateProductList)) {
-            $this->updateCiceksepetiProduct($updateProductList);
-        }
-        if (!empty($listProductList)) {
-            $this->createListingProcess($listProductList);
-        }
-        echo "Ciceksepeti sync completed.\n";
-        return Command::SUCCESS;
+        $groupedByMainCode = $this->groupByMainCode($newProductList);
+        $mainProductCount = count($groupedByMainCode);
+        $variantCount = count($newProductList);
+        $toMarketplaceUpdateProductCount = count($updateProductList);
+        $this->logger->warning("[" . __METHOD__ . "] ⚠️ From Marketplace $fromMarketplace Count: $fromMarketplaceNoMainProductCount products find has no main product ");
+        $this->logger->warning("[" . __METHOD__ . "] ⚠️ From Marketplace $fromMarketplace Count: $fromMarketplaceManyMainProductCount products find main product count is more than 1 ");
+        $this->logger->info("[" . __METHOD__ . "] ✅ From Marketplace $fromMarketplace Count: $fromMarketplaceVariantCountWithMainProduct products find has main product  ");
+        $this->logger->info("[" . __METHOD__ . "] ✅ Target Marketplace $toMarketplace contains $mainProductCount main products and $variantCount variants found for syncing.");
+        $this->logger->info("[" . __METHOD__ . "] ✅ Target Marketplace $toMarketplace Count: $toMarketplaceUpdateProductCount to marketplace find update products ");
+        $this->processUpdateList($updateProductList, $this->marketplaceConfig[$toMarketplace], $this->marketplaceConfig[$fromMarketplace], $toMarketplace);
+        $this->processNewList($groupedByMainCode, $this->marketplaceConfig[$toMarketplace], $this->marketplaceConfig[$fromMarketplace], $toMarketplace);
     }
 
-    private function getShopifyCfwTrVariantProductsIds()
+    private function groupByMainCode(array $newProductList): array
     {
-        $cfwTrSql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";
-        $cfwTrVariantProductsIds = Utility::fetchFromSql($cfwTrSql, ['marketplace_id' => $this->marketplaceConfig['shopifycfwtr']]);
-        if (!is_array($cfwTrVariantProductsIds) || empty($cfwTrVariantProductsIds)) {
-            echo "No Shopify products found for Ciceksepeti sync.\n";
-            return;
+        $grouped = [];
+        foreach ($newProductList as $item) {
+            $mainCode = $item['mainCode'];
+            $id = $item['id'];
+            if (!isset($grouped[$mainCode])) {
+                $grouped[$mainCode] = [];
+            }
+            $grouped[$mainCode][] = $id;
         }
-        echo "Found " . count($cfwTrVariantProductsIds) . " Shopify products for Ciceksepeti sync.\n";
-        return $cfwTrVariantProductsIds;
+        return $grouped;
     }
 
-    private function getCiceksepetiProduct($iwasku)
+    private function processNewList($groupedByMainCode, $targetMarketplaceId, $referenceMarketplaceId, $toMarketplace): void
     {
-        $ciceksepetiSql = "SELECT oo_id FROM object_query_varyantproduct WHERE sellerSku = :seller_sku AND marketplace__id = :marketplace_id";
-        $ciceksepetiProductsId = Utility::fetchFromSql($ciceksepetiSql, ['seller_sku' => $iwasku, 'marketplace_id' => $this->marketplaceConfig['ciceksepeti']]);
-        if (!is_array($ciceksepetiProductsId) || empty($ciceksepetiProductsId) || !isset($ciceksepetiProductsId[0]['oo_id'])) {
-            return null;
-        }
-        $ciceksepetiProductId = $ciceksepetiProductsId[0]['oo_id'];
-        $ciceksepetiProduct = VariantProduct::getById($ciceksepetiProductId);
-        if (!$ciceksepetiProduct instanceof VariantProduct) {
-            echo "Invalid Ciceksepeti product ID: $ciceksepetiProductId, skipping...\n";
-            return null;
-        }
-        return $ciceksepetiProduct;
-    }
-
-    // private function syncShopifyCiceksepeti()
-    // {
-    //     $cfwTrSql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";
-    //     $ciceksepetiSql = "SELECT oo_id FROM object_query_varyantproduct WHERE sellerSku = :seller_sku AND marketplace__id = :marketplace_id";
-    //     $cfwTrVariantProductsIds = Utility::fetchFromSql($cfwTrSql, ['marketplace_id' => $this->marketplaceConfig['shopifycfwtr']]);
-    //     $updateProductList = [];
-    //     $listProductList = [];
-    //     foreach ($cfwTrVariantProductsIds as $cfwTrVariantProductsId) {
-    //         $shopifyProduct = VariantProduct::getById($cfwTrVariantProductsId['oo_id']);
-    //         $mainProducts = $shopifyProduct->getMainProduct();
-    //         if (!is_array($mainProducts) || empty($mainProducts)) {
-    //             continue;
-    //         }
-    //         $mainProduct = $mainProducts[0];
-    //         if ($mainProduct instanceof Product) {
-    //             $iwasku = $mainProduct->getIwasku();
-    //             $ciceksepetiProductsId = Utility::fetchFromSql($ciceksepetiSql, ['seller_sku' => $iwasku, 'marketplace_id' => $this->marketplaceConfig['ciceksepeti']]);;
-    //             if (!is_array($ciceksepetiProductsId) || empty($ciceksepetiProductsId)) {
-    //                 $listProductList[] = $mainProduct;
-    //             }
-    //             else {
-    //                 $ciceksepetiProductId = $ciceksepetiProductsId[0];
-    //                 $ciceksepetiProduct = VariantProduct::getById($ciceksepetiProductId['oo_id']);
-    //                 if (!$ciceksepetiProduct instanceof VariantProduct) {
-    //                     continue;
-    //                 }
-    //                 echo "Ciceksepeti product found for: $iwasku \n";
-    //                 $preparedProduct = $this->prepareCiceksepetiProduct($ciceksepetiProduct, $shopifyProduct, $iwasku);
-    //                 if ($preparedProduct) {
-    //                     $updateProductList[] = $preparedProduct;
-    //                 }
-    //                 if (count($updateProductList) >= 200) {
-    //                     $this->sendToCiceksepeti($updateProductList);
-    //                     $updateProductList = [];
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     if (!empty($updateProductList)) {
-    //         $this->sendToCiceksepeti($updateProductList);
-    //     }
-    //     // if (!empty($listProductList)) {
-    //     //     $this->createListingProcess($listProductList);
-    //     // }
-    // }
-
-    private function createListingProcess($listProductList)
-    {
-        $groupedProducts = [];
-        foreach ($listProductList as $mainProduct) {
-            $parent = $mainProduct->getParent();
-            if (!$parent) {
-                continue;
-            }
-            $parentId = $parent->getId();
-            $productId = $mainProduct->getId();
-
-            $identifier = $parent->getProductIdentifier();
-            if (strpos($identifier, 'CM-') !== 0) {
-                continue;
-            }
-
-
-            if (!isset($groupedProducts[$parentId])) {
-                $groupedProducts[$parentId] = [];
-            }
-            $groupedProducts[$parentId][] = $productId;
-        }
-        foreach ($groupedProducts as $parentId => $variantIds) {
+        foreach ($groupedByMainCode as $mainCode => $variantIds) {
             $message = new ProductListingMessage(
                 'list',
-                $parentId,
-                265384,
+                $targetMarketplaceId,
+                $referenceMarketplaceId,
                 'admin',
                 $variantIds,
                 [],
                 1,
-                'test'
+                'test',
+                $this->logger
             );
-            $stamps = [new TransportNamesStamp(['ciceksepeti'])];
+            $stamps = [new TransportNamesStamp([strtolower($toMarketplace)])];
             $this->bus->dispatch($message, $stamps);
+            $this->logger->info("[" . __METHOD__ . "] ✅ Created Message for Main Product Code: $mainCode");
         }
     }
 
-    private function prepareUpdateCiceksepetiProduct(Product $mainProduct, VariantProduct $ciceksepetiProduct, VariantProduct $shopifyProduct, $iwasku)
+    private function processUpdateList($updateProductList, $targetMarketplaceId, $referenceMarketplaceId, $toMarketplace): void
     {
-        $parentApiJsonShopify = json_decode($shopifyProduct->jsonRead('parentResponseJson'), true);
-        $apiJsonShopify = json_decode($shopifyProduct->jsonRead('apiResponseJson'), true);
-        $apiJsonCiceksepeti = json_decode($ciceksepetiProduct->jsonRead('apiResponseJson'), true);
-        $ciceksepetiIsActive = $apiJsonCiceksepeti['isActive'];
-        if (!$ciceksepetiIsActive) {
-            echo "Ciceksepeti product is not active: $iwasku \n";
+        $message = new ProductListingMessage(
+            'update_list',
+            $targetMarketplaceId,
+            $referenceMarketplaceId,
+            'admin',
+            $updateProductList,
+            [],
+            1,
+            'test',
+            $this->logger
+        );
+        $stamps = [new TransportNamesStamp(['ciceksepeti'])];
+        $this->bus->dispatch($message, $stamps);
+        $this->logger->info("[" . __METHOD__ . "] ✅ UpdateProductsList sent to Ciceksepeti Queue");
+    }
+
+    private function getFromMarketplaceVariantIds(string $marketplace): array | null
+    {
+        $variantProductQuerySql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";
+        $variantProductIds = Utility::fetchFromSql($variantProductQuerySql, ['marketplace_id' => $this->marketplaceConfig[$marketplace]]);
+        if (!is_array($variantProductIds) || empty($variantProductIds)) {
+            echo "Marketplace $marketplace variant product ids not found\n";
+            $this->logger->error("[" . __METHOD__ . "] ❌ From Marketplace $marketplace variant product ids not found");
             return null;
         }
-        $images = $this->getShopifyImages($mainProduct, $parentApiJsonShopify);
-        if (empty($images)) {
-            $images = $apiJsonCiceksepeti['images'] ?? [];
-        }
-        foreach ($images as &$image) {
-            if (is_string($image) && strpos($image, 'http://') === 0) {
-                $image = preg_replace('/^http:\/\//', 'https://', $image);
-            }
-        }
-        unset($image);
-        $cleanAttributes = [];
-        if (isset($apiJsonCiceksepeti['attributes']) && is_array($apiJsonCiceksepeti['attributes'])) {
-            foreach ($apiJsonCiceksepeti['attributes'] as $attr) {
-                if (isset($attr['textLength']) && $attr['textLength'] == 0) {
-                    $cleanAttributes[] = [
-                        'ValueId' => $attr['id'],
-                        'Id' => $attr['parentId'],
-                        'textLength' => 0
-                    ];
-                }
-            }
-        }
-        return [
-            'productName' => mb_substr($parentApiJsonShopify['title'], 0, 255),
-            'mainProductCode' => $apiJsonCiceksepeti['mainProductCode'],
-            'stockCode' => $iwasku,
-            'categoryId' => $apiJsonCiceksepeti['categoryId'],
-            'description' => mb_substr($parentApiJsonShopify['descriptionHtml'], 0, 20000),
-            'deliveryMessageType' => $apiJsonCiceksepeti['deliveryMessageType'],
-            'deliveryType' => $apiJsonCiceksepeti['deliveryType'],
-            'stockQuantity' => $apiJsonShopify['inventoryQuantity'],
-            'salesPrice' => $apiJsonShopify['price'] * 1.5,
-            'attributes' => $cleanAttributes,
-            'isActive' => $parentApiJsonShopify['status'] === 'ACTIVE' ? 1 : 0,
-            'images' => array_slice($images, 0, 5)
-        ];
+        $count = count($variantProductIds);
+        echo "Marketplace $marketplace variant product ids found: $count\n";
+        $this->logger->info("[" . __METHOD__ . "] ✅ From Marketplace $marketplace variant product ids found: $count");
+        return array_column($variantProductIds, 'oo_id');
     }
 
-    private function getShopifyImages($mainProduct, $parentApiJsonShopify)
+    private function getTargetMarketplaceVariantProduct(string $marketplace, string $iwasku): VariantProduct | null
     {
-        $images = [];
-        $widthThreshold = 2000;
-        $heightThreshold = 2000;
-        if (isset($parentApiJsonShopify['media']['nodes'])) {
-            foreach ($parentApiJsonShopify['media']['nodes'] as $node) {
-                if (
-                    isset($node['mediaContentType'], $node['preview']['image']['url'], $node['preview']['image']['width'], $node['preview']['image']['height']) &&
-                    $node['mediaContentType'] === 'IMAGE' &&
-                    ($node['preview']['image']['width'] < $widthThreshold || $node['preview']['image']['height'] < $heightThreshold)
-                ) {
-                    $images[] = $node['preview']['image']['url'];
-                }
-            }
+        $sql = "SELECT oo_id FROM object_query_varyantproduct WHERE sellerSku = :seller_sku AND marketplace__id = :marketplace_id";
+        $targetMarketplaceVariantProductIds = Utility::fetchFromSql($sql, ['seller_sku' => $iwasku, 'marketplace_id' => $this->marketplaceConfig[$marketplace]]);
+        if (!is_array($targetMarketplaceVariantProductIds) || empty($targetMarketplaceVariantProductIds) || !isset($targetMarketplaceVariantProductIds[0]['oo_id'])) {
+            $this->logger->info("[" . __METHOD__ . "] 🆕 Target Marketplace $marketplace variant product not found for iwasku: $iwasku, adding to list for creation. ");
+            return null;
         }
-        if (empty($images) || count($images) <= 2) {
-            $listingItems = $mainProduct->getListingItems();
-            if (empty($listingItems)) {
-                return;
-            }
-            foreach ($listingItems as $listingItem) {
-                if (!$listingItem instanceof VariantProduct) {
-                    continue;
-                }
-                $images = array_merge($images, $this->getImages($listingItem));
-            }
+        if (count($targetMarketplaceVariantProductIds) > 1) {
+            $this->logger->error("[" . __METHOD__ . "] ❌ Target Marketplace $marketplace variant product count is more than 1 for iwasku: $iwasku ");
         }
-        return $images;
-    }
-
-    private function getImages($listingItem): array
-    {
-        $images = [];
-        $imageGallery = $listingItem->getImageGallery();
-        foreach ($imageGallery as $hotspotImage) {
-            $image = $hotspotImage->getImage();
-            $width = $image->getWidth();
-            $height = $image->getHeight();
-            if ($width >= 500 && $width <= 2000 && $height >= 500 && $height <= 2000) {
-                $imageUrl = $image->getFullPath();
-                $host = \Pimcore\Tool::getHostUrl();
-                $images[] = $host . $imageUrl;
-            }
+        $targetMarketplaceVariantProductId = $targetMarketplaceVariantProductIds[0]['oo_id'] ?? '';
+        $targetMarketplaceVariantProduct = VariantProduct::getById($targetMarketplaceVariantProductId);
+        if (!$targetMarketplaceVariantProduct instanceof VariantProduct) {
+            $this->logger->error("[" . __METHOD__ . "] ❌ Target Marketplace $marketplace variant product not found for iwasku: $iwasku ");
+            return null;
         }
-        return $images;
-    }
-
-    private function updateCiceksepetiProduct($productList)
-    {
-        $data = [
-            'products' => $productList,
-        ];
-        $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-        echo "Sent Update " . count($productList) . " products to Ciceksepeti.\n";
-        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
-        $ciceksepetiConnector->updateProduct($json);
+        $targetMarketplaceMainProduts = $targetMarketplaceVariantProduct->getMainProduct();
+        if (!is_array($targetMarketplaceMainProduts) || empty($targetMarketplaceMainProduts) || !$targetMarketplaceMainProduts[0] instanceof Product) {
+            $this->logger->error("[" . __METHOD__ . "] ❌ Target Marketplace $marketplace main product not found for iwasku: $iwasku ");
+            return null;
+        }
+        return $targetMarketplaceVariantProduct;
     }
 
 }
