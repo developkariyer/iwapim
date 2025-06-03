@@ -26,6 +26,11 @@ class PazaramaConnector extends MarketplaceConnectorAbstract
 
     public static string $marketplaceType = 'Pazarama';
 
+    public function __construct($marketplace)
+    {
+        parent::__construct($marketplace);
+    }
+
     protected function prepareToken(): void
     {
         if (!Utility::checkJwtTokenValidity($this->marketplace->getPazaramaAccessToken())) {
