@@ -11,6 +11,7 @@ use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Doctrine\DBAL\Exception;
 use LesserPHP\Utils\Util;
+use MongoDB\Driver\Command;
 use phpseclib3\File\ASN1\Maps\AttributeValue;
 use Pimcore\Console\AbstractCommand;
 use Pimcore\Db;
@@ -40,6 +41,30 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        /*
+         *  "weight" => $product->getInheritedField("packageWeight"),
+            "width" => $product->getInheritedField("packageDimension1"),
+            "length" => $product->getInheritedField("packageDimension2"),
+            "height" => $product->getInheritedField("packageDimension3"),
+         * */
+        $product = Product::getById(269388);
+        if (!$product instanceof Product) {
+            return Command::FAILURE;
+        }
+        $name = $product->getName();
+        $variationSize = $product->getVariationSize();
+        $variationColor = $product->getVariationColor();
+        $weight = $product->getInheritedField("packageWeight");
+        $width = $product->getInheritedField("packageDimension1");
+        $length = $product->getInheritedField("packageDimension2");
+        $height = $product->getInheritedField("packageDimension3");
+        echo "Name: $name\n";
+        echo "Variation size: $variationSize\n";
+        echo "Variation color: $variationColor\n";
+        echo "Weight: $weight\n";
+        echo "Width: $width\n";
+        echo "Length: $length\n";
+        echo "Height: $height\n";
 
         return Command::SUCCESS;
     }
