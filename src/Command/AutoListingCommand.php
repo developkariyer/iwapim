@@ -27,7 +27,7 @@ use App\Logger\LoggerFactory;
 
 #[AsCommand(
     name: 'app:autolisting',
-    description: 'Outputs Hello, World!'
+    description: 'Autolisting From Marketplace => To Marketplace',
 )]
 class AutoListingCommand extends AbstractCommand
 {
