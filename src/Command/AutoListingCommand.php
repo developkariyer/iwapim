@@ -31,6 +31,11 @@ use App\Logger\LoggerFactory;
 )]
 class AutoListingCommand extends AbstractCommand
 {
+    private array $marketplaceConfig = [
+        'Ciceksepeti' => 265384,
+        'ShopifyCfwTr' => 84124,
+    ];
+
     public function __construct(private MessageBusInterface $bus)
     {
         parent::__construct();
@@ -43,13 +48,6 @@ class AutoListingCommand extends AbstractCommand
             ->addOption('source', null, InputOption::VALUE_REQUIRED, 'Source Marketplace Name')
             ->addOption('target', null, InputOption::VALUE_REQUIRED, 'Targer Marketplace Name');
     }
-
-
-
-    private array $marketplaceConfig = [
-        'Ciceksepeti' => 265384,
-        'ShopifyCfwTr' => 84124,
-    ];
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
