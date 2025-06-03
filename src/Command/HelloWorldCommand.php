@@ -72,7 +72,9 @@ class HelloWorldCommand extends AbstractCommand
                 $width = $product->getInheritedField("packageDimension1");
                 $length = $product->getInheritedField("packageDimension2");
                 $height = $product->getInheritedField("packageDimension3");
-                echo "Name: $name, Variation size: $variationSize, Variation color: $variationColor, WS category: $wsCategory, Weight: $weight, Width: $width, Length: $length, Height: $height \n";
+                $desi5000 = $product->getInheritedField("desi5000");
+                echo "Name: $name, Variation size: $variationSize, Variation color: $variationColor, WS category: $wsCategory, Weight: $weight, Width: $width, Length: $length, Height: $height,
+                 Desi: $desi5000 \n";
             }
             echo "\nProcessed {$offset}\n";
         }
