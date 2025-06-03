@@ -50,7 +50,7 @@ class HelloWorldCommand extends AbstractCommand
         $offset = 0;
         $listingObject = new Product\Listing();
         $listingObject->setUnpublished(false);
-        $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ''");
+        $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != '' AND packageWeight IS NOT NULL");
         $listingObject->setLimit($pageSize);
         while (true) {
             $listingObject->setOffset($offset);
