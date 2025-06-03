@@ -149,9 +149,6 @@ class AutoListingCommand2 extends AbstractCommand
 
     private function processUpdateList($updateProductList, $targetMarketplaceId, $referenceMarketplaceId, $toMarketplace): void
     {
-        // Onay bekleyenler gitmemesi lazim
-        // pimde birden fazla aynı variant product var unique marketplace id leri olmadığı için
-        // update tekrar düzenlenecek
         $message = new ProductListingMessage(
             'update_list',
             $targetMarketplaceId,
@@ -198,6 +195,11 @@ class AutoListingCommand2 extends AbstractCommand
         $targetMarketplaceVariantProduct = VariantProduct::getById($targetMarketplaceVariantProductId);
         if (!$targetMarketplaceVariantProduct instanceof VariantProduct) {
             $this->logger->error("[" . __METHOD__ . "] ❌ Target Marketplace $marketplace variant product not found for iwasku: $iwasku ");
+            return null;
+        }
+        $targetMarketplaceMainProduts = $targetMarketplaceVariantProduct->getMainProduct();
+        if (!is_array($targetMarketplaceMainProduts) || empty($targetMarketplaceMainProduts) || !$targetMarketplaceMainProduts[0] instanceof Product) {
+            $this->logger->error("[" . __METHOD__ . "] ❌ Target Marketplace $marketplace main product not found for iwasku: $iwasku ");
             return null;
         }
         return $targetMarketplaceVariantProduct;
