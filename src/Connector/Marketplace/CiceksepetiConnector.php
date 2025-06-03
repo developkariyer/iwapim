@@ -125,7 +125,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                     'title' => $listing['productName'] ?? '',
                     'quantity' => $listing['stockQuantity'] ?? 0,
                     'attributes' => $listing['variantName']  ?? '',
-                    'uniqueMarketplaceId' =>  $listing['productCode'],
+                    'uniqueMarketplaceId' =>  $listing['productCode'] ?? '',
                     'apiResponseJson' => json_encode($listing, JSON_PRETTY_PRINT),
                     'published' => $listing['productStatusType'] === 'YAYINDA' ? 1 : 0,
                     'sku' => $listing['stockCode'] ?? '',
