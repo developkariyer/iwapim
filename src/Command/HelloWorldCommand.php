@@ -46,20 +46,56 @@ class HelloWorldCommand extends AbstractCommand
             "length" => $product->getInheritedField("packageDimension2"),
             "height" => $product->getInheritedField("packageDimension3"),
          * */
-        $product = Product::getById(269388);
-        if (!$product instanceof Product) {
-            return Command::FAILURE;
+        $pageSize = 50;
+        $offset = 0;
+        $listingObject = new Product\Listing();
+        $listingObject->setUnpublished(false);
+        $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != ''");
+        $listingObject->setLimit($pageSize);
+        while (true) {
+            $listingObject->setOffset($offset);
+            $products = $listingObject->load();
+            if (empty($products)) {
+                break;
+            }
+            $offset += $pageSize;
+            foreach ($products as $product) {
+                if ($product->level() != 1 || !$product instanceof Product) {
+                    continue;
+                }
+                $name = $product->getInheritedField("name");
+                $variationSize = $product->getVariationSize();
+                $variationColor = $product->getVariationColor();
+                $wsCategory = $product->getInheritedField("productCategory");
+                $weight = $product->getInheritedField("packageWeight");
+                $width = $product->getInheritedField("packageDimension1");
+                $length = $product->getInheritedField("packageDimension2");
+                $height = $product->getInheritedField("packageDimension3");
+                echo "Name: $name, Variation size: $variationSize, Variation color: $variationColor, WS category: $wsCategory, Weight: $weight, Width: $width, Length: $length, Height: $height \n";
+
+
+            }
+            echo "\nProcessed {$offset}\n";
         }
-        $name = $product->getInheritedField("name");
-        $variationSize = $product->getVariationSize();
-        $variationColor = $product->getVariationColor();
-        $wsCategory = $product->getInheritedField("productCategory");
-        $weight = $product->getInheritedField("packageWeight");
-        $width = $product->getInheritedField("packageDimension1");
-        $length = $product->getInheritedField("packageDimension2");
-        $height = $product->getInheritedField("packageDimension3");
-        $product->setPackageWeight(2);
-        $product->save();
+
+
+
+
+
+//        $product = Product::getById(269388);
+//        if (!$product instanceof Product) {
+//            return Command::FAILURE;
+//        }
+//        $name = $product->getInheritedField("name");
+//        $variationSize = $product->getVariationSize();
+//        $variationColor = $product->getVariationColor();
+//        $wsCategory = $product->getInheritedField("productCategory");
+//        $weight = $product->getInheritedField("packageWeight");
+//        $width = $product->getInheritedField("packageDimension1");
+//        $length = $product->getInheritedField("packageDimension2");
+//        $height = $product->getInheritedField("packageDimension3");
+//        $product->setPackageWeight(2);
+//        $product->save();
         echo "Name: $name\n";
         echo "Variation size: $variationSize\n";
         echo "Variation color: $variationColor\n";
