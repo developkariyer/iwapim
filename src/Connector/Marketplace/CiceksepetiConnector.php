@@ -265,7 +265,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     private function passiveVariant()
     {
         //$variantProductIds = [286108,286109, 286110, 286111,286112];
-        $variantProductIds = [286113, 286114];
+        //$variantProductIds = [286113, 286114];
+        $variantProductIds = [286243];
         $updateCiceksepetiList = [];
         foreach ($variantProductIds as $variantProductId) {
             $ciceksepetiVariantProduct = VariantProduct::getById($variantProductId);
