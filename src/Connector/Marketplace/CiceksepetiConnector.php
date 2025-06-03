@@ -259,7 +259,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
         //$this->downloadCategories();
         //$this->getCategoryAttributesAndSaveDatabase(12943);
-       $this->passiveVariant();
+       //$this->passiveVariant();
     }
 
     private function passiveVariant()
