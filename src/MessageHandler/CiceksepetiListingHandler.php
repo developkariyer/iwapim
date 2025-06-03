@@ -468,7 +468,7 @@ class CiceksepetiListingHandler
                 $this->logger->error("[" . __METHOD__ . "] ❌ Ciceksepeti Variant Product Not Found: $ciceksepetiVariantId  ");
                 continue;
             }
-            $mainProduct = $fromVariantProduct->getMainProduct();
+            $mainProduct = $fromVariantProduct->getMainProduct()[0];
             if (!$mainProduct instanceof Product) {
                 $this->logger->error("[" . __METHOD__ . "] ❌ From Variant Product Not Found Main Product: $fromVariantProductId  ");
                 continue;
