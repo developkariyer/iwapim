@@ -567,4 +567,21 @@ class CiceksepetiListingHandler
         return $images;
     }
 
+    private function getImages($listingItem): array
+    {
+        $images = [];
+        $imageGallery = $listingItem->getImageGallery();
+        foreach ($imageGallery as $hotspotImage) {
+            $image = $hotspotImage->getImage();
+            $width = $image->getWidth();
+            $height = $image->getHeight();
+            if ($width >= 500 && $width <= 2000 && $height >= 500 && $height <= 2000) {
+                $imageUrl = $image->getFullPath();
+                $host = \Pimcore\Tool::getHostUrl();
+                $images[] = $host . $imageUrl;
+            }
+        }
+        return $images;
+    }
+
 }
