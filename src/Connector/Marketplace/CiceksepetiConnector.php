@@ -242,7 +242,12 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         //d15702ea-5c2b-4e94-9dd2-edd80e99f858
         //87b74947-8d88-456f-9b24-48a6e6be0e31
 
-        print_r($this->getBatchRequestResult("62f41c6f-9cad-4fac-abeb-1d3d023e9f7d"));
+        //print_r($this->getBatchRequestResult("62f41c6f-9cad-4fac-abeb-1d3d023e9f7d"));
+
+
+
+
+
         //4f245922-d66f-4bb0-b8b6-4f9c3258b3e4
 //        $ids = [
 //        ];
@@ -257,6 +262,46 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
         //$this->downloadCategories();
         //$this->getCategoryAttributesAndSaveDatabase(12943);
+        $this->passiveVariant();
+    }
+
+    private function passiveVariant()
+    {
+        $variantProductIds = [285473, 285477, 285478, 285479, 285480, 285481, 285482, 285469, 285471,
+            285472, 285476, 285474, 285465, 285466, 285467, 285468, 285484, 285485, 285489];
+        $updateCiceksepetiList = [];
+        foreach ($variantProductIds as $variantProductId) {
+            $ciceksepetiVariantProduct = VariantProduct::getById($variantProductId);
+            $apiJsonCiceksepeti = json_decode($ciceksepetiVariantProduct->jsonRead('apiResponseJson'), true);
+            $cleanAttributes = [];
+            if (isset($apiJsonCiceksepeti['attributes']) && is_array($apiJsonCiceksepeti['attributes'])) {
+                foreach ($apiJsonCiceksepeti['attributes'] as $attr) {
+                    if (isset($attr['textLength']) && $attr['textLength'] == 0) {
+                        $cleanAttributes[] = [
+                            'ValueId' => $attr['id'],
+                            'Id' => $attr['parentId'],
+                            'textLength' => 0
+                        ];
+                    }
+                }
+            }
+            $updateCiceksepetiList['products'][] = [
+                'productName' => $apiJsonCiceksepeti['productName'],
+                'mainProductCode' => $apiJsonCiceksepeti['mainProductCode'],
+                'stockCode' => $apiJsonCiceksepeti['stockCode'],
+                'categoryId' => $apiJsonCiceksepeti['categoryId'],
+                'description' => $apiJsonCiceksepeti['description'],
+                'deliveryMessageType' => $apiJsonCiceksepeti['deliveryMessageType'],
+                'deliveryType' => $apiJsonCiceksepeti['deliveryType'],
+                'stockQuantity' => 0,
+                'salesPrice' => $apiJsonCiceksepeti['salesPrice'] * 1.5,
+                'Attributes' => $cleanAttributes,
+                'isActive' => 0,
+                'images' => $apiJsonCiceksepeti['images']
+            ];
+        }
+        $json = json_encode($updateCiceksepetiList, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        $this->updateProduct($json);
     }
 
     /**
