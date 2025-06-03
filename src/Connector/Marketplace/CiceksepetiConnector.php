@@ -560,7 +560,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     public function updateProduct($data)
     {
         $response = $this->httpClient->request('PUT', static::$apiUrl['offers'], ['body' => $data]);
-        print_r($response);
+        print_r($response->toContent());
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
