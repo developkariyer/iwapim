@@ -11,7 +11,6 @@ use App\Model\DataObject\VariantProduct;
 use App\Utils\Utility;
 use Doctrine\DBAL\Exception;
 use LesserPHP\Utils\Util;
-use MongoDB\Driver\Command;
 use phpseclib3\File\ASN1\Maps\AttributeValue;
 use Pimcore\Console\AbstractCommand;
 use Pimcore\Db;
