@@ -40,120 +40,9 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $sql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";
-        $variantProductIds = Utility::fetchFromSql($sql, ['marketplace_id' => 84124]);
-        $groupedProducts = [];
-        foreach ($variantProductIds as $variantProductId) {
-            $variantProduct = VariantProduct::getById($variantProductId['oo_id']);
-            if (!$variantProduct instanceof VariantProduct) {
-                continue;
-            }
-            $mainProducts = $variantProduct->getMainProduct();
-            if (empty($mainProducts)) {
-                continue;
-            }
-            $mainProduct = $mainProducts[0];
-            if (!$mainProduct instanceof Product) {
-                continue;
-            }
-            $identifier = $mainProduct->getProductIdentifier();
-            $sku = $mainProduct->getIwasku();
-            $ownSize = trim($mainProduct->getVariationSize());
-            if (!isset($groupedProducts[$identifier]['sizeLabelList'])) {
-                $groupedProducts[$identifier]['sizeLabelList'] = $this->getSizeLabelFromParent($mainProduct);
-            }
-            $sizeLabelList = $groupedProducts[$identifier]['sizeLabelList'];
-            $matchedLabel = null;
-            foreach ($sizeLabelList as $item) {
-                if (trim($item['original']) === $ownSize) {
-                    $matchedLabel = $item['label'];
-                    break;
-                }
-            }
-            $groupedProducts[$identifier]['items'][] = [
-                'sku' => $sku,
-                'ownSize' => $ownSize,
-                'matchedLabel' => $matchedLabel
-            ];
-        }
-        foreach ($groupedProducts as $identifier => $data) {
-            echo "ProductIdentifier: " . $identifier . "\n";
-            foreach ($data['items'] as $item) {
-                echo "  - " . $item['sku'] . "  " . $item['ownSize'] . " => " . ($item['matchedLabel'] ?? 'null') . "\n";
-            }
-            echo "\n";
-        }
 
+        $this->pazaramaTrendyolMatch();
         return Command::SUCCESS;
-    }
-
-    private function getSizeLabelFromParent($referenceMarketplaceMainProduct)
-    {
-        $parentProduct = $referenceMarketplaceMainProduct->getParent();
-        if (!$parentProduct instanceof \App\Model\DataObject\Product) {
-            return;
-        }
-        $childProducts = $parentProduct->getChildren();
-        $rawVariationSizes = [];
-        foreach ($childProducts as $childProduct) {
-            if (!$childProduct instanceof Product) {
-                continue;
-            }
-            $controlListings = $childProduct->getListingItems();
-            if (empty($controlListings)) {
-                continue;
-            }
-            $size = $childProduct->getVariationSize();
-            if (!empty($size)) {
-                $rawVariationSizes[] = trim($size);
-            }
-        }
-        if (empty($rawVariationSizes)) {
-            return;
-        }
-        $parsed = [];
-        $rawVariationSizes = array_unique($rawVariationSizes);
-        foreach ($rawVariationSizes as $line) {
-            $original = trim($line);
-            if ($original === '') continue;
-            $label = null;
-            $value = $original;
-            $sortKey = null;
-            if (preg_match('/^([XSML\d]{1,4})[\s\-:]+(.+)$/iu', $original, $match)) {
-                $label = strtoupper(trim($match[1]));
-                $value = trim($match[2]);
-            }
-            elseif (preg_match('/^(XS|S|M|L|XL|2XL|3XL|4XL)$/i', $original, $match)) {
-                $label = strtoupper($match[1]);
-                $value = $original;
-            }
-            elseif (preg_match('/(standart|tek\s*ebat)/iu', $original)) {
-                $label = 'Standart';
-                $value = $original;
-            }
-            if (preg_match('/(\d+)/', $value, $numMatch)) {
-                $sortKey = (int)$numMatch[1];
-            }
-            $parsed[] = [
-                'original' => $original,
-                'value' => $value,
-                'label' => $label,
-                'sortKey' => $sortKey,
-            ];
-        }
-        usort($parsed, function ($a, $b) {
-            return ($a['sortKey'] ?? PHP_INT_MAX) <=> ($b['sortKey'] ?? PHP_INT_MAX);
-        });
-        $autoLabels = ['M', 'L', 'XL', '2XL', '3XL', '4XL'];
-        $autoIndex = 0;
-        foreach ($parsed as &$item) {
-            if ($item['label'] === null) {
-                $item['label'] = $autoLabels[$autoIndex] ?? ('+' . end($autoLabels));
-                $autoIndex++;
-            }
-            unset($item['sortKey']);
-        }
-        return $parsed;
     }
 
     private function pazaramaTrendyolMatch()
@@ -164,7 +53,7 @@ class HelloWorldCommand extends AbstractCommand
         $trendyolPazaramaNoMatchCount = 0;
         $pazaramaVariantProductSql = "SELECT oo_id FROM object_query_varyantproduct WHERE marketplace__id = :marketplace_id";
         $trendyolControlSql = "SELECT oo_id FROM object_query_varyantproduct WHERE sellerSku = :seller_sku and marketplace__id = :marketplace_id";
-        $pazaramaVariantProductIds = Utility::fetchFromSql($pazaramaVariantProductSql, ['marketplace_id' => 279708]);
+        $pazaramaVariantProductIds = Utility::fetchFromSql($pazaramaVariantProductSql, ['marketplace_id' => 279709]);
         foreach ($pazaramaVariantProductIds as $pazaramaVariantProductId) {
             $variantProductPazarama = VariantProduct::getById($pazaramaVariantProductId['oo_id']);
             if (!$variantProductPazarama instanceof VariantProduct) {
@@ -174,46 +63,46 @@ class HelloWorldCommand extends AbstractCommand
             $mainProductPazarama = $variantProductPazarama->getMainProduct();
             if (empty($mainProductPazarama)){
                 echo "Main product not found" . $variantProductPazarama->getSellerSku() . "\n";
-//                $pazaramaMainProductNoCount++;
-//               echo "Main product not found Pazarama\n";
-//               $sellerSkuPazarama = $variantProductPazarama->getSellerSku();
-//               echo "Pazarama Seller Sku => " . $sellerSkuPazarama . "\n";
-//               $trendyolVariantProductIds = Utility::fetchFromSql($trendyolControlSql, ['seller_sku' => $sellerSkuPazarama,'marketplace_id' => 169698]);
-//               if (empty($trendyolVariantProductIds)) {
-//                   echo "Trendyol variant product not found : " . $sellerSkuPazarama . "\n";
-//                   $trendyolPazaramaNoMatchCount++;
-//                   continue;
-//               }
-//               $variantProductTrendyol = VariantProduct::getById($trendyolVariantProductIds[0]['oo_id']);
-//               if (!$variantProductTrendyol instanceof VariantProduct) {
-//                   echo "Invalid variantProductId:$trendyolVariantProductIds[0]\n";
-//                   continue;
-//               }
-//               $trendyolMainProducts = $variantProductTrendyol->getMainProduct();
-//               if (empty($trendyolMainProducts)) {
-//                   echo "Trendyol main product not found\n";
-//                   continue;
-//               }
-//               $trendyolMainProduct = $trendyolMainProducts[0];
-//               if (!$trendyolMainProduct instanceof Product) {
-//                   echo "Invalid trendyol main product\n";
-//                   continue;
-//               }
-//               echo $trendyolMainProduct->getIwasku() ."\n";
-//                $trendyolPazaramaMatchCount++;
+                $pazaramaMainProductNoCount++;
+                echo "Main product not found Pazarama\n";
+                $sellerSkuPazarama = $variantProductPazarama->getSellerSku();
+                echo "Pazarama Seller Sku => " . $sellerSkuPazarama . "\n";
+                $trendyolVariantProductIds = Utility::fetchFromSql($trendyolControlSql, ['seller_sku' => $sellerSkuPazarama,'marketplace_id' => 169699]);
+                if (empty($trendyolVariantProductIds)) {
+                    echo "Trendyol variant product not found : " . $sellerSkuPazarama . "\n";
+                    $trendyolPazaramaNoMatchCount++;
+                    continue;
+                }
+                $variantProductTrendyol = VariantProduct::getById($trendyolVariantProductIds[0]['oo_id']);
+                if (!$variantProductTrendyol instanceof VariantProduct) {
+                    echo "Invalid variantProductId:$trendyolVariantProductIds[0]\n";
+                    continue;
+                }
+                $trendyolMainProducts = $variantProductTrendyol->getMainProduct();
+                if (empty($trendyolMainProducts)) {
+                    echo "Trendyol main product not found\n";
+                    continue;
+                }
+                $trendyolMainProduct = $trendyolMainProducts[0];
+                if (!$trendyolMainProduct instanceof Product) {
+                    echo "Invalid trendyol main product\n";
+                    continue;
+                }
+                echo $trendyolMainProduct->getIwasku() ."\n";
+                $trendyolPazaramaMatchCount++;
 //                $result = $trendyolMainProduct->addVariant($variantProductPazarama);
 //                if (!$result) {
 //                    echo "Error adding variant to trendyol main product\n";
 //                }
 //                echo "Added variant to trendyol main product" . $result . "\n";
             }
-//            else {
-//                $pazaramaMainProductYesCount++;
-//                echo "Main product found Pazarama \n";
-//            }
+            else {
+                $pazaramaMainProductYesCount++;
+                echo "Main product found Pazarama \n";
+            }
         }
-//        echo "Pazarama Main Product Yes: " . $pazaramaMainProductYesCount . " Pazarama Main Product No: " . $pazaramaMainProductNoCount . "\n";
-//        echo "Trendyol Match Pazarama: " . $trendyolPazaramaMatchCount . " Trendyol No Match Pazarama: " . $trendyolPazaramaNoMatchCount . "\n";
+        echo "Pazarama Main Product Yes: " . $pazaramaMainProductYesCount . " Pazarama Main Product No: " . $pazaramaMainProductNoCount . "\n";
+        echo "Trendyol Match Pazarama: " . $trendyolPazaramaMatchCount . " Trendyol No Match Pazarama: " . $trendyolPazaramaNoMatchCount . "\n";
     }
 
 }
