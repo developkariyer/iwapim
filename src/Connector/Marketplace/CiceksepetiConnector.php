@@ -294,7 +294,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
                 'salesPrice' => $apiJsonCiceksepeti['salesPrice'] * 1.5,
                 'Attributes' => $cleanAttributes,
                 'isActive' => 0,
-                'images' => $apiJsonCiceksepeti['images']
+                'images' => ['https://cdn.shopify.com/s/files/1/0559/3435/3585/files/6_2000x2000_c4c0474a-feb4-4818-9383-dd9ea1c6beb7.jpg?v=1736197130']
+                //'images' => $apiJsonCiceksepeti['images']
             ];
         }
         $json = json_encode($updateCiceksepetiList, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
