@@ -44,7 +44,19 @@ class AutoListingCommand2 extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->syncMarketplaceProducts('ShopifyCfwTr', 'Ciceksepeti');
+        $source = $input->getOption('source');
+        $target = $input->getOption('target');
+        if (!$source || !$target) {
+            return Command::FAILURE;
+        }
+        if (!isset($this->marketplaceConfig[$source], $this->marketplaceConfig[$target])) {
+            $output->writeln("<error>Invalid Marketplace Name</error>");
+            return Command::FAILURE;
+        }
+        $this->logger = LoggerFactory::create($target, 'auto_listing');
+        $this->logger->info("[" . __METHOD__ . "] Sync Start:  $source → $target");
+        $this->syncMarketplaceProducts($source, $target);
+        $this->logger->info("[" . __METHOD__ . "] Sync Complated .... ");
         return Command::SUCCESS;
     }
 
