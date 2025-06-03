@@ -46,7 +46,7 @@ class AutoListingCommand extends AbstractCommand
         $this
             ->setDescription('Marketplace Sync Command')
             ->addOption('source', null, InputOption::VALUE_REQUIRED, 'Source Marketplace Name')
-            ->addOption('target', null, InputOption::VALUE_REQUIRED, 'Targer Marketplace Name');
+            ->addOption('target', null, InputOption::VALUE_REQUIRED, 'Target Marketplace Name');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
