@@ -266,7 +266,10 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     {
         //$variantProductIds = [286108,286109, 286110, 286111,286112];
         //$variantProductIds = [286113, 286114];
-        $variantProductIds = [286243];
+        $variantProductIds = [286956, 286957, 286959, 286960, 286961, 286962, 286969, 286955, 286940, 286912, 286924,
+            286927, 286928, 286930, 286931, 286933, 286935, 286936, 286908, 286910, 286911, 286923, 286913,
+            286915, 286916, 286917, 286918, 286920, 286921, 286954, 286941, 286943, 286946, 286948, 286951,
+            ];
         $updateCiceksepetiList = [];
         foreach ($variantProductIds as $variantProductId) {
             $ciceksepetiVariantProduct = VariantProduct::getById($variantProductId);
