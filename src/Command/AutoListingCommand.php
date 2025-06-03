@@ -168,20 +168,20 @@ class AutoListingCommand extends AbstractCommand
 
     private function processUpdateList($updateProductList, $targetMarketplaceId, $referenceMarketplaceId, $toMarketplace): void
     {
-        $message = new ProductListingMessage(
-            'update_list',
-            $targetMarketplaceId,
-            $referenceMarketplaceId,
-            'admin',
-            $updateProductList,
-            [],
-            1,
-            'test',
-            $this->logger
-        );
-        $stamps = [new TransportNamesStamp(['ciceksepeti'])];
-        $this->bus->dispatch($message, $stamps);
-        $this->logger->info("[" . __METHOD__ . "] ✅ UpdateProductsList sent to Ciceksepeti Queue");
+//        $message = new ProductListingMessage(
+//            'update_list',
+//            $targetMarketplaceId,
+//            $referenceMarketplaceId,
+//            'admin',
+//            $updateProductList,
+//            [],
+//            1,
+//            'test',
+//            $this->logger
+//        );
+//        $stamps = [new TransportNamesStamp(['ciceksepeti'])];
+//        $this->bus->dispatch($message, $stamps);
+//        $this->logger->info("[" . __METHOD__ . "] ✅ UpdateProductsList sent to Ciceksepeti Queue");
     }
 
     private function getFromMarketplaceVariantIds(string $marketplace): array | null
