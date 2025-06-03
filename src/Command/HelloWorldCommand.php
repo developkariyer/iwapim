@@ -41,7 +41,6 @@ class HelloWorldCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
 
-        $this->pazaramaTrendyolMatch();
         return Command::SUCCESS;
     }
 
