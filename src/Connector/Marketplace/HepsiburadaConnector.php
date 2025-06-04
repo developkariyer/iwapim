@@ -432,25 +432,41 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     {
         $categories = $this->getFromCache('categories.json');
         if (!$categories) {
-            $response = $this->httpClient->request('GET', "https://mpop.hepsiburada.com/product/api/categories/get-all-categories", [
-                'headers' => [
-                    'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
-                    "User-Agent" => "colorfullworlds_dev",
-                    'Accept' => 'application/json',
-                    'Content-Type' => 'application/json'
-                ],
-                'query' => [
-                    'leaf' => 1
-                ]
-            ]);
-            print_r($response->getContent());
-
-
-//            $this->putToCache('categories.json', $response->toArray());
-//            $categories = $this->getFromCache('categories.json');
+            $categories = [];
+            $size = 1000;
+            $page = 0;
+            do {
+                echo "Downloading Categories Page: $page\n";
+                $response = $this->httpClient->request('GET', "https://mpop.hepsiburada.com/product/api/categories/get-all-categories", [
+                    'headers' => [
+                        'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
+                        "User-Agent" => "colorfullworlds_dev",
+                        'Accept' => 'application/json',
+                        'Content-Type' => 'application/json'
+                    ],
+                    'query' => [
+                        'leaf' => 1,
+                        'status' => 'ACTIVE',
+                        'available' => 1,
+                        'page' => $page,
+                        'size' => $size,
+                    ]
+                ]);
+                $statusCode = $response->getStatusCode();
+                if ($statusCode !== 200) {
+                    echo "Error: $statusCode\n";
+                    break;
+                }
+                $data = $response->toArray();
+                $totalPages = $data['totalPages'];
+                $page++;
+                sleep(0.2);
+                $categories = array_merge($categories, $data['data']);
+            } while($page <= $totalPages);
+            $this->putToCache('categories.json', json_encode($categories));
         }
-
-
+        $categories = $this->getFromCache('categories.json');
     }
+    
 
 }
