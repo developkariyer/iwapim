@@ -7,56 +7,56 @@
     <div class="container-fluid mt-4">
         <h1 class="text-center mb-4">Ürün Boyutları Yönetimi</h1>
 
-        <!-- Filtreleme Formu -->
         <div class="card mb-4">
-            <div class="card-header bg-light">
-                <h5 class="mb-0">Filtreler</h5>
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Filtre ve Arama</h5>
+                <a href="{{ path('product_dimensions_main_page') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-counterclockwise"></i> Sıfırla
+                </a>
             </div>
             <div class="card-body">
-                <form id="filterForm" class="row g-3">
-                    <div class="col-md-6 col-lg-3">
-                        <label for="category" class="form-label">Kategori</label>
-                        <select class="form-select" id="category" name="category">
-                            <option value="">Tüm Kategoriler</option>
-                            {% for cat in categories|default([]) %}
-                                <option value="{{ cat }}" {% if app.request.query.get('category') == cat %}selected{% endif %}>{{ cat }}</option>
-                            {% endfor %}
-                        </select>
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <!-- Filtreleme Formu -->
+                        <form id="filterForm" class="row g-2">
+                            <div class="col-sm-4">
+                                <label for="category" class="form-label small">Kategori</label>
+                                <select class="form-select form-select-sm" id="category" name="category">
+                                    <option value="">Tüm Kategoriler</option>
+                                    {% for cat in categories|default([]) %}
+                                        <option value="{{ cat }}" {% if app.request.query.get('category') == cat %}selected{% endif %}>{{ cat }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-sm-4">
+                                <label for="packageStatus" class="form-label small">Boyut Durumu</label>
+                                <select class="form-select form-select-sm" id="packageStatus" name="packageStatus">
+                                    <option value="">Tümü</option>
+                                    <option value="with-dimensions" {% if app.request.query.get('packageStatus') == 'with-dimensions' %}selected{% endif %}>Boyutlu</option>
+                                    <option value="without-dimensions" {% if app.request.query.get('packageStatus') == 'without-dimensions' %}selected{% endif %}>Boyutsuz</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary btn-sm w-100">Filtrele</button>
+                            </div>
+                        </form>
                     </div>
-                    <div class="col-md-6 col-lg-3">
-                        <label for="packageStatus" class="form-label">Boyut Durumu</label>
-                        <select class="form-select" id="packageStatus" name="packageStatus">
-                            <option value="">Tümü</option>
-                            <option value="with-dimensions" {% if app.request.query.get('packageStatus') == 'with-dimensions' %}selected{% endif %}>Boyutlu</option>
-                            <option value="without-dimensions" {% if app.request.query.get('packageStatus') == 'without-dimensions' %}selected{% endif %}>Boyutsuz</option>
-                        </select>
+                    <div class="col-md-4">
+                        <!-- Arama Formu -->
+                        <form id="searchForm" class="d-flex flex-column h-100">
+                            <label for="globalSearch" class="form-label small">Arama</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control form-control-sm" id="globalSearch" name="search"
+                                       placeholder="Ürün adı, SKU, beden, renk..." value="{{ app.request.query.get('search') }}">
+                                <button type="submit" class="btn btn-success btn-sm">Ara</button>
+                            </div>
+                        </form>
                     </div>
-                    <div class="col-md-6 col-lg-3 mt-auto">
-                        <button type="submit" class="btn btn-primary w-100">Filtrele</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Arama Formu -->
-        <div class="card mb-4">
-            <div class="card-header bg-light">
-                <h5 class="mb-0">Arama</h5>
-            </div>
-            <div class="card-body">
-                <form id="searchForm" class="row g-3">
-                    <div class="col-md-9">
-                        <input type="text" class="form-control" id="globalSearch" name="search" placeholder="Ürün adı, SKU, beden veya renk ile ara..." value="{{ app.request.query.get('search') }}">
-                    </div>
-                    <div class="col-md-3">
-                        <button type="submit" class="btn btn-success w-100">Ara</button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
 
         {% if products is defined and products|length > 0 %}
-            
             <div class="table-responsive">
                 <table id="productTable" class="table table-striped table-bordered table-hover">
                     <thead class="thead-dark">
@@ -83,10 +83,7 @@
                             <td>{{ product.iwasku }}</td>
                             <td>{{ product.variationSize }}</td>
                             <td>{{ product.variationColor }}</td>
-                            <td>
-                                <input type="text" class="form-control form-control-sm editable-field"
-                                       data-field="wsCategory" value="{{ product.wsCategory }}" />
-                            </td>
+                            <td>{{ product.wsCategory }}</td>
                             <td>
                                 <input type="number" step="0.01" class="form-control form-control-sm editable-field"
                                        data-field="weight" value="{{ product.weight }}"
@@ -107,11 +104,7 @@
                                        data-field="height" value="{{ product.height }}"
                                        placeholder="Yükseklik" />
                             </td>
-                            <td>
-                                <input type="number" step="0.01" class="form-control form-control-sm editable-field"
-                                       data-field="desi5000" value="{{ product.desi5000 }}"
-                                       placeholder="Desi5000" />
-                            </td>
+                            <td>{{ product.desi5000 }}</td>
                             <td>
                                 <button class="btn btn-sm btn-primary save-dimensions">Kaydet</button>
                             </td>
@@ -120,7 +113,6 @@
                     </tbody>
                 </table>
             </div>
-
             <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap">
                 <div class="mb-2 mb-md-0">
                     Toplam: <strong>{{ total }}</strong> ürün
@@ -212,6 +204,9 @@
             content: '↓';
             opacity: 1;
         }
+        .small {
+            font-size: 0.875rem;
+        }
 
         @media (max-width: 768px) {
             .table-responsive {
@@ -243,23 +238,11 @@
                     window.location.href = currentUrl.toString();
                 });
             });
-            document.getElementById('tableSearch').addEventListener('keyup', function() {
-                const searchText = this.value.toLowerCase();
-                const table = document.getElementById('productTable');
-                const rows = table.querySelectorAll('tbody tr');
-                rows.forEach(function(row) {
-                    const text = row.textContent.toLowerCase();
-                    if (text.includes(searchText)) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-            });
-            document.querySelectorAll('.sortable').forEach(function(header) {
+            document.querySelectorAll('th.sortable').forEach(function(header) {
                 header.addEventListener('click', function() {
                     const table = document.getElementById('productTable');
-                    const columnIndex = Array.from(this.parentElement.children).indexOf(this);
+                    const thIndex = Array.from(this.parentElement.children).indexOf(this);
+                    const isHidden = Array.from(this.classList).includes('d-none');
                     const rows = Array.from(table.querySelectorAll('tbody tr'));
                     const sortDirection = this.classList.contains('asc') ? -1 : 1;
                     document.querySelectorAll('.sortable').forEach(function(h) {
@@ -267,18 +250,21 @@
                     });
                     this.classList.add(sortDirection === 1 ? 'asc' : 'desc');
                     rows.sort(function(rowA, rowB) {
-                        const cellA = rowA.cells[columnIndex].textContent.trim();
-                        const cellB = rowB.cells[columnIndex].textContent.trim();
-                        if (!isNaN(cellA) && !isNaN(cellB)) {
-                            return (parseFloat(cellA) - parseFloat(cellB)) * sortDirection;
+                        const cellA = rowA.cells[thIndex];
+                        const cellB = rowB.cells[thIndex];
+                        const valueA = cellA.querySelector('input') ?
+                            cellA.querySelector('input').value :
+                            cellA.textContent.trim();
+                        const valueB = cellB.querySelector('input') ?
+                            cellB.querySelector('input').value :
+                            cellB.textContent.trim();
+                        if (!isNaN(valueA) && !isNaN(valueB)) {
+                            return (parseFloat(valueA) - parseFloat(valueB)) * sortDirection;
                         } else {
-                            return cellA.localeCompare(cellB) * sortDirection;
+                            return valueA.toString().localeCompare(valueB.toString()) * sortDirection;
                         }
                     });
                     const tbody = table.querySelector('tbody');
-                    while (tbody.firstChild) {
-                        tbody.removeChild(tbody.firstChild);
-                    }
                     rows.forEach(function(row) {
                         tbody.appendChild(row);
                     });
@@ -323,7 +309,6 @@
                 e.preventDefault();
                 const currentUrl = new URL(window.location.href);
                 currentUrl.searchParams.delete('page');
-                currentUrl.searchParams.delete('search');
                 const formData = new FormData(this);
                 for (const [key, value] of formData.entries()) {
                     if (value) {
@@ -332,7 +317,6 @@
                         currentUrl.searchParams.delete(key);
                     }
                 }
-
                 window.location.href = currentUrl.toString();
             });
             document.getElementById('searchForm').addEventListener('submit', function(e) {
