@@ -31,10 +31,6 @@
                             <option value="without-dimensions" {% if app.request.query.get('packageStatus') == 'without-dimensions' %}selected{% endif %}>Boyutsuz</option>
                         </select>
                     </div>
-                    <div class="col-md-6 col-lg-3">
-                        <label for="iwasku" class="form-label">IWA SKU</label>
-                        <input type="text" class="form-control" id="iwasku" name="iwasku" value="{{ app.request.query.get('iwasku') }}">
-                    </div>
                     <div class="col-md-6 col-lg-3 mt-auto">
                         <button type="submit" class="btn btn-primary w-100">Filtrele</button>
                     </div>
@@ -60,19 +56,7 @@
         </div>
 
         {% if products is defined and products|length > 0 %}
-            <!-- Tablo içi hızlı arama -->
-            <div class="row mb-3">
-                <div class="col-md-6 col-lg-4">
-                    <div class="input-group">
-                        <span class="input-group-text">
-                            <i class="bi bi-search"></i>
-                        </span>
-                        <input type="text" class="form-control" id="tableSearch" placeholder="Tabloda görünür satırlarda ara...">
-                    </div>
-                    <small class="text-muted">Tablodaki görünür satırlar içinde anlık arama yapar</small>
-                </div>
-            </div>
-
+            
             <div class="table-responsive">
                 <table id="productTable" class="table table-striped table-bordered table-hover">
                     <thead class="thead-dark">
