@@ -67,10 +67,10 @@
                         <th class="sortable" data-sort="size">Beden</th>
                         <th class="sortable" data-sort="color">Renk</th>
                         <th class="sortable" data-sort="category">Kategori</th>
-                        <th class="sortable" data-sort="weight">Ağırlık</th>
-                        <th class="sortable" data-sort="width">Genişlik</th>
-                        <th class="sortable" data-sort="length">Uzunluk</th>
+                        <th class="sortable" data-sort="width">En</th>
+                        <th class="sortable" data-sort="length">Boy</th>
                         <th class="sortable" data-sort="height">Yükseklik</th>
+                        <th class="sortable" data-sort="weight">Ağırlık</th>
                         <th class="sortable" data-sort="desi">Desi5000</th>
                         <th>İşlemler</th>
                     </tr>
@@ -86,23 +86,23 @@
                             <td>{{ product.wsCategory }}</td>
                             <td>
                                 <input type="number" step="0.01" class="form-control form-control-sm editable-field"
-                                       data-field="weight" value="{{ product.weight }}"
-                                       placeholder="Ağırlık" />
-                            </td>
-                            <td>
-                                <input type="number" step="0.01" class="form-control form-control-sm editable-field"
                                        data-field="width" value="{{ product.width }}"
-                                       placeholder="Genişlik" />
+                                       placeholder="EN" />
                             </td>
                             <td>
                                 <input type="number" step="0.01" class="form-control form-control-sm editable-field"
                                        data-field="length" value="{{ product.length }}"
-                                       placeholder="Uzunluk" />
+                                       placeholder="BOY" />
                             </td>
                             <td>
                                 <input type="number" step="0.01" class="form-control form-control-sm editable-field"
                                        data-field="height" value="{{ product.height }}"
                                        placeholder="Yükseklik" />
+                            </td>
+                            <td>
+                                <input type="number" step="0.01" class="form-control form-control-sm editable-field"
+                                       data-field="weight" value="{{ product.weight }}"
+                                       placeholder="Ağırlık" />
                             </td>
                             <td>{{ product.desi5000 }}</td>
                             <td>
