@@ -40,69 +40,6 @@ class HelloWorldCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /*
-         *  "weight" => $product->getInheritedField("packageWeight"),
-            "width" => $product->getInheritedField("packageDimension1"),
-            "length" => $product->getInheritedField("packageDimension2"),
-            "height" => $product->getInheritedField("packageDimension3"),
-         * */
-//        $pageSize = 50;
-//        $offset = 0;
-//        $listingObject = new Product\Listing();
-//        $listingObject->setUnpublished(false);
-//        $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != '' AND (packageWeight IS NOT NULL OR packageDimension1 IS NOT NULL OR packageDimension2 IS NOT NULL OR packageDimension3 IS NOT NULL)");
-//        $listingObject->setLimit($pageSize);
-//        $count = $listingObject->count();
-//        while (true) {
-//            $listingObject->setOffset($offset);
-//            $products = $listingObject->load();
-//            if (empty($products)) {
-//                break;
-//            }
-//            $offset += $pageSize;
-//            foreach ($products as $product) {
-//                if ($product->level() != 1 || !$product instanceof Product) {
-//                    continue;
-//                }
-//                $name = $product->getInheritedField("name");
-//                $iwasku = $product->getInheritedField("iwasku");
-//                $variationSize = $product->getVariationSize();
-//                $variationColor = $product->getVariationColor();
-//                $wsCategory = $product->getInheritedField("productCategory");
-//                $weight = $product->getInheritedField("packageWeight");
-//                $width = $product->getInheritedField("packageDimension1");
-//                $length = $product->getInheritedField("packageDimension2");
-//                $height = $product->getInheritedField("packageDimension3");
-//                $desi5000 = $product->getInheritedField("desi5000");
-//                echo "Count: $count\n";
-//                echo "Name: $name, Iwasku: $iwasku, Variation size: $variationSize, Variation color: $variationColor, WS category: $wsCategory, Weight: $weight, Width: $width, Length: $length, Height: $height, Desi: $desi5000 \n";
-//            }
-//            echo "\nProcessed {$offset}\n";
-//        }
-
-        $sql = "SELECT DISTINCT(category) FROM object_query_category WHERE category IS NOT NULL AND category != '' ORDER BY category ASC";
-        $categories = Utility::fetchFromSql($sql);
-        print_r($categories);
-
-
-
-
-
-//        $product = Product::getById(269388);
-//        if (!$product instanceof Product) {
-//            return Command::FAILURE;
-//        }
-//        $name = $product->getInheritedField("name");
-//        $variationSize = $product->getVariationSize();
-//        $variationColor = $product->getVariationColor();
-//        $wsCategory = $product->getInheritedField("productCategory");
-//        $weight = $product->getInheritedField("packageWeight");
-//        $width = $product->getInheritedField("packageDimension1");
-//        $length = $product->getInheritedField("packageDimension2");
-//        $height = $product->getInheritedField("packageDimension3");
-//        $product->setPackageWeight(2);
-//        $product->save();
-
         return Command::SUCCESS;
     }
 
