@@ -52,7 +52,6 @@ class ProductDimensionsController extends FrontendController
             $conditions .= " AND (packageDimension1 IS NULL OR packageDimension2 IS NULL OR packageDimension3 IS NULL)";
         }
         $listingObject->setCondition($conditions);
-        $listingObject->setOrder("iwasku ASC");
         $listingObject->setLimit($pageSize);
         $listingObject->setOffset($offset);
         $products = $listingObject->load();
