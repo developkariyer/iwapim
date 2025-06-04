@@ -1,21 +1,53 @@
 {% extends 'base.html.twig' %}
-{% block title %} Missing Product Dimensions {% endblock %}
+{% block title %} Product Dimensions Management {% endblock %}
 {% block navbaritems %}{% endblock %}
 {% block header %}{% endblock %}
 
 {% block content %}
     <div class="container-fluid mt-4">
-        <h1 class="text-center mb-4">Eksik Ürün Boyutları</h1>
+        <h1 class="text-center mb-4">Ürün Boyutları Yönetimi</h1>
+        <div class="card mb-4">
+            <div class="card-body">
+                <form id="filterForm" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="iwasku" class="form-label">IWA SKU</label>
+                        <input type="text" class="form-control" id="iwasku" name="iwasku" value="{{ app.request.query.get('iwasku') }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="category" class="form-label">Kategori</label>
+                        <input type="text" class="form-control" id="category" name="category" value="{{ app.request.query.get('category') }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="packageStatus" class="form-label">Boyut Durumu</label>
+                        <select class="form-select" id="packageStatus" name="packageStatus">
+                            <option value="">Tümü</option>
+                            <option value="with-dimensions" {% if app.request.query.get('packageStatus') == 'with-dimensions' %}selected{% endif %}>Boyutlu</option>
+                            <option value="without-dimensions" {% if app.request.query.get('packageStatus') == 'without-dimensions' %}selected{% endif %}>Boyutsuz</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Filtrele</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
         {% if products is defined and products|length > 0 %}
             <div class="table-responsive">
                 <table class="table table-striped table-bordered">
                     <thead class="thead-dark">
                     <tr>
-                        <th>Ürün ID</th>
+                        <th>ID</th>
                         <th>Ürün Adı</th>
-                        <th>SKU</th>
-                        <th>Boyut</th>
+                        <th>IWA SKU</th>
+                        <th>Beden</th>
+                        <th>Renk</th>
+                        <th>Kategori</th>
+                        <th>Ağırlık</th>
+                        <th>Genişlik</th>
+                        <th>Uzunluk</th>
+                        <th>Yükseklik</th>
+                        <th>Desi5000</th>
                         <th>İşlemler</th>
                     </tr>
                     </thead>
@@ -24,25 +56,64 @@
                         <tr>
                             <td>{{ product.id }}</td>
                             <td>{{ product.name }}</td>
-                            <td>{{ product.sku }}</td>
+                            <td>{{ product.iwasku }}</td>
+                            <td>{{ product.variationSize }}</td>
+                            <td>{{ product.variationColor }}</td>
+                            <td>{{ product.wsCategory }}</td>
+                            <td>{{ product.weight }}</td>
+                            <td>{% if product.width %}{{ product.width }}{% else %}<span class="text-danger">Eksik</span>{% endif %}</td>
+                            <td>{% if product.length %}{{ product.length }}{% else %}<span class="text-danger">Eksik</span>{% endif %}</td>
+                            <td>{% if product.height %}{{ product.height }}{% else %}<span class="text-danger">Eksik</span>{% endif %}</td>
+                            <td>{{ product.desi5000 }}</td>
                             <td>
-                                {% if product.dimensions %}
-                                    {{ product.dimensions }}
-                                {% else %}
-                                    <span class="text-danger">Eksik</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <button class="btn btn-sm btn-primary edit-dimensions" data-product-id="{{ product.id }}">Düzenle</button>
+                                <button class="btn btn-sm btn-primary save-dimensions" data-product-id="{{ product.id }}">Kaydet</button>
                             </td>
                         </tr>
                     {% endfor %}
                     </tbody>
                 </table>
             </div>
+
+            <!-- Sayfalama -->
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div>
+                    Toplam: <strong>{{ total }}</strong> ürün
+                </div>
+                <nav>
+                    <ul class="pagination">
+                        {% set totalPages = (total / pageSize)|round(0, 'ceil') %}
+                        {% set startPage = max(1, page - 2) %}
+                        {% set endPage = min(totalPages, page + 2) %}
+
+                        {% if page > 1 %}
+                            <li class="page-item">
+                                <a class="page-link" href="#" data-page="1">&laquo;</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#" data-page="{{ page - 1 }}">&lsaquo;</a>
+                            </li>
+                        {% endif %}
+
+                        {% for i in startPage..endPage %}
+                            <li class="page-item {% if i == page %}active{% endif %}">
+                                <a class="page-link" href="#" data-page="{{ i }}">{{ i }}</a>
+                            </li>
+                        {% endfor %}
+
+                        {% if page < totalPages %}
+                            <li class="page-item">
+                                <a class="page-link" href="#" data-page="{{ page + 1 }}">&rsaquo;</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#" data-page="{{ totalPages }}">&raquo;</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
         {% else %}
             <div class="alert alert-info text-center">
-                Eksik boyut bilgisi olan ürün bulunmamaktadır.
+                Arama kriterlerine uygun ürün bulunamadı.
             </div>
         {% endif %}
     </div>
@@ -54,18 +125,46 @@
         .table th, .table td {
             vertical-align: middle;
         }
+        .text-danger {
+            font-weight: bold;
+        }
     </style>
 {% endblock %}
 
 {% block body_scripts %}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.edit-dimensions').forEach(function(button) {
+            document.querySelectorAll('.pagination .page-link').forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    const currentUrl = new URL(window.location.href);
+                    currentUrl.searchParams.set('page', page);
+                    window.location.href = currentUrl.toString();
+                });
+            });
+            document.querySelectorAll('.save-dimensions').forEach(function(button) {
                 button.addEventListener('click', function() {
                     const productId = this.getAttribute('data-product-id');
-                    // Burada düzenleme işlemi için modal açılabilir veya başka bir işlem yapılabilir
-                    alert('Ürün ID: ' + productId + ' için düzenleme işlemi başlatılacak');
+                    console.log('Ürün ID:', productId, 'için kaydetme işlemi başlatılacak');
                 });
+            });
+
+            document.getElementById('filterForm').addEventListener('submit', function(e) {
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.delete('page');
+
+                const formData = new FormData(this);
+                for (const [key, value] of formData.entries()) {
+                    if (value) {
+                        currentUrl.searchParams.set(key, value);
+                    } else {
+                        currentUrl.searchParams.delete(key);
+                    }
+                }
+
+                window.location.href = currentUrl.toString();
+                e.preventDefault();
             });
         });
     </script>
