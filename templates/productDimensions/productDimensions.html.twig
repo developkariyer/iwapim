@@ -85,22 +85,22 @@
                             <td>{{ product.variationColor }}</td>
                             <td>{{ product.wsCategory }}</td>
                             <td>
-                                <input type="number" step="0.01" class="form-control form-control-sm editable-field"
+                                <input type="number" step="0.01" class="form-control form-control-sm editable-field {% if product.width is empty %}is-invalid{% endif %}"
                                        data-field="width" value="{{ product.width }}"
                                        placeholder="{% if product.width is empty %}Eksik!{% else %}EN{% endif %}" />
                             </td>
                             <td>
-                                <input type="number" step="0.01" class="form-control form-control-sm editable-field"
+                                <input type="number" step="0.01" class="form-control form-control-sm editable-field {% if product.width is empty %}is-invalid{% endif %}"
                                        data-field="length" value="{{ product.length }}"
                                        placeholder="{% if product.length is empty %}Eksik!{% else %}BOY{% endif %}" />
                             </td>
                             <td>
-                                <input type="number" step="0.01" class="form-control form-control-sm editable-field"
+                                <input type="number" step="0.01" class="form-control form-control-sm editable-field {% if product.width is empty %}is-invalid{% endif %}"
                                        data-field="height" value="{{ product.height }}"
                                        placeholder="{% if product.height is empty %}Eksik!{% else %}Yükseklik{% endif %}" />
                             </td>
                             <td>
-                                <input type="number" step="0.01" class="form-control form-control-sm editable-field"
+                                <input type="number" step="0.01" class="form-control form-control-sm editable-field {% if product.width is empty %}is-invalid{% endif %}"
                                        data-field="weight" value="{{ product.weight }}"
                                        placeholder="{% if product.weight is empty %}Eksik!{% else %}Ağırlık{% endif %}" />
                             </td>
