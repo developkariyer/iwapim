@@ -52,6 +52,7 @@ class HelloWorldCommand extends AbstractCommand
         $listingObject->setUnpublished(false);
         $listingObject->setCondition("iwasku IS NOT NULL AND iwasku != '' AND (packageWeight IS NULL OR packageDimension1 IS NULL OR packageDimension2 IS NULL OR packageDimension3 IS NULL)");
         $listingObject->setLimit($pageSize);
+        $count = $listingObject->count();
         while (true) {
             $listingObject->setOffset($offset);
             $products = $listingObject->load();
@@ -73,6 +74,7 @@ class HelloWorldCommand extends AbstractCommand
                 $length = $product->getInheritedField("packageDimension2");
                 $height = $product->getInheritedField("packageDimension3");
                 $desi5000 = $product->getInheritedField("desi5000");
+                echo "Count: $count\n";
                 echo "Name: $name, Iwasku: $iwasku, Variation size: $variationSize, Variation color: $variationColor, WS category: $wsCategory, Weight: $weight, Width: $width, Length: $length, Height: $height, Desi: $desi5000 \n";
             }
             echo "\nProcessed {$offset}\n";
