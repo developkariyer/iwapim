@@ -1,5 +1,4 @@
 {% extends 'base.html.twig' %}
-
 {% block title %} Missing Product Dimensions {% endblock %}
 {% block navbaritems %}{% endblock %}
 {% block header %}{% endblock %}
@@ -7,78 +6,15 @@
 {% block content %}
     <div class="container-fluid mt-4">
         <h1 class="text-center mb-4">Eksik Ürün Boyutları</h1>
-
-        <form id="filterForm">
-            <div class="row">
-                <div class="col-md-4">
-                    <label for="iwasku">IWASKU:</label>
-                    <input type="text" id="iwasku" name="iwasku" class="form-control">
-                </div>
-                <div class="col-md-4">
-                    <label for="category">Kategori:</label>
-                    <input type="text" id="category" name="category" class="form-control">
-                </div>
-                <div class="col-md-4">
-                    <label for="packageStatus">Boyut Durumu:</label>
-                    <select id="packageStatus" name="packageStatus" class="form-control">
-                        <option value="all">Tümü</option>
-                        <option value="with-dimensions">Boyutlu</option>
-                        <option value="without-dimensions">Boyutsuz</option>
-                    </select>
-                </div>
-            </div>
-            <button type="submit" class="btn btn-primary mt-3">Filtrele</button>
-        </form>
-
-        <div id="productData" class="mt-4">
-            <!-- Burada veriler gelecektir -->
-        </div>
     </div>
 {% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
     <style>
-        input[type="number"] {
-            max-width: 80px;
-        }
     </style>
 {% endblock %}
 
 {% block body_scripts %}
-    <script>
-        document.getElementById('filterForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            fetchProductData();
-        });
 
-        function fetchProductData(page = 1) {
-            const iwasku = document.getElementById('iwasku').value;
-            const category = document.getElementById('category').value;
-            const packageStatus = document.getElementById('packageStatus').value;
-
-            const url = new URL('/productDimensions', window.location.origin);
-            const params = new URLSearchParams();
-
-            if (iwasku) params.append('iwasku', iwasku);
-            if (category) params.append('category', category);
-            if (packageStatus && packageStatus !== 'all') params.append('packageStatus', packageStatus);
-            params.append('page', page);
-
-            url.search = params.toString();
-
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    data.products.forEach(product => {
-                        console.log(`ID: ${product.id}, Name: ${product.name}`);
-                    });
-                })
-                .catch(error => {
-                    console.error('Hata:', error);
-                });
-        }
-        fetchProductData();
-    </script>
 {% endblock %}
