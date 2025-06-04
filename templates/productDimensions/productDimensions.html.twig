@@ -6,6 +6,8 @@
 {% block content %}
     <div class="container-fluid mt-4">
         <h1 class="text-center mb-4">Ürün Boyutları Yönetimi</h1>
+
+        <!-- Filtreleme Formu -->
         <div class="card mb-4">
             <div class="card-body">
                 <form id="filterForm" class="row g-3">
@@ -53,18 +55,41 @@
                     </thead>
                     <tbody>
                     {% for product in products %}
-                        <tr>
+                        <tr data-product-id="{{ product.id }}">
                             <td>{{ product.id }}</td>
                             <td>{{ product.name }}</td>
                             <td>{{ product.iwasku }}</td>
                             <td>{{ product.variationSize }}</td>
                             <td>{{ product.variationColor }}</td>
-                            <td>{{ product.wsCategory }}</td>
-                            <td>{{ product.weight }}</td>
-                            <td>{% if product.width %}{{ product.width }}{% else %}<span class="text-danger">Eksik</span>{% endif %}</td>
-                            <td>{% if product.length %}{{ product.length }}{% else %}<span class="text-danger">Eksik</span>{% endif %}</td>
-                            <td>{% if product.height %}{{ product.height }}{% else %}<span class="text-danger">Eksik</span>{% endif %}</td>
-                            <td>{{ product.desi5000 }}</td>
+                            <td>
+                                <input type="text" class="form-control form-control-sm editable-field"
+                                       data-field="wsCategory" value="{{ product.wsCategory }}" />
+                            </td>
+                            <td>
+                                <input type="number" step="0.01" class="form-control form-control-sm editable-field"
+                                       data-field="weight" value="{{ product.weight }}"
+                                       placeholder="Ağırlık" />
+                            </td>
+                            <td>
+                                <input type="number" step="0.01" class="form-control form-control-sm editable-field"
+                                       data-field="width" value="{{ product.width }}"
+                                       placeholder="Genişlik" />
+                            </td>
+                            <td>
+                                <input type="number" step="0.01" class="form-control form-control-sm editable-field"
+                                       data-field="length" value="{{ product.length }}"
+                                       placeholder="Uzunluk" />
+                            </td>
+                            <td>
+                                <input type="number" step="0.01" class="form-control form-control-sm editable-field"
+                                       data-field="height" value="{{ product.height }}"
+                                       placeholder="Yükseklik" />
+                            </td>
+                            <td>
+                                <input type="number" step="0.01" class="form-control form-control-sm editable-field"
+                                       data-field="desi5000" value="{{ product.desi5000 }}"
+                                       placeholder="Desi5000" />
+                            </td>
                             <td>
                                 <button class="btn btn-sm btn-primary save-dimensions" data-product-id="{{ product.id }}">Kaydet</button>
                             </td>
@@ -125,8 +150,17 @@
         .table th, .table td {
             vertical-align: middle;
         }
-        .text-danger {
-            font-weight: bold;
+        .form-control-sm {
+            height: calc(1.5em + 0.5rem + 2px);
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        .editable-field.changed {
+            background-color: #fff3cd;
+        }
+        .editable-field:invalid {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
         }
     </style>
 {% endblock %}
@@ -143,17 +177,38 @@
                     window.location.href = currentUrl.toString();
                 });
             });
+            document.querySelectorAll('.editable-field').forEach(function(input) {
+                const originalValue = input.value;
+                input.addEventListener('change', function() {
+                    if (this.value !== originalValue) {
+                        this.classList.add('changed');
+                    } else {
+                        this.classList.remove('changed');
+                    }
+                });
+            });
             document.querySelectorAll('.save-dimensions').forEach(function(button) {
                 button.addEventListener('click', function() {
                     const productId = this.getAttribute('data-product-id');
-                    console.log('Ürün ID:', productId, 'için kaydetme işlemi başlatılacak');
+                    const row = document.querySelector(`tr[data-product-id="${productId}"]`);
+                    const updatedData = {};
+                    row.querySelectorAll('.editable-field').forEach(function(input) {
+                        if (input.classList.contains('changed')) {
+                            const fieldName = input.getAttribute('data-field');
+                            updatedData[fieldName] = input.value;
+                        }
+                    });
+                    if (Object.keys(updatedData).length > 0) {
+                        console.log(`Ürün ID ${productId} için değişiklikler:`, updatedData);
+                        alert('Değişiklikler kaydedildi (Bu sadece bir bildirimdir, gerçek kayıt işlemi için API entegrasyonu eklenecek)');
+                    } else {
+                        alert('Değişiklik yapılmadı.');
+                    }
                 });
             });
-
             document.getElementById('filterForm').addEventListener('submit', function(e) {
                 const currentUrl = new URL(window.location.href);
                 currentUrl.searchParams.delete('page');
-
                 const formData = new FormData(this);
                 for (const [key, value] of formData.entries()) {
                     if (value) {
@@ -162,7 +217,6 @@
                         currentUrl.searchParams.delete(key);
                     }
                 }
-
                 window.location.href = currentUrl.toString();
                 e.preventDefault();
             });
