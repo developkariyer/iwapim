@@ -425,7 +425,8 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     
     public function downloadInventory(): void
     {
-        $this->downloadCategories();
+        //$this->downloadCategories();
+        $this->getCategoryAttributesAndSaveDatabase(80455057);
     }
 
     private function downloadCategories(): void
@@ -482,5 +483,19 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                     category_name = VALUES(category_name)";
             Utility::executeSql($sql, ['id' => $id, 'category_name' => $category['name']]);
         }
+    }
+
+    private function getCategoryAttributesAndSaveDatabase($categoryId): void
+    {
+        $response = $this->httpClient->request('GET', "https://mpop.hepsiburada.com/product/api/categories/{$categoryId}/attributes", [
+            'headers' => [
+                'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
+                "User-Agent" => "colorfullworlds_dev",
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json'
+            ]
+        ]);
+        print_r($response->toArray());
+
     }
 }
