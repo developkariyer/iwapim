@@ -30,20 +30,12 @@ class ProductDimensionsController extends FrontendController
      */
     public function productDimensionsMainPage(Request $request): Response
     {
-        return $this->render('productDimensions/productDimensions.html.twig');
-    }
-
-    /**
-     * @Route("/product-dimensions-data", name="product_dimensions_data", methods={"GET"})
-     */
-    public function getProductDimensionsData(Request $request): JsonResponse
-    {
+        $pageSize = 50;
+        $offset = 0;
         $iwasku = $request->query->get('iwasku');
         $category = $request->query->get('category');
-        $packageStatus = $request->query->get('packageStatus');
         $page = max(1, (int) $request->query->get('page', 1));
-        $offset = ($page - 1) * 50;
-
+        $offset = ($page - 1) * $pageSize;
         $listingObject = new Product\Listing();
         $listingObject->setUnpublished(false);
         $conditions = "iwasku IS NOT NULL AND iwasku != '' AND (packageWeight IS NOT NULL OR packageDimension1 IS NOT NULL OR packageDimension2 IS NOT NULL OR packageDimension3 IS NOT NULL)";
@@ -53,21 +45,22 @@ class ProductDimensionsController extends FrontendController
         if ($category) {
             $conditions .= " AND productCategory = '" . $category . "'";
         }
+        $packageStatus = $request->query->get('packageStatus');
         if ($packageStatus === 'with-dimensions') {
-            $conditions .= " AND (packageDimension1 IS NOT NULL OR packageDimension2 IS NOT NULL OR packageDimension3 IS NOT NULL)";
+            $conditions .= " AND packageDimension1 IS NOT NULL AND packageDimension2 IS NOT NULL AND packageDimension3 IS NOT NULL";
         } elseif ($packageStatus === 'without-dimensions') {
-            $conditions .= " AND (packageDimension1 IS NULL AND packageDimension2 IS NULL AND packageDimension3 IS NULL)";
+            $conditions .= " AND (packageDimension1 IS NULL OR packageDimension2 IS NULL OR packageDimension3 IS NULL)";
         }
-
         $listingObject->setCondition($conditions);
-        $listingObject->setLimit(50);
+        $listingObject->setLimit($pageSize);
         $listingObject->setOffset($offset);
-
         $products = $listingObject->load();
         $count = $listingObject->count();
         $productData = [];
-
         foreach ($products as $product) {
+            if ($product->level() != 1 || !$product instanceof Product) {
+                continue;
+            }
             $productData[] = [
                 'id' => $product->getId(),
                 'name' => $product->getInheritedField("name"),
@@ -82,12 +75,11 @@ class ProductDimensionsController extends FrontendController
                 'desi5000' => $product->getInheritedField("desi5000")
             ];
         }
-
-        return new JsonResponse([
+        return $this->render('productDimensions/productDimensions.html.twig', [
             'products' => $productData,
             'total' => $count,
             'page' => $page,
-            'pageSize' => 50
+            'pageSize' => $pageSize
         ]);
     }
 

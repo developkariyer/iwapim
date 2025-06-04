@@ -57,7 +57,7 @@
             const category = document.getElementById('category').value;
             const packageStatus = document.getElementById('packageStatus').value;
 
-            const url = new URL('/product-dimensions-data', window.location.origin);
+            const url = new URL('/productDimensions', window.location.origin);
             const params = new URLSearchParams();
 
             if (iwasku) params.append('iwasku', iwasku);
