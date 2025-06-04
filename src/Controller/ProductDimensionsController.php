@@ -38,7 +38,7 @@ class ProductDimensionsController extends FrontendController
         $offset = ($page - 1) * $pageSize;
         $listingObject = new Product\Listing();
         $listingObject->setUnpublished(false);
-        $conditions = "iwasku IS NOT NULL AND iwasku != '' AND (packageWeight IS NOT NULL OR packageDimension1 IS NOT NULL OR packageDimension2 IS NOT NULL OR packageDimension3 IS NOT NULL)";
+        $conditions = "iwasku IS NOT NULL AND iwasku != ''";
         if ($iwasku) {
             $conditions .= " AND iwasku LIKE '%" . $iwasku . "%'";
         }
