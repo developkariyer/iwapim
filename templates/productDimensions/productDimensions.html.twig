@@ -78,10 +78,75 @@
             const bsToast = new bootstrap.Toast(toast);
             bsToast.show();
         }
-        if (data.success) {
-            showNotification('Ürün boyutları başarıyla kaydedildi');
-        } else {
-            showNotification('Kaydederken hata oluştu: ' + (data.message || 'Bilinmeyen hata'), false);
+
+        // REMOVE THESE LINES - They're using 'data' outside of any function context
+        // if (data.success) {
+        //     showNotification('Ürün boyutları başarıyla kaydedildi');
+        // } else {
+        //     showNotification('Kaydederken hata oluştu: ' + (data.message || 'Bilinmeyen hata'), false);
+        // }
+
+        function saveProductDimensions(row) {
+            const productId = row.dataset.productId;
+            const saveBtn = row.querySelector('.save-btn');
+            const spinner = row.querySelector('.spinner-border');
+
+            // Collect input values
+            const weight = row.querySelector('.weight-input').value;
+            const width = row.querySelector('.width-input').value;
+            const length = row.querySelector('.length-input').value;
+            const height = row.querySelector('.height-input').value;
+
+            // Disable button and show spinner
+            saveBtn.disabled = true;
+            saveBtn.classList.add('d-none');
+            spinner.classList.remove('d-none');
+
+            // Send data to server
+            fetch(`/product-dimensions-save/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    weight: weight,
+                    width: width,
+                    length: length,
+                    height: height
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Re-enable button and hide spinner
+                    saveBtn.disabled = false;
+                    saveBtn.classList.remove('d-none');
+                    spinner.classList.add('d-none');
+
+                    if (data.success) {
+                        showNotification('Ürün boyutları başarıyla kaydedildi');
+
+                        // Update desi calculation if dimensions are provided
+                        if (width && length && height) {
+                            const desi = (parseFloat(width) * parseFloat(length) * parseFloat(height)) / 5000;
+                            row.cells[7].textContent = desi.toFixed(2);
+                        }
+
+                        // Visual feedback
+                        row.classList.add('table-success');
+                        setTimeout(() => {
+                            row.classList.remove('table-success');
+                        }, 2000);
+                    } else {
+                        showNotification('Kaydederken hata oluştu: ' + (data.message || 'Bilinmeyen hata'), false);
+                    }
+                })
+                .catch(error => {
+                    console.error('Hata:', error);
+                    saveBtn.disabled = false;
+                    saveBtn.classList.remove('d-none');
+                    spinner.classList.add('d-none');
+                    showNotification('Kaydederken bir hata oluştu', false);
+                });
         }
 
         function fetchData(page = 1) {
@@ -149,6 +214,7 @@
                         `<tr><td colspan="9" class="text-center text-danger">Hata oluştu: ${error.message}</td></tr>`;
                 });
         }
+
         function renderPagination() {
             const totalPages = Math.ceil(totalItems / pageSize);
             const pagination = document.getElementById('pagination');
@@ -189,6 +255,7 @@
                 pagination.appendChild(nextLi);
             }
         }
+
         document.addEventListener('DOMContentLoaded', () => fetchData());
     </script>
 {% endblock %}
