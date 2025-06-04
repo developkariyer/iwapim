@@ -87,22 +87,22 @@
                             <td>
                                 <input type="number" step="0.01" class="form-control form-control-sm editable-field"
                                        data-field="width" value="{{ product.width }}"
-                                       placeholder="EN" />
+                                       placeholder="{% if product.width is empty %}Eksik!{% else %}EN{% endif %}" />
                             </td>
                             <td>
                                 <input type="number" step="0.01" class="form-control form-control-sm editable-field"
                                        data-field="length" value="{{ product.length }}"
-                                       placeholder="BOY" />
+                                       placeholder="{% if product.length is empty %}Eksik!{% else %}BOY{% endif %}" />
                             </td>
                             <td>
                                 <input type="number" step="0.01" class="form-control form-control-sm editable-field"
                                        data-field="height" value="{{ product.height }}"
-                                       placeholder="Yükseklik" />
+                                       placeholder="{% if product.height is empty %}Eksik!{% else %}Yükseklik{% endif %}" />
                             </td>
                             <td>
                                 <input type="number" step="0.01" class="form-control form-control-sm editable-field"
                                        data-field="weight" value="{{ product.weight }}"
-                                       placeholder="Ağırlık" />
+                                       placeholder="{% if product.weight is empty %}Eksik!{% else %}Ağırlık{% endif %}" />
                             </td>
                             <td>{{ product.desi5000 }}</td>
                             <td>
@@ -185,6 +185,14 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
+        .is-invalid {
+            border-color: #dc3545 !important;
+            background-color: rgba(220, 53, 69, 0.1) !important;
+        }
+        .is-invalid::placeholder {
+            color: #dc3545 !important;
+            font-weight: bold !important;
+        }
         .table th, .table td {
             vertical-align: middle;
         }
