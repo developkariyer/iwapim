@@ -4,32 +4,47 @@
 {% block header %}{% endblock %}
 
 {% block content %}
-    <div class="container mt-4">
-        <h2 class="text-center mb-4">📦 Eksik Ürün Boyutları</h2>
-        <div class="table-responsive">
-            <table class="table table-bordered align-middle" id="productTable">
-                <thead class="table-light">
-                <tr>
-                    <th>Ad</th>
-                    <th>SKU</th>
-                    <th>Kategori</th>
-                    <th>Ağırlık</th>
-                    <th>Genişlik</th>
-                    <th>Uzunluk</th>
-                    <th>Yükseklik</th>
-                    <th>Desi</th>
-                    <th>Kaydet</th>
-                </tr>
-                </thead>
-                <tbody id="productTableBody">
-                <tr><td colspan="9" class="text-center">Yükleniyor...</td></tr>
-                </tbody>
-            </table>
-        </div>
+    <div class="container-fluid mt-4">
+        <h1 class="text-center mb-4">Eksik Ürün Boyutları</h1>
 
+        <!-- Filtreleme Formu -->
+        <form id="filterForm" method="get">
+            <div class="row">
+                <div class="col-md-4">
+                    <input type="text" class="form-control" id="iwasku" placeholder="IWASKU" />
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" id="category" placeholder="Kategori" />
+                </div>
+                <div class="col-md-4">
+                    <select class="form-control" id="packageStatus">
+                        <option value="">Tüm Paketler</option>
+                        <option value="completed">Tamamlanmış</option>
+                        <option value="incomplete">Eksik</option>
+                    </select>
+                </div>
+                <div class="col-md-12 mt-2">
+                    <button type="button" class="btn btn-primary" onclick="applyFilters()">Filtrele</button>
+                </div>
+            </div>
+        </form>
+        <table class="table mt-4">
+            <thead>
+            <tr>
+                <th>Ad</th>
+                <th>Varyasyon</th>
+                <th>Kategori</th>
+                <th>Ağırlık</th>
+                <th>Boyut 1</th>
+                <th>Boyut 2</th>
+                <th>Boyut 3</th>
+                <th>Kaydet</th>
+            </tr>
+            </thead>
+            <tbody id="productTableBody"></tbody>
+        </table>
         <nav>
-            <ul class="pagination justify-content-center mt-3" id="pagination">
-            </ul>
+            <ul class="pagination" id="pagination"></ul>
         </nav>
     </div>
 {% endblock %}
@@ -48,53 +63,51 @@
         const pageSize = 50;
         let currentPage = 1;
         let totalItems = 0;
-        function fetchData(page = 1) {
+        function fetchData(page = 1, iwasku = '', category = '', packageStatus = '') {
             currentPage = page;
-            fetch(`/product-dimensions-data?page=${page}`)
+            fetch(`/product-dimensions/filter?page=${page}&iwasku=${iwasku}&category=${category}&packageStatus=${packageStatus}`)
                 .then(response => response.json())
                 .then(data => {
                     totalItems = data.total;
                     const tbody = document.getElementById('productTableBody');
                     tbody.innerHTML = '';
-
-                    if (data.products.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="9" class="text-center">Ürün bulunamadı</td></tr>';
-                        return;
-                    }
-
                     data.products.forEach(product => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                        <td>${product.name}</td>
-                        <td>${product.iwasku}</td>
-                        <td>${product.category}</td>
-                        <td><input type="number" step="0.01" value="${product.weight ?? ''}" class="form-control"></td>
-                        <td><input type="number" step="0.1" value="${product.width ?? ''}" class="form-control"></td>
-                        <td><input type="number" step="0.1" value="${product.length ?? ''}" class="form-control"></td>
-                        <td><input type="number" step="0.1" value="${product.height ?? ''}" class="form-control"></td>
-                        <td>${product.desi ?? '-'}</td>
-                        <td><button class="btn btn-primary btn-sm">Kaydet</button></td>
-                    `;
+                    <td>${product.name}</td>
+                    <td>${product.variationSize}</td>
+                    <td>${product.category}</td>
+                    <td><input type="number" value="${product.packageWeight || ''}" /></td>
+                    <td><input type="number" value="${product.packageDimension1 || ''}" /></td>
+                    <td><input type="number" value="${product.packageDimension2 || ''}" /></td>
+                    <td><input type="number" value="${product.packageDimension3 || ''}" /></td>
+                    <td><button type="button" onclick="saveProduct(${product.id})">Kaydet</button></td>
+                `;
                         tbody.appendChild(row);
                     });
-
-                    renderPagination();
-                });
+                    updatePagination(data.total);
+                })
+                .catch(error => console.error('Hata:', error));
         }
-        function renderPagination() {
-            const totalPages = Math.ceil(totalItems / pageSize);
-            const pagination = document.getElementById('pagination');
-            pagination.innerHTML = '';
+        function updatePagination(total) {
+            const totalPages = Math.ceil(total / 50);
+            const paginationElement = document.getElementById('pagination');
+            paginationElement.innerHTML = '';
             for (let i = 1; i <= totalPages; i++) {
-                const li = document.createElement('li');
-                li.className = 'page-item' + (i === currentPage ? ' active' : '');
-                li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-                li.addEventListener('click', e => {
-                    e.preventDefault();
-                    fetchData(i);
-                });
-                pagination.appendChild(li);
+                const pageItem = document.createElement('li');
+                pageItem.classList.add('page-item');
+                pageItem.innerHTML = `<a class="page-link" href="#" onclick="fetchData(${i})">${i}</a>`;
+                paginationElement.appendChild(pageItem);
             }
+        }
+        function saveProduct(productId) {
+            alert('Kaydedildi: ' + productId);
+        }
+        function applyFilters() {
+            const iwasku = document.getElementById('iwasku').value;
+            const category = document.getElementById('category').value;
+            const packageStatus = document.getElementById('packageStatus').value;
+            fetchData(1, iwasku, category, packageStatus);
         }
         fetchData();
     </script>

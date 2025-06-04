@@ -40,53 +40,50 @@ class ProductDimensionsController extends FrontendController
         $iwasku = $request->query->get('iwasku');
         $category = $request->query->get('category');
         $packageStatus = $request->query->get('packageStatus');
-        $page = max(0, (int)$request->query->get('page', 0));
+        $page = max(0, (int)$request->query->get('page', 1));
         $limit = max(1, (int)$request->query->get('limit', 50));
-        $offset = $page * $limit;
-        $conditions = ["iwasku IS NOT NULL AND iwasku != ''"];
+        $condition = "iwasku IS NOT NULL AND iwasku != ''";
         if ($iwasku) {
-            $conditions[] = "iwasku LIKE '%" . addslashes($iwasku) . "%'";
+            $condition .= " AND iwasku LIKE :iwasku";
         }
         if ($category) {
-            $conditions[] = "productCategory = '" . addslashes($category) . "'";
+            $condition .= " AND productCategory = :category";
         }
-        if ($packageStatus === 'all_empty') {
-            $conditions[] = "packageWeight IS NULL AND packageDimension1 IS NULL AND packageDimension2 IS NULL AND packageDimension3 IS NULL";
-        } elseif ($packageStatus === 'any_empty') {
-            $conditions[] = "packageWeight IS NULL OR packageDimension1 IS NULL OR packageDimension2 IS NULL OR packageDimension3 IS NULL";
-        } elseif ($packageStatus === 'all_filled') {
-            $conditions[] = "packageWeight IS NOT NULL AND packageDimension1 IS NOT NULL AND packageDimension2 IS NOT NULL AND packageDimension3 IS NOT NULL";
-        }
-        $listing = new Product\Listing();
-        $listing->setUnpublished(false);
-        $listing->setCondition(implode(' AND ', $conditions));
-        $listing->setLimit($limit);
-        $listing->setOffset($offset);
-        $totalCount = $listing->count();
-        $products = $listing->load();
-        $result = [];
-        foreach ($products as $product) {
-            if (!$product instanceof Product || $product->level() !== 1) {
-                continue;
+        if ($packageStatus) {
+            if ($packageStatus === 'completed') {
+                $condition .= " AND (packageWeight IS NOT NULL OR packageDimension1 IS NOT NULL)";
+            } else {
+                $condition .= " AND (packageWeight IS NULL OR packageDimension1 IS NULL)";
             }
-            $result[] = [
-                'name' => $product->getInheritedField("name"),
-                'iwasku' => $product->getInheritedField("iwasku"),
-                'variationSize' => $product->getVariationSize(),
-                'variationColor' => $product->getVariationColor(),
-                'category' => $product->getInheritedField("productCategory"),
-                'weight' => $product->getInheritedField("packageWeight"),
-                'width' => $product->getInheritedField("packageDimension1"),
-                'length' => $product->getInheritedField("packageDimension2"),
-                'height' => $product->getInheritedField("packageDimension3"),
-                'desi5000' => $product->getInheritedField("desi5000"),
-            ];
         }
+        $listingObject = new Product\Listing();
+        $listingObject->setUnpublished(false);
+        $listingObject->setCondition($condition);
+        $listingObject->setLimit($limit);
+        $listingObject->setOffset(($page - 1) * $limit);
+        if ($iwasku) {
+            $listingObject->setParameter('iwasku', '%'.$iwasku.'%');
+        }
+        if ($category) {
+            $listingObject->setParameter('category', $category);
+        }
+        $products = $listingObject->load();
+        $totalItems = $listingObject->count();
+        $productData = array_map(function($product) {
+            return [
+                'id' => $product->getId(),
+                'name' => $product->getInheritedField('name'),
+                'variationSize' => $product->getVariationSize(),
+                'category' => $product->getInheritedField('productCategory'),
+                'packageWeight' => $product->getInheritedField('packageWeight'),
+                'packageDimension1' => $product->getInheritedField('packageDimension1'),
+                'packageDimension2' => $product->getInheritedField('packageDimension2'),
+                'packageDimension3' => $product->getInheritedField('packageDimension3')
+            ];
+        }, $products);
         return new JsonResponse([
-            'total' => $totalCount,
-            'page' => $page,
-            'limit' => $limit,
-            'products' => $result,
+            'total' => $totalItems,
+            'products' => $productData
         ]);
     }
 
