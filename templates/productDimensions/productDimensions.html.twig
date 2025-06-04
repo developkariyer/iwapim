@@ -32,8 +32,8 @@
                                 <label for="packageStatus" class="form-label small">Boyut Durumu</label>
                                 <select class="form-select form-select-sm" id="packageStatus" name="packageStatus">
                                     <option value="">Tümü</option>
-                                    <option value="with-dimensions" {% if app.request.query.get('packageStatus') == 'with-dimensions' %}selected{% endif %}>Boyutlu</option>
-                                    <option value="without-dimensions" {% if app.request.query.get('packageStatus') == 'without-dimensions' %}selected{% endif %}>Boyutsuz</option>
+                                    <option value="with-dimensions" {% if app.request.query.get('packageStatus') == 'with-dimensions' %}selected{% endif %}>Boyut Mevcut</option>
+                                    <option value="without-dimensions" {% if app.request.query.get('packageStatus') == 'without-dimensions' %}selected{% endif %}>Boyut Eksik</option>
                                 </select>
                             </div>
                             <div class="col-sm-4 d-flex align-items-end">
