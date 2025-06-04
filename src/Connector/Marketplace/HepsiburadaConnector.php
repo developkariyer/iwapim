@@ -443,7 +443,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                     'leaf' => 1
                 ]
             ]);
-            print_r($response->toContent());
+            print_r($response->getContent());
 
 
 //            $this->putToCache('categories.json', $response->toArray());
