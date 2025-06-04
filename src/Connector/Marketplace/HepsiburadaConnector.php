@@ -510,6 +510,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             echo "Error: $isSuccess\n";
             return;
         };
+        $data = $data['data'];
         if (isset($data['attributes']) || !empty($data['attributes'])) {
             $attributes = $data['attributes'];
         }
