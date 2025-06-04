@@ -553,4 +553,5 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         }
         print_r(json_encode($result));
     }
+
 }
