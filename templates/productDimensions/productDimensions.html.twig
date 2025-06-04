@@ -58,7 +58,7 @@
 
         {% if products is defined and products|length > 0 %}
             <div class="table-responsive">
-                <table id="productTable" class="table table-striped table-bordered table-hover table-sm compact-table">
+                <table id="productTable" class="table table-striped table-bordered table-hover table-sm ">
                     <thead class="thead-dark">
                     <tr>
                         <th class="d-none">ID</th>
@@ -185,17 +185,9 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
-        .compact-table {
+        .table {
             width: 100%;
-            table-layout: fixed;
-        }
-
-        .compact-table th, .compact-table td {
-            vertical-align: middle;
-            padding: 0.3rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            table-layout: auto;
         }
         .is-empty {
             border-color: #dc3545 !important;
