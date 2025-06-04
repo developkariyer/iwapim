@@ -33,59 +33,40 @@ class ProductDimensionsController extends FrontendController
     }
 
     /**
-     * @Route("/productDimensions/filter", name="product_dimensions_filtered", methods={"GET"})
+     * @Route("/product-dimensions-data", name="product_dimensions_data", methods={"GET"})
+     * @return Response
      */
-    public function filterProductDimensions(Request $request): JsonResponse
+    public function getProductDimensionsData(Request $request): Response
     {
-        $iwasku = $request->query->get('iwasku');
-        $category = $request->query->get('category');
-        $packageStatus = $request->query->get('packageStatus');
-        $page = max(0, (int)$request->query->get('page', 1));
-        $limit = max(1, (int)$request->query->get('limit', 50));
-        $condition = "iwasku IS NOT NULL AND iwasku != ''";
-        if ($iwasku) {
-            $condition .= " AND iwasku LIKE :iwasku";
-        }
-        if ($category) {
-            $condition .= " AND productCategory = :category";
-        }
-        if ($packageStatus) {
-            if ($packageStatus === 'completed') {
-                $condition .= " AND (packageWeight IS NOT NULL OR packageDimension1 IS NOT NULL)";
-            } else {
-                $condition .= " AND (packageWeight IS NULL OR packageDimension1 IS NULL)";
-            }
-        }
-        $listingObject = new Product\Listing();
-        $listingObject->setUnpublished(false);
-        $listingObject->setCondition($condition);
-        $listingObject->setLimit($limit);
-        $listingObject->setOffset(($page - 1) * $limit);
-        if ($iwasku) {
-            $listingObject->setParameter('iwasku', '%'.$iwasku.'%');
-        }
-        if ($category) {
-            $listingObject->setParameter('category', $category);
-        }
-        $products = $listingObject->load();
-        $totalItems = $listingObject->count();
-        $productData = array_map(function($product) {
-            return [
+        $page = max(1, (int)$request->query->get('page', 1));
+        $pageSize = 50;
+        $offset = ($page - 1) * $pageSize;
+        $listing = new Product\Listing();
+        $listing->setCondition("packageDimension1 IS NULL OR packageDimension2 IS NULL OR packageDimension3 IS NULL OR packageWeight IS NULL");
+        $listing->setLimit($pageSize);
+        $listing->setOffset($offset);
+        $total = $listing->getTotalCount();
+        $products = $listing->load();
+        $data = [
+            'total' => $total,
+            'products' => []
+        ];
+        foreach ($products as $product) {
+            $data['products'][] = [
                 'id' => $product->getId(),
-                'name' => $product->getInheritedField('name'),
-                'variationSize' => $product->getVariationSize(),
-                'category' => $product->getInheritedField('productCategory'),
-                'packageWeight' => $product->getInheritedField('packageWeight'),
-                'packageDimension1' => $product->getInheritedField('packageDimension1'),
-                'packageDimension2' => $product->getInheritedField('packageDimension2'),
-                'packageDimension3' => $product->getInheritedField('packageDimension3')
+                'name' => $product->getName() ?: '',
+                'iwasku' => $product->getIwasku() ?: '',
+                'category' => $product->getProductCategory() ? $product->getProductCategory()->getName() : '',
+                'weight' => $product->getPackageWeight(),
+                'width' => $product->getPackageDimension1(),
+                'length' => $product->getPackageDimension2(),
+                'height' => $product->getPackageDimension3(),
+                'desi' => $this->calculateDesi($product)
             ];
-        }, $products);
-        return new JsonResponse([
-            'total' => $totalItems,
-            'products' => $productData
-        ]);
+        }
+        return $this->json($data);
     }
+
 
 
 }

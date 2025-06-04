@@ -4,34 +4,23 @@
 {% block header %}{% endblock %}
 
 {% block content %}
-    <div class="container mt-4">
-        <h2 class="text-center mb-4">📦 Eksik Ürün Boyutları</h2>
-        <div class="table-responsive">
-            <table class="table table-bordered align-middle" id="productTable">
-                <thead class="table-light">
-                <tr>
-                    <th>Ad</th>
-                    <th>SKU</th>
-                    <th>Kategori</th>
-                    <th>Ağırlık</th>
-                    <th>Genişlik</th>
-                    <th>Uzunluk</th>
-                    <th>Yükseklik</th>
-                    <th>Desi</th>
-                    <th>Kaydet</th>
-                </tr>
-                </thead>
-                <tbody id="productTableBody">
-                <tr><td colspan="9" class="text-center">Yükleniyor...</td></tr>
-                </tbody>
-            </table>
+        <div class="container mt-4">
+            <h2 class="text-center mb-4">📦 Eksik Ürün Boyutları</h2>
+            <div class="toast-container position-fixed top-0 end-0 p-3">
+                <div id="notification" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <strong class="me-auto" id="toastTitle">Bildirim</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body" id="toastMessage">
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle" id="productTable">
+                </table>
+            </div>
         </div>
-
-        <nav>
-            <ul class="pagination justify-content-center mt-3" id="pagination">
-            </ul>
-        </nav>
-    </div>
 {% endblock %}
 
 {% block stylesheets %}
@@ -48,10 +37,39 @@
         const pageSize = 50;
         let currentPage = 1;
         let totalItems = 0;
+
+        function showNotification(message, isSuccess = true) {
+            const toast = document.getElementById('notification');
+            const toastTitle = document.getElementById('toastTitle');
+            const toastMessage = document.getElementById('toastMessage');
+            toastTitle.textContent = isSuccess ? 'Başarılı' : 'Hata';
+            toastMessage.textContent = message;
+            toast.classList.remove('bg-success', 'bg-danger', 'text-white');
+            if (isSuccess) {
+                toast.classList.add('bg-success', 'text-white');
+            } else {
+                toast.classList.add('bg-danger', 'text-white');
+            }
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+        }
+        if (data.success) {
+            showNotification('Ürün boyutları başarıyla kaydedildi');
+        } else {
+            showNotification('Kaydederken hata oluştu: ' + (data.message || 'Bilinmeyen hata'), false);
+        }
+
         function fetchData(page = 1) {
             currentPage = page;
+            const loadingRow = '<tr><td colspan="9" class="text-center">Yükleniyor...</td></tr>';
+            document.getElementById('productTableBody').innerHTML = loadingRow;
             fetch(`/product-dimensions-data?page=${page}`)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Veri yüklenirken hata oluştu: ' + response.status);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     totalItems = data.total;
                     const tbody = document.getElementById('productTableBody');
@@ -64,28 +82,68 @@
 
                     data.products.forEach(product => {
                         const row = document.createElement('tr');
+                        row.dataset.productId = product.id;
                         row.innerHTML = `
-                        <td>${product.name}</td>
-                        <td>${product.iwasku}</td>
-                        <td>${product.category}</td>
-                        <td><input type="number" step="0.01" value="${product.weight ?? ''}" class="form-control"></td>
-                        <td><input type="number" step="0.1" value="${product.width ?? ''}" class="form-control"></td>
-                        <td><input type="number" step="0.1" value="${product.length ?? ''}" class="form-control"></td>
-                        <td><input type="number" step="0.1" value="${product.height ?? ''}" class="form-control"></td>
-                        <td>${product.desi ?? '-'}</td>
-                        <td><button class="btn btn-primary btn-sm">Kaydet</button></td>
-                    `;
+                            <td>${product.name || '-'}</td>
+                            <td>${product.iwasku || '-'}</td>
+                            <td>${product.category || '-'}</td>
+                            <td>
+                                <input type="number" step="0.01" value="${product.weight !== null ? product.weight : ''}"
+                                    class="form-control weight-input">
+                            </td>
+                            <td>
+                                <input type="number" step="0.1" value="${product.width !== null ? product.width : ''}"
+                                    class="form-control width-input">
+                            </td>
+                            <td>
+                                <input type="number" step="0.1" value="${product.length !== null ? product.length : ''}"
+                                    class="form-control length-input">
+                            </td>
+                            <td>
+                                <input type="number" step="0.1" value="${product.height !== null ? product.height : ''}"
+                                    class="form-control height-input">
+                            </td>
+                            <td>${product.desi !== null ? product.desi.toFixed(2) : '-'}</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm save-btn">Kaydet</button>
+                                <div class="spinner-border spinner-border-sm d-none" role="status">
+                                    <span class="visually-hidden">Yükleniyor...</span>
+                                </div>
+                            </td>
+                        `;
                         tbody.appendChild(row);
+                        const saveBtn = row.querySelector('.save-btn');
+                        saveBtn.addEventListener('click', () => saveProductDimensions(row));
                     });
 
                     renderPagination();
+                })
+                .catch(error => {
+                    console.error('Hata:', error);
+                    document.getElementById('productTableBody').innerHTML =
+                        `<tr><td colspan="9" class="text-center text-danger">Hata oluştu: ${error.message}</td></tr>`;
                 });
         }
         function renderPagination() {
             const totalPages = Math.ceil(totalItems / pageSize);
             const pagination = document.getElementById('pagination');
             pagination.innerHTML = '';
-            for (let i = 1; i <= totalPages; i++) {
+            if (currentPage > 1) {
+                const prevLi = document.createElement('li');
+                prevLi.className = 'page-item';
+                prevLi.innerHTML = '<a class="page-link" href="#">&laquo;</a>';
+                prevLi.addEventListener('click', e => {
+                    e.preventDefault();
+                    fetchData(currentPage - 1);
+                });
+                pagination.appendChild(prevLi);
+            }
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, startPage + 4);
+            if (endPage - startPage < 4) {
+                startPage = Math.max(1, endPage - 4);
+            }
+            for (let i = startPage; i <= endPage; i++) {
                 const li = document.createElement('li');
                 li.className = 'page-item' + (i === currentPage ? ' active' : '');
                 li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
@@ -95,7 +153,17 @@
                 });
                 pagination.appendChild(li);
             }
+            if (currentPage < totalPages) {
+                const nextLi = document.createElement('li');
+                nextLi.className = 'page-item';
+                nextLi.innerHTML = '<a class="page-link" href="#">&raquo;</a>';
+                nextLi.addEventListener('click', e => {
+                    e.preventDefault();
+                    fetchData(currentPage + 1);
+                });
+                pagination.appendChild(nextLi);
+            }
         }
-        fetchData();
+        document.addEventListener('DOMContentLoaded', () => fetchData());
     </script>
 {% endblock %}
