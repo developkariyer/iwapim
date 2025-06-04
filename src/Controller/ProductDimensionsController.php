@@ -25,47 +25,59 @@ class ProductDimensionsController extends FrontendController
 {
     /**
      * @Route("/productDimensions", name="product_dimensions_main_page")
+     * @param Request $request
      * @return Response
      */
-    public function productDimensionsMainPage(): Response
+    public function productDimensionsMainPage(Request $request): Response
     {
-        return $this->render('productDimensions/productDimensions.html.twig');
-    }
-
-    /**
-     * @Route("/product-dimensions-data", name="product_dimensions_data", methods={"GET"})
-     * @return Response
-     */
-    public function getProductDimensionsData(Request $request): Response
-    {
-        $page = max(1, (int)$request->query->get('page', 1));
         $pageSize = 50;
+        $offset = 0;
+        $iwasku = $request->query->get('iwasku');
+        $category = $request->query->get('category');
+        $page = max(1, (int) $request->query->get('page', 1));
         $offset = ($page - 1) * $pageSize;
-        $listing = new Product\Listing();
-        $listing->setCondition("packageDimension1 IS NULL OR packageDimension2 IS NULL OR packageDimension3 IS NULL OR packageWeight IS NULL");
-        $listing->setLimit($pageSize);
-        $listing->setOffset($offset);
-        $total = $listing->count();
-        $products = $listing->load();
-        $data = [
-            'total' => $total,
-            'products' => []
-        ];
+        $listingObject = new Product\Listing();
+        $listingObject->setUnpublished(false);
+        $conditions = "iwasku IS NOT NULL AND iwasku != '' AND (packageWeight IS NOT NULL OR packageDimension1 IS NOT NULL OR packageDimension2 IS NOT NULL OR packageDimension3 IS NOT NULL)";
+        if ($iwasku) {
+            $conditions .= " AND iwasku LIKE '%" . $iwasku . "%'";
+        }
+        if ($category) {
+            $conditions .= " AND productCategory = '" . $category . "'";
+        }
+        $listingObject->setCondition($conditions);
+        $listingObject->setLimit($pageSize);
+        $listingObject->setOffset($offset);
+        $products = $listingObject->load();
+        $count = $listingObject->count();
+        $productData = [];
         foreach ($products as $product) {
-            $data['products'][] = [
+            if ($product->level() != 1 || !$product instanceof Product) {
+                continue;
+            }
+            $productData[] = [
                 'id' => $product->getId(),
-                'name' => $product->getName() ?: '',
-                'iwasku' => $product->getIwasku() ?: '',
-                'category' => $product->getProductCategory() ? $product->getProductCategory()->getName() : '',
-                'weight' => $product->getPackageWeight(),
-                'width' => $product->getPackageDimension1(),
-                'length' => $product->getPackageDimension2(),
-                'height' => $product->getPackageDimension3(),
-                'desi' => $this->calculateDesi($product)
+                'name' => $product->getInheritedField("name"),
+                'iwasku' => $product->getInheritedField("iwasku"),
+                'variationSize' => $product->getVariationSize(),
+                'variationColor' => $product->getVariationColor(),
+                'wsCategory' => $product->getInheritedField("productCategory"),
+                'weight' => $product->getInheritedField("packageWeight"),
+                'width' => $product->getInheritedField("packageDimension1"),
+                'length' => $product->getInheritedField("packageDimension2"),
+                'height' => $product->getInheritedField("packageDimension3"),
+                'desi5000' => $product->getInheritedField("desi5000")
             ];
         }
-        return $this->json($data);
+        return $this->render('productDimensions/productDimensions.html.twig', [
+            'products' => $productData,
+            'total' => $count,
+            'page' => $page,
+            'pageSize' => $pageSize
+        ]);
     }
+
+
 
 
 
