@@ -425,7 +425,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     
     public function downloadInventory(): void
     {
-
+        $this->downloadCategories();
     }
 
     private function downloadCategories(): void
