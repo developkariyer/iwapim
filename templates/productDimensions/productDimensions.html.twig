@@ -167,6 +167,19 @@
             </div>
         </div>
     </div>
+
+    <div id="loadingOverlay" class="position-fixed top-0 start-0 w-100 h-100" style="background-color: rgba(0,0,0,0.5); z-index: 9999; display: none;">
+        <div class="d-flex justify-content-center align-items-center h-100">
+            <div class="card p-4 shadow">
+                <div class="d-flex align-items-center">
+                    <div class="spinner-border text-primary me-3" role="status">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                    <strong>Kaydediliyor, lütfen bekleyin...</strong>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block stylesheets %}
@@ -220,12 +233,25 @@
                 font-size: 0.75rem;
             }
         }
+        #loadingOverlay {
+            backdrop-filter: blur(2px);
+            transition: opacity 0.2s ease-in-out;
+        }
     </style>
 {% endblock %}
 
 {% block body_scripts %}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            function showLoading() {
+                loadingOverlay.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+            function hideLoading() {
+                loadingOverlay.style.display = 'none';
+                document.body.style.overflow = '';
+            }
             var successToast = new bootstrap.Toast(document.getElementById('successToast'), {
                 delay: 3000
             });
@@ -295,11 +321,31 @@
                         }
                     });
                     if (hasChanges) {
-                        console.log('Ürün güncelleme verileri:', JSON.stringify(updatedData));
-                        successToast.show();
-                        row.querySelectorAll('.editable-field.changed').forEach(function(input) {
-                            input.classList.remove('changed');
-                        });
+                        showLoading();
+                        fetch('/api/updateProductDimensions', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(updatedData)
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                hideLoading();
+                                if(data.success) {
+                                    successToast.show();
+                                    row.querySelectorAll('.editable-field.changed').forEach(function(input) {
+                                        input.classList.remove('changed');
+                                    });
+                                } else {
+                                    alert('Hata oluştu: ' + data.message);
+                                }
+                            })
+                            .catch(error => {
+                                hideLoading();
+                                console.error('Error:', error);
+                                alert('İşlem sırasında bir hata oluştu.');
+                            });
                     } else {
                         alert('Değişiklik yapılmadı.');
                     }

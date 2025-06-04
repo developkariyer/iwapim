@@ -98,8 +98,60 @@ class ProductDimensionsController extends FrontendController
         ]);
     }
 
+    /**
+     * @Route("/api/updateProductDimensions", name="product_dimensions_update", methods={"POST"})
+     * @param Request $request
+     * @return Response
+     */
+    public function updateProductDimensions(Request $request): Response
+    {
+        $data = json_decode($request->getContent(), true);
+        $productId = $data['id'] ?? null;
+        $success = false;
+        $message = '';
+        if (!$productId) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Ürün Bulunamadı.'
+            ]);
+        }
+        try {
+            $product = Product::getById($productId);
+            if (!$product || !$product instanceof Product) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Ürün bulunamadı.'
+                ]);
+            }
+            $weight = $data['weight'] ?? null;
+            $width = $data['width'] ?? null;
+            $length = $data['length'] ?? null;
+            $height = $data['height'] ?? null;
+            if ($weight !== null) {
+                $product->setPackageWeight($weight);
+            }
 
+            if ($width !== null) {
+                $product->setPackageDimension1($width);
+            }
 
+            if ($length !== null) {
+                $product->setPackageDimension2($length);
+            }
 
+            if ($height !== null) {
+                $product->setPackageDimension3($height);
+            }
+            $product->save();
+            $success = true;
+            $message = 'Ürün başarıyla güncellendi.';
+        } catch (\Exception $e) {
+            $message = 'Hata oluştu: ' . $e->getMessage();
+        }
+        return $this->json([
+            'success' => $success,
+            'message' => $message
+        ]);
+    }
 
 }
