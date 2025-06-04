@@ -463,10 +463,10 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 sleep(0.2);
                 $categories = array_merge($categories, $data['data']);
             } while($page <= $totalPages);
-            $this->putToCache('categories.json', json_encode($categories));
+            $this->putToCache('categories.json', $categories);
         }
         $categories = $this->getFromCache('categories.json');
     }
-    
+
 
 }
