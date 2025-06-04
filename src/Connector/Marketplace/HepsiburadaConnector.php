@@ -466,7 +466,21 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             $this->putToCache('categories.json', $categories);
         }
         $categories = $this->getFromCache('categories.json');
+        $this->processCategoriesAndSaveDatabase($categories);
     }
 
-
+    public function processCategoriesAndSaveDatabase($categories)
+    {
+        foreach ($categories as $category) {
+            if (!isset($category['categoryId']) || !isset($category['name'])) {
+                continue;
+            }
+            $id = $category['categoryId'];
+            $sql = "INSERT INTO iwa_hepsiburada_categories (id, category_name)
+                VALUES (:id, :category_name)
+                ON DUPLICATE KEY UPDATE
+                    category_name = VALUES(category_name)";
+            Utility::executeSql($sql, ['id' => $id, 'category_name' => $category['name']]);
+        }
+    }
 }
