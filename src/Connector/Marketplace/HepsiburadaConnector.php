@@ -495,7 +495,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'Content-Type' => 'application/json'
             ]
         ]);
-        print_r(json_encode($response->getContent()));
+        print_r($response->getContent());
 
     }
 }
