@@ -82,7 +82,10 @@ class ProductDimensionsController extends FrontendController
         $categories = [];
         try {
             $sql = "SELECT DISTINCT(category) FROM object_query_category WHERE category IS NOT NULL AND category != '' ORDER BY category ASC";
-            $categories = Utility::fetchFromSql($sql);
+            $result = Utility::fetchFromSql($sql);
+            foreach ($result as $category) {
+                $categories[] = $category['category'];
+            }
         } catch (\Exception $e) {
             $categories = [];
         }
