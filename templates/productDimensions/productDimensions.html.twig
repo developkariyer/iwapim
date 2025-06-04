@@ -4,23 +4,48 @@
 {% block header %}{% endblock %}
 
 {% block content %}
-        <div class="container mt-4">
-            <h2 class="text-center mb-4">📦 Eksik Ürün Boyutları</h2>
-            <div class="toast-container position-fixed top-0 end-0 p-3">
-                <div id="notification" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="toast-header">
-                        <strong class="me-auto" id="toastTitle">Bildirim</strong>
-                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                    </div>
-                    <div class="toast-body" id="toastMessage">
-                    </div>
+    <div class="container mt-4">
+        <h2 class="text-center mb-4">📦 Eksik Ürün Boyutları</h2>
+        <div class="toast-container position-fixed top-0 end-0 p-3">
+            <div id="notification" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <strong class="me-auto" id="toastTitle">Bildirim</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body" id="toastMessage">
                 </div>
             </div>
-            <div class="table-responsive">
-                <table class="table table-bordered align-middle" id="productTable">
-                </table>
-            </div>
         </div>
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle" id="productTable">
+                <thead>
+                <tr>
+                    <th>Ürün Adı</th>
+                    <th>Kod</th>
+                    <th>Kategori</th>
+                    <th>Ağırlık (kg)</th>
+                    <th>En (cm)</th>
+                    <th>Boy (cm)</th>
+                    <th>Yükseklik (cm)</th>
+                    <th>Desi</th>
+                    <th>İşlemler</th>
+                </tr>
+                </thead>
+                <tbody id="productTableBody">
+                <tr>
+                    <td colspan="9" class="text-center">Yükleniyor...</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-center mt-4">
+            <nav aria-label="Page navigation">
+                <ul class="pagination" id="pagination">
+                </ul>
+            </nav>
+        </div>
+    </div>
 {% endblock %}
 
 {% block stylesheets %}
