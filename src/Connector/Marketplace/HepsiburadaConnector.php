@@ -377,6 +377,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             sleep(0.2);
         }
     }
+
     public function downloadReturns(): void
     {
         $returns = [];
@@ -424,6 +425,31 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     
     public function downloadInventory(): void
     {
+
+    }
+
+    private function downloadCategories(): void
+    {
+        $categories = $this->getFromCache('categories.json');
+        if (!$categories) {
+            $response = $this->httpClient->request('GET', "https://mpop.hepsiburada.com/product/api/categories/get-all-categories", [
+                'headers' => [
+                    'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
+                    "User-Agent" => "colorfullworlds_dev",
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json'
+                ],
+                'query' => [
+                    'leaf' => 1
+                ]
+            ]);
+            print_r($response->toContent());
+
+
+//            $this->putToCache('categories.json', $response->toArray());
+//            $categories = $this->getFromCache('categories.json');
+        }
+
 
     }
 
