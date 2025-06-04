@@ -487,6 +487,10 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
 
     private function getCategoryAttributesAndSaveDatabase($categoryId): void
     {
+        if ($categoryId === null) {
+            echo "Error: Category ID cannot be null\n";
+            return;
+        }
         $response = $this->httpClient->request('GET', "https://mpop.hepsiburada.com/product/api/categories/{$categoryId}/attributes", [
             'headers' => [
                 'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
@@ -495,7 +499,57 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'Content-Type' => 'application/json'
             ]
         ]);
-        print_r($response->getContent());
-
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+            return;
+        }
+        $data = $response->toArray();
+        $isSuccess = $data['success'];
+        if (!$isSuccess) {
+            echo "Error: $isSuccess\n";
+            return;
+        };
+        if (isset($data['attributes']) || !empty($data['attributes'])) {
+            $attributes = $data['attributes'];
+        }
+        if (isset($data['baseAttributes']) || !empty($data['baseAttributes'])) {
+            $baseAttributes = $data['baseAttributes'];
+        }
+        if (isset($data['variantAttributes']) || !empty($data['variantAttributes'])) {
+            $variantAttributes = $data['variantAttributes'];
+        }
+        $result = [];
+        foreach ($attributes as $attribute) {
+            $result[] = [
+                'attribute_id' => $attribute['id'],
+                'category_id' => $categoryId,
+                'attribute_name' => $attribute['name'] ?? null,
+                'is_required' => $attribute['mandatory'] ?? false,
+                'varianter' => 0,
+                'type' => 'attributes'
+            ];
+        }
+        foreach ($baseAttributes as $attribute) {
+            $result[] = [
+                'attribute_id' => $attribute['id'],
+                'category_id' => $categoryId,
+                'attribute_name' => $attribute['name'] ?? null,
+                'is_required' => $attribute['mandatory'] ?? false,
+                'varianter' => 0,
+                'type' => 'baseAttributes'
+            ];
+        }
+        foreach ($variantAttributes as $attribute) {
+            $result[] = [
+                'attribute_id' => $attribute['id'],
+                'category_id' => $categoryId,
+                'attribute_name' => $attribute['name'] ?? null,
+                'is_required' => $attribute['mandatory'] ?? false,
+                'varianter' => 1,
+                'type' => 'variantAttributes'
+            ];
+        }
+        print_r(json_encode($result));
     }
 }
