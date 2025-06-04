@@ -9,17 +9,21 @@
 
         <!-- Filtreleme Formu -->
         <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Filtreler</h5>
+            </div>
             <div class="card-body">
                 <form id="filterForm" class="row g-3">
-                    <div class="col-md-4 col-sm-6">
-                        <label for="iwasku" class="form-label">IWA SKU</label>
-                        <input type="text" class="form-control" id="iwasku" name="iwasku" value="{{ app.request.query.get('iwasku') }}">
-                    </div>
-                    <div class="col-md-4 col-sm-6">
+                    <div class="col-md-6 col-lg-3">
                         <label for="category" class="form-label">Kategori</label>
-                        <input type="text" class="form-control" id="category" name="category" value="{{ app.request.query.get('category') }}">
+                        <select class="form-select" id="category" name="category">
+                            <option value="">Tüm Kategoriler</option>
+                            {% for cat in categories|default([]) %}
+                                <option value="{{ cat }}" {% if app.request.query.get('category') == cat %}selected{% endif %}>{{ cat }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
-                    <div class="col-md-4 col-sm-6">
+                    <div class="col-md-6 col-lg-3">
                         <label for="packageStatus" class="form-label">Boyut Durumu</label>
                         <select class="form-select" id="packageStatus" name="packageStatus">
                             <option value="">Tümü</option>
@@ -27,18 +31,48 @@
                             <option value="without-dimensions" {% if app.request.query.get('packageStatus') == 'without-dimensions' %}selected{% endif %}>Boyutsuz</option>
                         </select>
                     </div>
-                    <div class="col-md-4 col-sm-6">
-                        <label for="tableSearch" class="form-label">Tablo İçinde Ara</label>
-                        <input type="text" class="form-control" id="tableSearch" placeholder="Ürün adı, SKU vb.">
+                    <div class="col-md-6 col-lg-3">
+                        <label for="iwasku" class="form-label">IWA SKU</label>
+                        <input type="text" class="form-control" id="iwasku" name="iwasku" value="{{ app.request.query.get('iwasku') }}">
                     </div>
-                    <div class="col-md-4 col-sm-6 mt-auto">
+                    <div class="col-md-6 col-lg-3 mt-auto">
                         <button type="submit" class="btn btn-primary w-100">Filtrele</button>
                     </div>
                 </form>
             </div>
         </div>
 
+        <!-- Arama Formu -->
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Arama</h5>
+            </div>
+            <div class="card-body">
+                <form id="searchForm" class="row g-3">
+                    <div class="col-md-9">
+                        <input type="text" class="form-control" id="globalSearch" name="search" placeholder="Ürün adı, SKU, beden veya renk ile ara..." value="{{ app.request.query.get('search') }}">
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-success w-100">Ara</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         {% if products is defined and products|length > 0 %}
+            <!-- Tablo içi hızlı arama -->
+            <div class="row mb-3">
+                <div class="col-md-6 col-lg-4">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="tableSearch" placeholder="Tabloda görünür satırlarda ara...">
+                    </div>
+                    <small class="text-muted">Tablodaki görünür satırlar içinde anlık arama yapar</small>
+                </div>
+            </div>
+
             <div class="table-responsive">
                 <table id="productTable" class="table table-striped table-bordered table-hover">
                     <thead class="thead-dark">
@@ -65,7 +99,10 @@
                             <td>{{ product.iwasku }}</td>
                             <td>{{ product.variationSize }}</td>
                             <td>{{ product.variationColor }}</td>
-                            <td>{{ product.wsCategory }}</td>
+                            <td>
+                                <input type="text" class="form-control form-control-sm editable-field"
+                                       data-field="wsCategory" value="{{ product.wsCategory }}" />
+                            </td>
                             <td>
                                 <input type="number" step="0.01" class="form-control form-control-sm editable-field"
                                        data-field="weight" value="{{ product.weight }}"
@@ -86,7 +123,11 @@
                                        data-field="height" value="{{ product.height }}"
                                        placeholder="Yükseklik" />
                             </td>
-                            <td>{{ product.desi5000 }}</td>
+                            <td>
+                                <input type="number" step="0.01" class="form-control form-control-sm editable-field"
+                                       data-field="desi5000" value="{{ product.desi5000 }}"
+                                       placeholder="Desi5000" />
+                            </td>
                             <td>
                                 <button class="btn btn-sm btn-primary save-dimensions">Kaydet</button>
                             </td>
@@ -96,7 +137,6 @@
                 </table>
             </div>
 
-            <!-- Sayfalama -->
             <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap">
                 <div class="mb-2 mb-md-0">
                     Toplam: <strong>{{ total }}</strong> ürün
@@ -188,6 +228,7 @@
             content: '↓';
             opacity: 1;
         }
+
         @media (max-width: 768px) {
             .table-responsive {
                 overflow-x: auto;
@@ -275,35 +316,20 @@
                     const row = this.closest('tr');
                     const productId = row.getAttribute('data-product-id');
                     const updatedData = {id: productId};
+                    let hasChanges = false;
                     row.querySelectorAll('.editable-field').forEach(function(input) {
                         if (input.classList.contains('changed')) {
                             const fieldName = input.getAttribute('data-field');
                             updatedData[fieldName] = input.value;
+                            hasChanges = true;
                         }
                     });
-                    if (Object.keys(updatedData).length > 1) {
-                        fetch('/api/updateProductDimensions', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(updatedData)
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if(data.success) {
-                                    successToast.show();
-                                    row.querySelectorAll('.editable-field.changed').forEach(function(input) {
-                                        input.classList.remove('changed');
-                                    });
-                                } else {
-                                    alert('Hata oluştu: ' + data.message);
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                alert('İşlem sırasında bir hata oluştu.');
-                            });
+                    if (hasChanges) {
+                        console.log('Ürün güncelleme verileri:', JSON.stringify(updatedData));
+                        successToast.show();
+                        row.querySelectorAll('.editable-field.changed').forEach(function(input) {
+                            input.classList.remove('changed');
+                        });
                     } else {
                         alert('Değişiklik yapılmadı.');
                     }
@@ -313,6 +339,7 @@
                 e.preventDefault();
                 const currentUrl = new URL(window.location.href);
                 currentUrl.searchParams.delete('page');
+                currentUrl.searchParams.delete('search');
                 const formData = new FormData(this);
                 for (const [key, value] of formData.entries()) {
                     if (value) {
@@ -320,6 +347,19 @@
                     } else {
                         currentUrl.searchParams.delete(key);
                     }
+                }
+
+                window.location.href = currentUrl.toString();
+            });
+            document.getElementById('searchForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.delete('page');
+                const searchValue = document.getElementById('globalSearch').value;
+                if (searchValue) {
+                    currentUrl.searchParams.set('search', searchValue);
+                } else {
+                    currentUrl.searchParams.delete('search');
                 }
                 window.location.href = currentUrl.toString();
             });

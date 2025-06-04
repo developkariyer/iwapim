@@ -51,6 +51,10 @@ class ProductDimensionsController extends FrontendController
         } elseif ($packageStatus === 'without-dimensions') {
             $conditions .= " AND (packageDimension1 IS NULL OR packageDimension2 IS NULL OR packageDimension3 IS NULL)";
         }
+        $search = $request->query->get('search');
+        if ($search) {
+            $conditions .= " AND (name LIKE '%" . $search . "%' OR iwasku LIKE '%" . $search . "%' OR variationSize LIKE '%" . $search . "%' OR variationColor LIKE '%" . $search . "%')";
+        }
         $listingObject->setCondition($conditions);
         $listingObject->setLimit($pageSize);
         $listingObject->setOffset($offset);
@@ -75,11 +79,19 @@ class ProductDimensionsController extends FrontendController
                 'desi5000' => $product->getInheritedField("desi5000")
             ];
         }
+        $categories = [];
+        try {
+            $sql = "SELECT DISTINCT(productCategory) FROM object_Product WHERE productCategory IS NOT NULL AND productCategory != '' ORDER BY productCategory ASC";
+            $categories = Utility::fetchFromSql($sql);
+        } catch (\Exception $e) {
+            $categories = [];
+        }
         return $this->render('productDimensions/productDimensions.html.twig', [
             'products' => $productData,
             'total' => $count,
             'page' => $page,
-            'pageSize' => $pageSize
+            'pageSize' => $pageSize,
+            'categories' => $categories
         ]);
     }
 
