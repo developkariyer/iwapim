@@ -45,6 +45,12 @@ class ProductDimensionsController extends FrontendController
         if ($category) {
             $conditions .= " AND productCategory = '" . $category . "'";
         }
+        $packageStatus = $request->query->get('packageStatus');
+        if ($packageStatus === 'with-dimensions') {
+            $conditions .= " AND packageDimension1 IS NOT NULL AND packageDimension2 IS NOT NULL AND packageDimension3 IS NOT NULL";
+        } elseif ($packageStatus === 'without-dimensions') {
+            $conditions .= " AND (packageDimension1 IS NULL OR packageDimension2 IS NULL OR packageDimension3 IS NULL)";
+        }
         $listingObject->setCondition($conditions);
         $listingObject->setLimit($pageSize);
         $listingObject->setOffset($offset);
