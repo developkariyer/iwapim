@@ -185,13 +185,12 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
-        .is-invalid {
+        .is-empty {
             border-color: #dc3545 !important;
-            background-color: rgba(220, 53, 69, 0.1) !important;
+            box-shadow: 0 0 0 0.1rem rgba(220, 53, 69, 0.25) !important;
         }
-        .is-invalid::placeholder {
-            color: #dc3545 !important;
-            font-weight: bold !important;
+        .is-empty::placeholder {
+            color: #6c757d; 
         }
         .table th, .table td {
             vertical-align: middle;
