@@ -45,7 +45,7 @@ class ProductDimensionsController extends FrontendController
         $listing->setCondition("packageDimension1 IS NULL OR packageDimension2 IS NULL OR packageDimension3 IS NULL OR packageWeight IS NULL");
         $listing->setLimit($pageSize);
         $listing->setOffset($offset);
-        $total = $listing->getTotalCount();
+        $total = $listing->count();
         $products = $listing->load();
         $data = [
             'total' => $total,
