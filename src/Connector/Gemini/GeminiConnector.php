@@ -9,46 +9,37 @@ use Symfony\Component\HttpClient\HttpClient;
  * */
 class GeminiConnector
 {
-//    private static array $ciceksepetiGenerationConfig  = [
-//        'responseMimeType' => 'application/json',
-//        'temperature'      => 0.0,
-//        'topP'             => 1.0,
-//        'candidateCount'   => 1,
-//        'stopSequences'    => ["\n\n"],
-//        'presencePenalty'  => 0.0,
-//        'frequencyPenalty' => 0.0,
-//        'responseSchema'   => [
-//            'type'  => 'ARRAY',
-//            'items' => [
-//                'type'       => 'OBJECT',
-//                'properties' => [
-//                    'productName'     => ['type'=>'STRING'],
-//                    'mainProductCode' => ['type'=>'STRING'],
-//                    'stockCode'       => ['type'=>'STRING'],
-//                    'description'     => ['type'=>'STRING'],
-//                    'images'          => [
-//                        'type'     => 'ARRAY',
-//                        'minItems' => 0,
-//                        'maxItems' => 5,
-//                        'items'    => ['type'=>'STRING']
-//                    ],
-//                    'salesPrice'      => ['type'=>'NUMBER'],
-//                    'categoryId'      => ['type'=>'INTEGER'],
-//                    'deliveryMessageType' => ['type'=>'INTEGER'],
-//                    'deliveryType' => ['type'=>'INTEGER'],
-//                    'stockQuantity' => ['type'=>'INTEGER'],
-//                    'renk'            => ['type'=>'STRING'],
-//                    'ebat'            => ['type'=>'STRING'],
-//                ],
-//                'required'=>[
-//                    'productName','mainProductCode','stockCode',
-//                    'description','images','salesPrice','categoryId','renk','ebat'
-//                ]
-//            ]
-//        ]
-//    ];
-
     private static array $ciceksepetiGenerationConfig  = [
+        'responseMimeType' => 'application/json',
+        'temperature'      => 0.0,
+        'topP'             => 1.0,
+        'candidateCount'   => 1,
+        'stopSequences'    => ["\n\n"],
+        'presencePenalty'  => 0.0,
+        'frequencyPenalty' => 0.0,
+        'responseSchema' => [
+            'type'       => 'OBJECT',
+            'properties' => [
+                'title'       => ['type' => 'STRING'],
+                'description' => ['type' => 'STRING'],
+                'categoryId' => ['type' => 'INTEGER'],
+                'variants'    => [
+                    'type'  => 'ARRAY',
+                    'items' => [
+                        'type'       => 'OBJECT',
+                        'properties' => [
+                            'stockCode' => ['type' => 'STRING'],
+                            'color'     => ['type' => 'STRING']
+                        ],
+                        'required' => ['stockCode', 'color']
+                    ]
+                ]
+            ],
+            'required' => ['title', 'description', 'categoryId', 'variants']
+        ]
+    ];
+
+    private static array $hepsiburadaGenerationConfig  = [
         'responseMimeType' => 'application/json',
         'temperature'      => 0.0,
         'topP'             => 1.0,
@@ -85,6 +76,7 @@ class GeminiConnector
         $url = "https://generativelanguage.googleapis.com/v1beta/models/" . $model . ":generateContent?key=" . $geminiApiKey;
         $generationConfig = match ($platform) {
             'ciceksepeti' => self::$ciceksepetiGenerationConfig,
+            'hepsiburada' => self::$hepsiburadaGenerationConfig,
             default       => null,
         };
         $payload = [
