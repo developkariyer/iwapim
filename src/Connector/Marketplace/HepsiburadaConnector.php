@@ -573,7 +573,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 attribute_name = VALUES(attribute_name),
                 is_required = VALUES(is_required),
                 varianter = VALUES(varianter),
-                type = VALUES(type)
+                type = VALUES(type),
                 data_type = VALUES(data_type)";
 
         Utility::executeSql($sql, $parameters);
