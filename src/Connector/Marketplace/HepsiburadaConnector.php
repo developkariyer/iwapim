@@ -499,6 +499,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'Content-Type' => 'application/json'
             ]
         ]);
+        print_r($response->getContent());
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
@@ -572,7 +573,6 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 type = VALUES(type)";
 
         Utility::executeSql($sql, $parameters);
-        print_r($result);
         foreach ($result as $data) {
             $response = $this->httpClient->request('GET', "https://mpop.hepsiburada.com/product/api/categories/{$categoryId}/attribute/{$data['attribute_id']}/values", [
                 'headers' => [
