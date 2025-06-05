@@ -161,7 +161,8 @@ class AutoListingCommand extends AbstractCommand
                 'test',
                 $this->logger
             );
-            $stamps = [new TransportNamesStamp([strtolower($toMarketplace)])];
+            $transportName = $this->resolveTransportName($toMarketplace);
+            $stamps = [new TransportNamesStamp([$transportName])];
             $this->bus->dispatch($message, $stamps);
             $this->logger->info("[" . __METHOD__ . "] ✅ Created Message for Main Product Code: $mainCode");
         }
@@ -183,6 +184,18 @@ class AutoListingCommand extends AbstractCommand
 //        $stamps = [new TransportNamesStamp(['ciceksepeti'])];
 //        $this->bus->dispatch($message, $stamps);
 //        $this->logger->info("[" . __METHOD__ . "] ✅ UpdateProductsList sent to Ciceksepeti Queue");
+    }
+
+    private function resolveTransportName(string $toMarketplace)
+    {
+        $knownTransports = ['hepsiburada', 'trendyol', 'n11', 'amazon', 'ciceksepeti'];
+        $normalized = strtolower($toMarketplace);
+        foreach ($knownTransports as $known) {
+            if (str_starts_with($normalized, $known)) {
+                return $known;
+            }
+        }
+        return null;
     }
 
     private function getFromMarketplaceVariantIds(string $marketplace): array | null
