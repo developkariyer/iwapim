@@ -49,8 +49,44 @@ class HepsiburadaListingHandler
         $listingInfo = $this->listingHelper->getPimListingsInfo($message, $this->logger);
         $this->logger->info("[" . __METHOD__ . "] ✅ Pim Listings Info Fetched ");
         $categories = $this->getHepsiburadaCategoriesDetails();
-        print_r($categories);
+        $this->logger->info("[" . __METHOD__ . "] ✅ Category Data Fetched ");
+        $geminiFilledData = $this->geminiProcess($listingInfo, $categories);
 
+    }
+
+    private function geminiProcess($data, $categories)
+    {
+        $firstProduct = $data[0];
+        $geminiData = [
+            'title'       => $firstProduct['title'],
+            'description' => $firstProduct['description'] ?? null,
+            'categoryId'  => null,
+            'variants'    => []
+        ];
+        foreach ($data as $product) {
+            $geminiData['variants'][] = [
+                'stockCode' => $product['stockCode'] ?? null,
+                'color'     => $product['color'] ?? null,
+            ];
+        }
+        $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Created Variant Count: " . count($geminiData['variants']));
+        $prompt = $this->generateListingPrompt(json_encode(['products' => $geminiData], JSON_UNESCAPED_UNICODE), $categories);
+        $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Api Send Data ");
+        $geminiApiResult = GeminiConnector::chat($prompt, 'hepsiburada');
+        $geminiResult = $this->parseGeminiResult($geminiApiResult);
+        foreach ($data as &$product) {
+            $product['geminiCategoryId']   = $geminiResult['categoryId'] ?? null;
+            $product['geminiTitle']        = $geminiResult['title'] ?? null;
+            $product['geminiDescription']  = $geminiResult['description'] ?? null;
+            $product['geminiColor'] = null;
+            foreach ($geminiResult['variants'] as $variant) {
+                if ($variant['stockCode'] === $product['stockCode']) {
+                    $product['geminiColor'] = $variant['color'];
+                    break;
+                }
+            }
+        }
+        return $data;
     }
 
 
