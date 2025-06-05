@@ -433,8 +433,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
 //        $this->downloadCategories();
         $categoryIdList = $this->getHepsiburadaListingCategoriesIdList();
         foreach ($categoryIdList as $categoryId) {
-            echo "Processing Category ID: $categoryId\n";
-//            $this->getCategoryAttributesAndSaveDatabase($categoryId);
+            $this->getCategoryAttributesAndSaveDatabase($categoryId);
         }
     }
 
@@ -515,6 +514,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
 
     private function getCategoryAttributesAndSaveDatabase($categoryId): void
     {
+        echo "Getting Category Attributes: $categoryId\n";
         if ($categoryId === null) {
             echo "Error: Category ID cannot be null\n";
             return;
@@ -586,6 +586,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         VALUES ";
         $values = [];
         $parameters = [];
+        echo "Result Count = " . count($result) . "\n";
         foreach ($result as $key => $data) {
             $values[] = "(:attribute_id{$key}, :category_id{$key}, :attribute_name{$key}, :is_required{$key}, :varianter{$key}, :type{$key}, :data_type{$key})";
             $parameters["attribute_id{$key}"] = $data['attribute_id'];
