@@ -431,12 +431,29 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     private function updateCategoryAndAttributes()
     {
         $this->downloadCategories();
-        $sql = "select id from iwa_hepsiburada_categories";
-        $categories = Utility::fetchFromSql($sql);
-        foreach ($categories as $category) {
-            $categoryId = $category['id'];
+        $categoryIdList = $this->getHepsiburadaListingCategoriesIdList();
+        foreach ($categoryIdList as $categoryId) {
             $this->getCategoryAttributesAndSaveDatabase($categoryId);
         }
+    }
+
+    private function getHepsiburadaListingCategoriesIdList(): array
+    {
+        $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Hepsiburada'";
+        $hepsiburadaVariantIds = Utility::fetchFromSql($sql);
+        if (!is_array($hepsiburadaVariantIds) || empty($hepsiburadaVariantIds)) {
+            return [];
+        }
+        $categoryIdList = [];
+        foreach ($hepsiburadaVariantIds as $hepsiburadaVariantId) {
+            $variantProduct = VariantProduct::getById($hepsiburadaVariantId['oo_id']);
+            if (!$variantProduct instanceof VariantProduct) {
+                continue;
+            }
+            $apiData = json_decode($variantProduct->jsonRead('apiResponseJson'), true);
+            $categoryIdList[] = $apiData['attributes']['categoryId'];
+        }
+        return array_unique($categoryIdList);
     }
 
     private function downloadCategories(): void
