@@ -606,16 +606,16 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         if (!empty($attributeValueResult)) {
             $placeholders = [];
             $bindings = [];
-
             foreach ($attributeValueResult as $row) {
                 $placeholders[] = "(?, ?, ?)";
-                $bindings = array_merge($bindings, $row);
+                $bindings[] = $row['attribute_value_id'];
+                $bindings[] = $row['attribute_id'];
+                $bindings[] = $row['name'];
             }
             $attributeValueSql = "
         INSERT INTO iwa_ciceksepeti_category_attributes_values (attribute_value_id, attribute_id, name)
         VALUES " . implode(', ', $placeholders) . "
         ON DUPLICATE KEY UPDATE name = VALUES(name)";
-
             Utility::executeSql($attributeValueSql, $bindings);
         }
     }
