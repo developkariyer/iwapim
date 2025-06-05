@@ -47,10 +47,68 @@ class HepsiburadaListingHandler
     {
         $this->logger->info("[" . __METHOD__ . "] ✅ Processing New Listing ");
         $listingInfo = $this->listingHelper->getPimListingsInfo($message, $this->logger);
-        print_r($listingInfo);
-        //        $this->logger->info("[" . __METHOD__ . "] ✅ Pim Listings Info Fetched ");
-//        $categories = $this->getCiceksepetiCategoriesDetails();
+        $this->logger->info("[" . __METHOD__ . "] ✅ Pim Listings Info Fetched ");
+        $categories = $this->getHepsiburadaCategoriesDetails();
+        print_r($categories);
 
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private function getHepsiburadaCategoriesDetails(): false|array|string
+    {
+        $categoryIdList = $this->getHepsiburadaListingCategoriesIdList();
+        if (empty($categoryIdList)) {
+            return [];
+        }
+        $inClause = implode(',', array_fill(0, count($categoryIdList), '?'));
+        $sql = "SELECT * FROM iwa_hepsiburada_categories WHERE id IN ($inClause)";
+        $categories = Utility::fetchFromSql($sql, $categoryIdList);
+        if (empty($categories)) {
+            return [];
+        }
+        return json_encode($categories, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    }
+
+    private function getHepsiburadaListingCategoriesIdList(): array
+    {
+        $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Hepsiburada'";
+        $hepsiburadaVariantIds = Utility::fetchFromSql($sql);
+        if (!is_array($hepsiburadaVariantIds) || empty($hepsiburadaVariantIds)) {
+            return [];
+        }
+        $categoryIdList = [];
+        foreach ($hepsiburadaVariantIds as $hepsiburadaVariantId) {
+            $variantProduct = VariantProduct::getById($hepsiburadaVariantId['oo_id']);
+            if (!$variantProduct instanceof VariantProduct) {
+                continue;
+            }
+            $apiData = json_decode($variantProduct->jsonRead('apiResponseJson'), true);
+            $categoryIdList[] = $apiData['attributes']['categoryId'];
+        }
+        return array_unique($categoryIdList);
     }
 
 }
