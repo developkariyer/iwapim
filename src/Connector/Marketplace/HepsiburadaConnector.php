@@ -582,10 +582,10 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                     'Content-Type' => 'application/json'
                 ]
             ]);
-            if ($response->getStatusCode() !== 200) {
-                echo "Error: $statusCode\n";
-                continue;
-            }
+//            if ($response->getStatusCode() !== 200) {
+//                echo "Error: $statusCode\n";
+//                continue;
+//            }
             print_r($response->getContent());
         }
 
