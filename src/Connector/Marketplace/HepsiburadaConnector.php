@@ -499,7 +499,6 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'Content-Type' => 'application/json'
             ]
         ]);
-        print_r($response->getContent());
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
@@ -529,7 +528,8 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'attribute_name' => $attribute['name'] ?? null,
                 'is_required' => $attribute['mandatory'] ?? false,
                 'varianter' => 0,
-                'type' => 'attributes'
+                'type' => 'attributes',
+                'data_type' => $attribute['type']
             ];
         }
         foreach ($baseAttributes as $attribute) {
@@ -539,7 +539,8 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'attribute_name' => $attribute['name'] ?? null,
                 'is_required' => $attribute['mandatory'] ?? false,
                 'varianter' => 0,
-                'type' => 'baseAttributes'
+                'type' => 'baseAttributes',
+                'data_type' => $attribute['type']
             ];
         }
         foreach ($variantAttributes as $attribute) {
@@ -549,31 +550,37 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'attribute_name' => $attribute['name'] ?? null,
                 'is_required' => $attribute['mandatory'] ?? false,
                 'varianter' => 1,
-                'type' => 'variantAttributes'
+                'type' => 'variantAttributes',
+                'data_type' => $attribute['type']
             ];
         }
-        $sql = "INSERT INTO iwa_hepsiburada_category_attributes (attribute_id, category_id, attribute_name, is_required, varianter, type) 
+        $sql = "INSERT INTO iwa_hepsiburada_category_attributes (attribute_id, category_id, attribute_name, is_required, varianter, type, data_type) 
         VALUES ";
         $values = [];
         $parameters = [];
         foreach ($result as $key => $data) {
-            $values[] = "(:attribute_id{$key}, :category_id{$key}, :attribute_name{$key}, :is_required{$key}, :varianter{$key}, :type{$key})";
+            $values[] = "(:attribute_id{$key}, :category_id{$key}, :attribute_name{$key}, :is_required{$key}, :varianter{$key}, :type{$key}, :data_type{$key})";
             $parameters["attribute_id{$key}"] = $data['attribute_id'];
             $parameters["category_id{$key}"] = $data['category_id'];
             $parameters["attribute_name{$key}"] = $data['attribute_name'];
             $parameters["is_required{$key}"] = $data['is_required'];
             $parameters["varianter{$key}"] = $data['varianter'];
             $parameters["type{$key}"] = $data['type'];
+            $parameters["data_type{$key}"] = $data['data_type'];
         }
         $sql .= implode(", ", $values);
         $sql .= " ON DUPLICATE KEY UPDATE 
                 attribute_name = VALUES(attribute_name),
                 is_required = VALUES(is_required),
                 varianter = VALUES(varianter),
-                type = VALUES(type)";
+                type = VALUES(type)
+                data_type = VALUES(data_type)";
 
         Utility::executeSql($sql, $parameters);
         foreach ($result as $data) {
+            if ($data['data_type'] != 'enum') {
+                continue;
+            }
             $response = $this->httpClient->request('GET', "https://mpop.hepsiburada.com/product/api/categories/{$categoryId}/attribute/{$data['attribute_id']}/values", [
                 'headers' => [
                     'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
@@ -582,11 +589,11 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                     'Content-Type' => 'application/json'
                 ]
             ]);
-//            if ($response->getStatusCode() !== 200) {
-//                echo "Error: $statusCode\n";
-//                continue;
-//            }
-            //print_r($response->getContent());
+            if ($response->getStatusCode() !== 200) {
+                echo "Error: $statusCode\n";
+                continue;
+            }
+            print_r($response->getContent());
         }
 
 
