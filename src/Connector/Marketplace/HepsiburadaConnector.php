@@ -577,6 +577,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 data_type = VALUES(data_type)";
 
         Utility::executeSql($sql, $parameters);
+        $attributeValueResult = [];
         foreach ($result as $data) {
             if ($data['data_type'] != 'enum') {
                 continue;
@@ -593,10 +594,29 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 echo "Error: $statusCode\n";
                 continue;
             }
-            print_r($response->getContent());
+            $responseData = $response->toArray();
+            foreach ($responseData as $valueItem) {
+                $attributeValueResult[] = [
+                    'attribute_id' => $data['attribute_id'],
+                    'attribute_value_id' => $valueItem['id'],
+                    'name' => $valueItem['value']
+                ];
+            }
         }
-
-
+        $attributeValueSql = "
+            INSERT INTO iwa_ciceksepeti_category_attributes_values (attribute_value_id, attribute_id, name)
+            VALUES ";
+        $values = [];
+        $parameters = [];
+        foreach ($attributeValueResult as $key => $row) {
+            $values[] = "(:attribute_value_id{$key}, :attribute_id{$key}, :name{$key})";
+            $parameters["attribute_value_id{$key}"] = $row['attribute_value_id'];
+            $parameters["attribute_id{$key}"] = $row['attribute_id'];
+            $parameters["name{$key}"] = $row['name'];
+        }
+        $attributeValueSql .= implode(", ", $values);
+        $attributeValueSql .= " ON DUPLICATE KEY UPDATE name = VALUES(name);";
+        Utility::executeSql($attributeValueSql, $parameters);
     }
 
 }
