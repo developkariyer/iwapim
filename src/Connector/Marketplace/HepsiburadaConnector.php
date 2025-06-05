@@ -586,7 +586,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
 //                echo "Error: $statusCode\n";
 //                continue;
 //            }
-            print_r($response->getContent());
+            //print_r($response->getContent());
         }
 
 
