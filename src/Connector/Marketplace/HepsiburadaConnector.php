@@ -435,7 +435,22 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
 //        foreach ($categoryIdList as $categoryId) {
 //            $this->getCategoryAttributesAndSaveDatabase($categoryId);
 //        }
-        $this->getCategoryAttributesAndSaveDatabase(80455057);
+        //$this->getCategoryAttributesAndSaveDatabase(80455057);
+
+        $response = $this->httpClient->request('GET', "https://mpop.hepsiburada.com/product/api/categories/80455057/attributes", [
+            'headers' => [
+                'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
+                "User-Agent" => "colorfullworlds_dev",
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json'
+            ]
+        ]);
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+        }
+        print_r($response->getContent());
+
     }
 
     private function getHepsiburadaListingCategoriesIdList(): array
