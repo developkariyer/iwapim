@@ -432,7 +432,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     {
         $this->downloadCategories();
         $sql = "select id from iwa_hepsiburada_categories";
-        $categories = Utility::executeSql($sql);
+        $categories = Utility::fetchFromSql($sql);
         foreach ($categories as $category) {
             $categoryId = $category['id'];
             $this->getCategoryAttributesAndSaveDatabase($categoryId);
