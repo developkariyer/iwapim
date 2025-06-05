@@ -572,6 +572,24 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 type = VALUES(type)";
 
         Utility::executeSql($sql, $parameters);
+
+        foreach ($result as $data) {
+            $response = $this->httpClient->request('GET', "https://mpop.hepsiburada.com/product/api/categories/{$categoryId}/attribute/{$data['attribute_id']}/values", [
+                'headers' => [
+                    'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
+                    "User-Agent" => "colorfullworlds_dev",
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json'
+                ]
+            ]);
+            if ($response->getStatusCode() !== 200) {
+                echo "Error: $statusCode\n";
+                continue;
+            }
+            print_r($response->getContent());
+        }
+
+
     }
 
 }
