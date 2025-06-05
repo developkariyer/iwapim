@@ -429,6 +429,17 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         $this->getCategoryAttributesAndSaveDatabase(80455057);
     }
 
+    private function updateCategoryAndAttributes()
+    {
+        $this->downloadCategories();
+        $sql = "select id from iwa_hepsiburada_categories";
+        $categories = Utility::executeSql($sql);
+        foreach ($categories as $category) {
+            $categoryId = $category['id'];
+            $this->getCategoryAttributesAndSaveDatabase($categoryId);
+        }
+    }
+
     private function downloadCategories(): void
     {
         $categories = $this->getFromCache('categories.json');
