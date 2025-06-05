@@ -603,21 +603,20 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 ];
             }
         }
-        if (!empty($attributeValueResult)) {
-            $placeholders = [];
-            $bindings = [];
-            foreach ($attributeValueResult as $row) {
-                $placeholders[] = "(?, ?, ?)";
-                $bindings[] = $row['attribute_value_id'];
-                $bindings[] = $row['attribute_id'];
-                $bindings[] = $row['name'];
-            }
-            $attributeValueSql = "
+
+        foreach ($attributeValueResult as $row) {
+            $sql = "
         INSERT INTO iwa_ciceksepeti_category_attributes_values (attribute_value_id, attribute_id, name)
-        VALUES " . implode(', ', $placeholders) . "
+        VALUES (:attribute_value_id, :attribute_id, :name)
         ON DUPLICATE KEY UPDATE name = VALUES(name)";
-            Utility::executeSql($attributeValueSql, $bindings);
+            $parameters = [
+                'attribute_value_id' => $row['attribute_value_id'],
+                'attribute_id' => $row['attribute_id'],
+                'name' => $row['name'],
+            ];
+            Utility::executeSql($sql, $parameters);
         }
+
     }
 
 }
