@@ -603,20 +603,20 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 ];
             }
         }
-
-        foreach ($attributeValueResult as $row) {
-            $sql = "
-        INSERT INTO iwa_ciceksepeti_category_attributes_values (attribute_value_id, attribute_id, name)
-        VALUES (:attribute_value_id, :attribute_id, :name)
-        ON DUPLICATE KEY UPDATE name = VALUES(name)";
-            $parameters = [
-                'attribute_value_id' => $row['attribute_value_id'],
-                'attribute_id' => $row['attribute_id'],
-                'name' => $row['name'],
-            ];
-            Utility::executeSql($sql, $parameters);
+        $attributeValueSql = "
+            INSERT INTO iwa_hepsiburada_category_attributes_values (attribute_value_id, attribute_id, name)
+            VALUES ";
+        $values = [];
+        $parameters = [];
+        foreach ($attributeValueResult as $key => $row) {
+            $values[] = "(:attribute_value_id{$key}, :attribute_id{$key}, :name{$key})";
+            $parameters["attribute_value_id{$key}"] = $row['attribute_value_id'];
+            $parameters["attribute_id{$key}"] = $row['attribute_id'];
+            $parameters["name{$key}"] = $row['name'];
         }
-
+        $attributeValueSql .= implode(", ", $values);
+        $attributeValueSql .= " ON DUPLICATE KEY UPDATE name = VALUES(name);";
+        Utility::executeSql($attributeValueSql, $parameters);
     }
 
 }
