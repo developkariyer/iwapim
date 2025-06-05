@@ -620,15 +620,17 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             VALUES ";
         $values = [];
         $parameters = [];
-        foreach ($attributeValueResult as $key => $row) {
-            $values[] = "(:attribute_value_id{$key}, :attribute_id{$key}, :name{$key})";
-            $parameters["attribute_value_id{$key}"] = $row['attribute_value_id'];
-            $parameters["attribute_id{$key}"] = $row['attribute_id'];
-            $parameters["name{$key}"] = $row['name'];
+        if (!empty($attributeValueResult)) {
+            foreach ($attributeValueResult as $key => $row) {
+                $values[] = "(:attribute_value_id{$key}, :attribute_id{$key}, :name{$key})";
+                $parameters["attribute_value_id{$key}"] = $row['attribute_value_id'];
+                $parameters["attribute_id{$key}"] = $row['attribute_id'];
+                $parameters["name{$key}"] = $row['name'];
+            }
+            $attributeValueSql .= implode(", ", $values);
+            $attributeValueSql .= " ON DUPLICATE KEY UPDATE name = VALUES(name);";
+            Utility::executeSql($attributeValueSql, $parameters);
         }
-        $attributeValueSql .= implode(", ", $values);
-        $attributeValueSql .= " ON DUPLICATE KEY UPDATE name = VALUES(name);";
-        Utility::executeSql($attributeValueSql, $parameters);
     }
 
 }
