@@ -603,7 +603,6 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 ];
             }
         }
-        print_r($attributeValueResult);
         $attributeValueSql = "
             INSERT INTO iwa_ciceksepeti_category_attributes_values (attribute_value_id, attribute_id, name)
             VALUES ";
@@ -617,7 +616,12 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         }
         $attributeValueSql .= implode(", ", $values);
         $attributeValueSql .= " ON DUPLICATE KEY UPDATE name = VALUES(name);";
-        Utility::executeSql($attributeValueSql, $parameters);
+        try {
+            $stmt = Utility::executeSql($attributeValueSql, $parameters);
+            echo "Etki edilen satır sayısı: " . $stmt->rowCount() . "\n";
+        } catch (\Exception $e) {
+            echo "SQL Error: " . $e->getMessage();
+        }
     }
 
 }
