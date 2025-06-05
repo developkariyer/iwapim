@@ -430,11 +430,12 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
 
     private function updateCategoryAndAttributes()
     {
-        $this->downloadCategories();
-        $categoryIdList = $this->getHepsiburadaListingCategoriesIdList();
-        foreach ($categoryIdList as $categoryId) {
-            $this->getCategoryAttributesAndSaveDatabase($categoryId);
-        }
+//        $this->downloadCategories();
+//        $categoryIdList = $this->getHepsiburadaListingCategoriesIdList();
+//        foreach ($categoryIdList as $categoryId) {
+//            $this->getCategoryAttributesAndSaveDatabase($categoryId);
+//        }
+        $this->getCategoryAttributesAndSaveDatabase(80455057);
     }
 
     private function getHepsiburadaListingCategoriesIdList(): array
