@@ -603,6 +603,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 ];
             }
         }
+        print_r($attributeValueResult);
         $attributeValueSql = "
             INSERT INTO iwa_ciceksepeti_category_attributes_values (attribute_value_id, attribute_id, name)
             VALUES ";
