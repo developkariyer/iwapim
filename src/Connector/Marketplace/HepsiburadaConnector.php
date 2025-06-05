@@ -606,11 +606,13 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             }
             $responseData = $response->toArray();
             foreach ($responseData as $valueItem) {
-                $attributeValueResult[] = [
-                    'attribute_id' => $data['attribute_id'],
-                    'attribute_value_id' => $valueItem['id'],
-                    'name' => $valueItem['value']
-                ];
+                if (is_array($valueItem)) {
+                    $attributeValueResult[] = [
+                        'attribute_id' => $data['attribute_id'],
+                        'attribute_value_id' => $valueItem['id'],
+                        'name' => $valueItem['value']
+                    ];
+                }
             }
         }
         $attributeValueSql = "
