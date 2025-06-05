@@ -34,6 +34,7 @@ class AutoListingCommand extends AbstractCommand
     private array $marketplaceConfig = [
         'Ciceksepeti' => 265384,
         'ShopifyCfwTr' => 84124,
+        'HepsiburadaCfw' => 265919
     ];
 
     public function __construct(private MessageBusInterface $bus)
