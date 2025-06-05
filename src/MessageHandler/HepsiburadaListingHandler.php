@@ -36,10 +36,21 @@ class HepsiburadaListingHandler
         $actionType = $message->getActionType();
         echo "action type: $actionType\n";
         $this->logger->info("[" . __METHOD__ . "] ✅ Action Type: $actionType ");
-//        match ($actionType) {
-//            'list' => $this->processNewListing($message),
-//            'update_list' => $this->processUpdateListing($message),
-//            default => throw new \InvalidArgumentException("Unknown Action Type: $actionType")
-//        };
+        match ($actionType) {
+            'list' => $this->processNewListing($message),
+            //'update_list' => $this->processUpdateListing($message),
+            default => throw new \InvalidArgumentException("Unknown Action Type: $actionType")
+        };
     }
+
+    private function processNewListing($message)
+    {
+        $this->logger->info("[" . __METHOD__ . "] ✅ Processing New Listing ");
+        $listingInfo = $this->listingHelper->getPimListingsInfo($message, $this->logger);
+        print_r($listingInfo);
+        //        $this->logger->info("[" . __METHOD__ . "] ✅ Pim Listings Info Fetched ");
+//        $categories = $this->getCiceksepetiCategoriesDetails();
+
+    }
+
 }
