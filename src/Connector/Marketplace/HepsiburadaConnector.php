@@ -551,7 +551,27 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'type' => 'variantAttributes'
             ];
         }
-        print_r(json_encode($result));
+        $sql = "INSERT INTO iwa_hepsiburada_category_attributes (attribute_id, category_id, attribute_name, is_required, varianter, type) 
+        VALUES ";
+        $values = [];
+        $parameters = [];
+        foreach ($result as $key => $data) {
+            $values[] = "(:attribute_id{$key}, :category_id{$key}, :attribute_name{$key}, :is_required{$key}, :varianter{$key}, :type{$key})";
+            $parameters["attribute_id{$key}"] = $data['attribute_id'];
+            $parameters["category_id{$key}"] = $data['category_id'];
+            $parameters["attribute_name{$key}"] = $data['attribute_name'];
+            $parameters["is_required{$key}"] = $data['is_required'];
+            $parameters["varianter{$key}"] = $data['varianter'];
+            $parameters["type{$key}"] = $data['type'];
+        }
+        $sql .= implode(", ", $values);
+        $sql .= " ON DUPLICATE KEY UPDATE 
+                attribute_name = VALUES(attribute_name),
+                is_required = VALUES(is_required),
+                varianter = VALUES(varianter),
+                type = VALUES(type)";
+
+        Utility::executeSql($sql, $parameters);
     }
 
 }
