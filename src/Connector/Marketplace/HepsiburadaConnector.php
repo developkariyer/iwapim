@@ -603,24 +603,20 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 ];
             }
         }
-        $attributeValueSql = "
-            INSERT INTO iwa_ciceksepeti_category_attributes_values (attribute_value_id, attribute_id, name)
-            VALUES ";
-        $values = [];
-        $parameters = [];
-        foreach ($attributeValueResult as $key => $row) {
-            $values[] = "(:attribute_value_id{$key}, :attribute_id{$key}, :name{$key})";
-            $parameters["attribute_value_id{$key}"] = $row['attribute_value_id'];
-            $parameters["attribute_id{$key}"] = $row['attribute_id'];
-            $parameters["name{$key}"] = $row['name'];
-        }
-        $attributeValueSql .= implode(", ", $values);
-        $attributeValueSql .= " ON DUPLICATE KEY UPDATE name = VALUES(name);";
-        try {
-            $stmt = Utility::executeSql($attributeValueSql, $parameters);
-            echo "Etki edilen satır sayısı: " . $stmt->rowCount() . "\n";
-        } catch (\Exception $e) {
-            echo "SQL Error: " . $e->getMessage();
+        if (!empty($attributeValueResult)) {
+            $placeholders = [];
+            $bindings = [];
+
+            foreach ($attributeValueResult as $row) {
+                $placeholders[] = "(?, ?, ?)";
+                $bindings = array_merge($bindings, $row);
+            }
+            $attributeValueSql = "
+        INSERT INTO iwa_ciceksepeti_category_attributes_values (attribute_value_id, attribute_id, name)
+        VALUES " . implode(', ', $placeholders) . "
+        ON DUPLICATE KEY UPDATE name = VALUES(name)";
+
+            Utility::executeSql($attributeValueSql, $bindings);
         }
     }
 
