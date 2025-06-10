@@ -54,7 +54,7 @@ class HepsiburadaListingHandler
         $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Filled ");
         $filledAttributeData =  $this->fillAttributeData($geminiFilledData);
         $this->logger->info("[" . __METHOD__ . "] ✅ Filled Attribute Data ");
-        print_r($geminiFilledData);
+        print_r($filledAttributeData);
     }
 
     public function fillAttributeData(array $data): array
@@ -74,16 +74,62 @@ class HepsiburadaListingHandler
                 continue;
             }
             $variantAttributes = $this->getVariantAttributes($product['geminiCategoryId']);
-//            if (empty($variantAttributes['color']) && empty($variantAttributes['size'])) {
-//                $this->logger->error("[" . __METHOD__ . "] ❌ Size AttributeId Not Found: {$product['stockCode']} ");
-//                continue;
-//            }
-//            $product['Attributes'] = $this->buildProductAttributes(
-//                $product,
-//                $variantAttributes
-//            );
+            if (empty($variantAttributes['color']) && empty($variantAttributes['size'])) {
+                $this->logger->error("[" . __METHOD__ . "] ❌ Size AttributeId Not Found: {$product['stockCode']} ");
+                continue;
+            }
+            $product['Attributes'] = $this->buildProductAttributes(
+                $product,
+                $variantAttributes
+            );
         }
         return $data;
+    }
+
+    private function buildProductAttributes(array $product, array $variantAttributes): array
+    {
+        $attributes = [];
+        if (!empty($variantAttributes['color']) && isset($product['geminiColor']) && !empty(trim($product['geminiColor']))) {
+            $colorAttrId = $variantAttributes['color']['id'];
+            $colorValue = trim($product['geminiColor']);
+            $bestColorMatch = $this->findAttributeHepsiburadaAttributeDatabase($colorAttrId, $colorValue);
+            if ($bestColorMatch) {
+                $attributes[] = [
+                    'id' => $colorAttrId,
+                    'ValueId' => $bestColorMatch['attribute_value_id'],
+                    'TextLength' => 0
+                ];
+                $this->logger->info("[" . __METHOD__ . "] ✅ Color Match Found: {$bestColorMatch['name']} (ID: {$bestColorMatch['attribute_value_id']})");
+            } else {
+                $this->logger->error("[" . __METHOD__ . "] ❌ Color Match Not Found For Value: {$colorValue}");
+            }
+        }
+        if (!empty($variantAttributes['size']) && isset($product['sizeLabel']) && !empty(trim($product['sizeLabel']))) {
+            $sizeAttrId = $variantAttributes['size']['id'];
+            $sizeValue = trim($product['sizeLabel']);
+            $attributes[] = [
+                'id' => $sizeAttrId,
+                'ValueId' => $sizeValue,
+                'TextLength' => 0
+            ];
+            $this->logger->info("[" . __METHOD__ . "] ✅ Size Match Found: {$sizeValue}");
+        }
+        if (empty($attributes)) {
+            $this->logger->warning("[" . __METHOD__ . "] ⚠️ No Attributes Could Be Added For Product: {$product['stockCode']}");
+        }
+        return $attributes;
+    }
+
+    private function findAttributeHepsiburadaAttributeDatabase($attributeId, $searchValue)
+    {
+        $sql = "SELECT attribute_value_id, name FROM iwa_hepsiburada_category_attributes_values 
+            WHERE attribute_id = :attribute_id and name = :searchValue LIMIT 1";
+        $result = Utility::fetchFromSql($sql, ['attribute_id' => $attributeId, 'searchValue' => $searchValue]);
+        if (empty($result) || !isset($result[0])) {
+            $this->logger->warning("[" . __METHOD__ . "] ⚠️ AttributeMatch No Attribute Values Found In DB For attributeId: {$attributeId} searchValue: {$searchValue} ");
+            return null;
+        }
+        return $result[0];
     }
 
     private function getCategoryInfo(int $categoryId): ?array
