@@ -239,7 +239,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         //d15702ea-5c2b-4e94-9dd2-edd80e99f858
         //87b74947-8d88-456f-9b24-48a6e6be0e31
 
-        print_r($this->getBatchRequestResult("76e9fb36-606c-4b49-8b9a-43b57086c99f"));
+        print_r($this->getBatchRequestResult("87b74947-8d88-456f-9b24-48a6e6be0e31"));
 
 
 
