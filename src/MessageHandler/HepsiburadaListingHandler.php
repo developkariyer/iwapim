@@ -54,7 +54,9 @@ class HepsiburadaListingHandler
         $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Filled ");
         $filledAttributeData =  $this->fillAttributeData($geminiFilledData);
         $this->logger->info("[" . __METHOD__ . "] ✅ Filled Attribute Data ");
-        print_r($filledAttributeData);
+        $normalizedHepsiburadaData = $this->normalizeHepsiburadaData($filledAttributeData);
+        $this->logger->info("[" . __METHOD__ . "] ✅ Normalized Hepsiburada Data ");
+        print_r($normalizedHepsiburadaData);
     }
 
     public function fillAttributeData(array $data): array
@@ -78,12 +80,69 @@ class HepsiburadaListingHandler
                 $this->logger->error("[" . __METHOD__ . "] ❌ Size AttributeId Not Found: {$product['stockCode']} ");
                 continue;
             }
-            $product['Attributes'] = $this->buildProductAttributes(
+            $product['attributes'] = $this->buildProductAttributes(
                 $product,
                 $variantAttributes
             );
         }
         return $data;
+    }
+
+    private function queryHepsiburadaAttribute($attributeName, $categoryId)
+    {
+        $sql = "select attribute_id from iwa_hepsiburada_category_attributes where attribute_name = :attributeName and category_id = :categoryId";
+        $result = Utility::fetchFromSql($sql, ['attribute_name' => $attributeName, 'categoryId' => $categoryId]);
+        if (!$result && empty($result[0])) {
+            return null;
+        }
+        return $result[0]['attribute_id'];
+    }
+
+    private function normalizeHepsiburadaData($data)
+    {
+        $categoryId = $data['geminiCategoryId'] ?? null;
+        if (!$categoryId) {
+            $this->logger->error("[" . __METHOD__ . "] ❌ CategoryId Not Found For Product: {$data['stockCode']} ");
+            return;
+        }
+        $result = [];
+        foreach ($data as $product) {
+            $item = [
+                'categoryId' => $categoryId,
+                'attributes' => $this->normalizeAttributes($product['Attributes']),
+                'merchantSku' => $product['stockCode'],
+                'VaryantGroupID' => $product['mainProductCode'],
+                'UrunAdi' => $product['geminiTitle'],
+                'UrunAciklamasi' => $product['geminiDescription'],
+                'Marka' => 'Colorfullworlds',
+                'GarantiSuresi' => 24,
+                'price' => $product['salesPrice'],
+                'stock' => 5,
+            ];
+            for ($i = 0; $i < 5; $i++) {
+                if (!empty($product['images'][$i]['url'])) {
+                    $item['Image' . ($i + 1)] = $product['images'][$i]['url'];
+                }
+            }
+            $result[] = $item;
+        }
+        $this->logger->info("[" . __METHOD__ . "] 📦 Listing Data Ready " . count($result) . " Product(s) Formatted For Hepsiburada Listing.");
+        $result = json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        if ($result === false) {
+            $this->logger->error("[" . __METHOD__ . "] ❌ JSON Encode Error Failed To Encode Formatted Listing Data.");
+            return false;
+        }
+        return $result;
+    }
+
+    private function normalizeAttributes($attributes)
+    {
+        $result = [];
+        foreach ($attributes as $attribute) {
+            $result[] = [
+                $attribute['id'] => $attribute['ValueId']
+            ];
+        }
     }
 
     private function buildProductAttributes(array $product, array $variantAttributes): array
