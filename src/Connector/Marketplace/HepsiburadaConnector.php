@@ -432,31 +432,19 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     {
         echo "-------------------------------API SENDING DATA Hepsiburada CONNECTOR-----------------------------------------------------------\n";
         $jsonData = json_encode($data);
-        if ($jsonData === false) {
-            echo "Error encoding data to JSON: " . json_last_error_msg() . "\n";
-            throw new \Exception("Failed to encode data to JSON for Hepsiburada API: " . json_last_error_msg());
-        }
-        $boundary = bin2hex(random_bytes(16));
-        $headers = [
-            'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
-            "User-Agent" => "colorfullworlds_dev",
-            'Accept' => 'application/json',
-            'Content-Type' => 'multipart/form-data; boundary=' . $boundary
-        ];
-        $body = '';
-        $body .= "--$boundary\r\n";
-        $body .= "Content-Disposition: form-data; name=\"file\"; filename=\"integrator.json\"\r\n";
-        $body .= "Content-Type: application/json\r\n\r\n";
-        $body .= $jsonData . "\r\n";
-        $body .= "--$boundary--\r\n";
-        $response = $this->httpClient->request(
-            'POST',
-            "https://mpop-sit.hepsiburada.com/product/api/products/import?version=1",
-            [
-                'headers' => $headers,
-                'body' => $body
+        $this->putToCache("createListing". $data['merchantSku'] .".json", $jsonData);
+        $jsonDataR = $this->getFromCache("createListing". $data['merchantSku'] .".json");
+        $response = $this->httpClient->request('POST', "https://mpop-sit.hepsiburada.com/product/api/products/import?version=1", [
+            'headers' => [
+                'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
+                "User-Agent" => "colorfullworlds_dev",
+                'Accept' => 'application/json',
+                'Content-Type' => 'multipart/form-data'
+            ],
+            'form' => [
+                'file' => $jsonDataR
             ]
-        );
+        ]);
         print_r($response->getContent());
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
