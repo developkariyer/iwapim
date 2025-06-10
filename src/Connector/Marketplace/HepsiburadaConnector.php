@@ -432,8 +432,8 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     {
         echo "-------------------------------API SENDING DATA Hepsiburada CONNECTOR-----------------------------------------------------------\n";
         $jsonData = json_encode($data, true);
-        $this->putToCache("createListing". $data[0]['VaryantGroupID'] .".json", $jsonData);
-        $jsonDataR = $this->getFromCache("createListing". $data[0]['VaryantGroupID'] .".json");
+        $this->putToCache("createListing.json", $jsonData);
+        $jsonDataR = $this->getFromCache("createListing.json");
         $response = $this->httpClient->request('POST', "https://mpop-sit.hepsiburada.com/product/api/products/import?version=1", [
             'headers' => [
                 'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
