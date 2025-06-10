@@ -51,6 +51,7 @@ class HepsiburadaListingHandler
         $categories = $this->getHepsiburadaCategoriesDetails();
         $this->logger->info("[" . __METHOD__ . "] ✅ Category Data Fetched ");
         $geminiFilledData = $this->geminiProcess($listingInfo, $categories);
+        $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Filled ");
         print_r($geminiFilledData);
     }
 
