@@ -108,7 +108,7 @@ class HepsiburadaListingHandler
                 'merchantSku' => $product['stockCode'],
                 'VaryantGroupID' => $product['mainProductCode'],
                 'UrunAdi' => $product['geminiTitle'],
-                'UrunAciklamasi' => $product['geminiDescription'],
+                'UrunAciklamasi' =>  $this->normalizeDescription($product['geminiDescription'], $product['sizeLabelMap']),
                 'Marka' => 'Colorfullworlds',
                 'GarantiSuresi' => 24,
                 'price' => $product['salesPrice'],
@@ -128,6 +128,24 @@ class HepsiburadaListingHandler
             return false;
         }
         return $result;
+    }
+
+    private function normalizeDescription($description, $sizeLabelMap)
+    {
+        $appendHtml = '';
+        if (!empty($sizeLabelMap)) {
+            $appendHtml .= '<h4>Boyut Bilgileri</h4>';
+            $appendHtml .= '<ul>';
+            foreach ($sizeLabelMap as $item) {
+                $original = htmlspecialchars((string) ($item['original'] ?? ''));
+                $label = htmlspecialchars((string) ($item['label'] ?? ''));
+                $appendHtml .= "<li>{$original} → {$label}</li>";
+            }
+            $appendHtml .= '</ul>';
+        }
+        $finalHtml = $description . $appendHtml;
+        return $finalHtml;
+
     }
 
     private function normalizeAttributes($attributes)
