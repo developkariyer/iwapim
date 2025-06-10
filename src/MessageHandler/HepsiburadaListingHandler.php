@@ -102,6 +102,8 @@ class HepsiburadaListingHandler
     {
         $result = [];
         foreach ($data as $product) {
+            print_r("PRODUCT \n");
+            print_r($product);
             print_r("PRODUCT ATTRIBUTES \n");
             print_r($product['Attributes']);
             $item = [
