@@ -239,7 +239,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         //d15702ea-5c2b-4e94-9dd2-edd80e99f858
         //87b74947-8d88-456f-9b24-48a6e6be0e31
 
-        print_r($this->getBatchRequestResult("87b74947-8d88-456f-9b24-48a6e6be0e31"));
+        //print_r($this->getBatchRequestResult("87b74947-8d88-456f-9b24-48a6e6be0e31"));
 
 
 
@@ -257,9 +257,33 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 //        }
 
 
-        //$this->downloadCategories();
-        //$this->getCategoryAttributesAndSaveDatabase(12943);
-       $this->passiveVariant();
+
+        $this->downloadCategories();
+        $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
+        echo "Ciceksepeti Category List Updated\n";
+        foreach ($categoryIdList as $categoryId) {
+            $this->getCategoryAttributesAndSaveDatabase($categoryId);
+        }
+//       $this->passiveVariant();
+    }
+
+    public function getCiceksepetiListingCategoriesIdList(): array
+    {
+        $sql = "SELECT oo_id FROM `object_query_varyantproduct` WHERE marketplaceType = 'Ciceksepeti'";
+        $ciceksepetiVariantIds = Utility::fetchFromSql($sql);
+        if (!is_array($ciceksepetiVariantIds) || empty($ciceksepetiVariantIds)) {
+            return [];
+        }
+        $categoryIdList = [];
+        foreach ($ciceksepetiVariantIds as $ciceksepetiVariantId) {
+            $variantProduct = VariantProduct::getById($ciceksepetiVariantId['oo_id']);
+            if (!$variantProduct instanceof VariantProduct) {
+                continue;
+            }
+            $apiData = json_decode($variantProduct->jsonRead('apiResponseJson'), true);
+            $categoryIdList[] = $apiData['categoryId'];
+        }
+        return array_unique($categoryIdList);
     }
 
     private function passiveVariant()
