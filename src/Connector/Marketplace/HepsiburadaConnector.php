@@ -449,7 +449,6 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         $body .= "Content-Type: application/json\r\n\r\n";
         $body .= $jsonData . "\r\n";
         $body .= "--$boundary--\r\n";
-
         $response = $this->httpClient->request(
             'POST',
             "https://mpop-sit.hepsiburada.com/product/api/products/import?version=1",
@@ -463,7 +462,6 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         if ($statusCode !== 200) {
             echo "Error: $statusCode\n";
         }
-
     }
 
     private function updateCategoryAndAttributes()
