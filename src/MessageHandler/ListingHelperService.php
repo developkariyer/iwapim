@@ -143,7 +143,8 @@ class ListingHelperService
             return null;
         }
         foreach ($listingItems as $listingItem) {
-            if (!$listingItem instanceof VariantProduct) {
+            $marketplace = $listingItem->getMarketplaceType();
+            if (!$listingItem instanceof VariantProduct || $marketplace == 'Etsy') {
                 continue;
             }
             $images = array_merge($images, $this->getListingImages($listingItem));
