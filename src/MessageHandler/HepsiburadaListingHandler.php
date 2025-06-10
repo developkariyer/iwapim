@@ -102,24 +102,25 @@ class HepsiburadaListingHandler
     {
         $result = [];
         foreach ($data as $product) {
-            $item = [
-                'categoryId' => $product['geminiCategoryId'],
-                'attributes' => $this->normalizeAttributes($product['Attributes']),
-                'merchantSku' => $product['stockCode'],
-                'VaryantGroupID' => $product['mainProductCode'],
-                'UrunAdi' => $product['geminiTitle'],
-                'UrunAciklamasi' => $product['geminiDescription'],
-                'Marka' => 'Colorfullworlds',
-                'GarantiSuresi' => 24,
-                'price' => $product['salesPrice'],
-                'stock' => 5,
-            ];
-            for ($i = 0; $i < 5; $i++) {
-                if (!empty($product['images'][$i]['url'])) {
-                    $item['Image' . ($i + 1)] = $product['images'][$i]['url'];
-                }
-            }
-            $result[] = $item;
+            print_r($product);
+//            $item = [
+//                'categoryId' => $product['geminiCategoryId'],
+//                'attributes' => $this->normalizeAttributes($product['Attributes']),
+//                'merchantSku' => $product['stockCode'],
+//                'VaryantGroupID' => $product['mainProductCode'],
+//                'UrunAdi' => $product['geminiTitle'],
+//                'UrunAciklamasi' => $product['geminiDescription'],
+//                'Marka' => 'Colorfullworlds',
+//                'GarantiSuresi' => 24,
+//                'price' => $product['salesPrice'],
+//                'stock' => 5,
+//            ];
+//            for ($i = 0; $i < 5; $i++) {
+//                if (!empty($product['images'][$i]['url'])) {
+//                    $item['Image' . ($i + 1)] = $product['images'][$i]['url'];
+//                }
+//            }
+//            $result[] = $item;
         }
         $this->logger->info("[" . __METHOD__ . "] 📦 Listing Data Ready " . count($result) . " Product(s) Formatted For Hepsiburada Listing.");
         $result = json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
