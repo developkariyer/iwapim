@@ -88,15 +88,15 @@ class HepsiburadaListingHandler
         return $data;
     }
 
-    private function queryHepsiburadaAttribute($attributeName, $categoryId)
-    {
-        $sql = "select attribute_id from iwa_hepsiburada_category_attributes where attribute_name = :attributeName and category_id = :categoryId";
-        $result = Utility::fetchFromSql($sql, ['attribute_name' => $attributeName, 'categoryId' => $categoryId]);
-        if (!$result && empty($result[0])) {
-            return null;
-        }
-        return $result[0]['attribute_id'];
-    }
+//    private function queryHepsiburadaAttribute($attributeName, $categoryId)
+//    {
+//        $sql = "select attribute_id from iwa_hepsiburada_category_attributes where attribute_name = :attributeName and category_id = :categoryId";
+//        $result = Utility::fetchFromSql($sql, ['attribute_name' => $attributeName, 'categoryId' => $categoryId]);
+//        if (!$result && empty($result[0])) {
+//            return null;
+//        }
+//        return $result[0]['attribute_id'];
+//    }
 
     private function normalizeHepsiburadaData($data)
     {
@@ -244,7 +244,7 @@ class HepsiburadaListingHandler
         $attributeSizeSql = "SELECT attribute_id, attribute_name FROM iwa_hepsiburada_category_attributes 
                          WHERE category_id = :categoryId 
                          AND type = 'variantAttributes' 
-                         AND attribute_name = 'Ölçü' 
+                         AND attribute_name = 'Seçenek' 
                          LIMIT 1";
         $sizeData = Utility::fetchFromSql($attributeSizeSql, ['categoryId' => $categoryId]);
         if (!empty($sizeData) && isset($sizeData[0])) {
