@@ -100,15 +100,10 @@ class HepsiburadaListingHandler
 
     private function normalizeHepsiburadaData($data)
     {
-        $categoryId = $data['geminiCategoryId'] ?? null;
-        if (!$categoryId) {
-            $this->logger->error("[" . __METHOD__ . "] ❌ CategoryId Not Found For Product: {$data['stockCode']} ");
-            return;
-        }
         $result = [];
         foreach ($data as $product) {
             $item = [
-                'categoryId' => $categoryId,
+                'categoryId' => $product['geminiCategoryId'],
                 'attributes' => $this->normalizeAttributes($product['Attributes']),
                 'merchantSku' => $product['stockCode'],
                 'VaryantGroupID' => $product['mainProductCode'],
