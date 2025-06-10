@@ -102,13 +102,9 @@ class HepsiburadaListingHandler
     {
         $result = [];
         foreach ($data as $product) {
-            print_r("PRODUCT \n");
-            print_r($product);
-            print_r("PRODUCT ATTRIBUTES \n");
-            print_r($product['Attributes']);
             $item = [
                 'categoryId' => $product['geminiCategoryId'],
-                'attributes' => $this->normalizeAttributes($product['Attributes']),
+                'attributes' => $this->normalizeAttributes($product['attributes']),
                 'merchantSku' => $product['stockCode'],
                 'VaryantGroupID' => $product['mainProductCode'],
                 'UrunAdi' => $product['geminiTitle'],
@@ -156,14 +152,10 @@ class HepsiburadaListingHandler
     {
         $result = [];
         foreach ($attributes as $attribute) {
-            echo "attribute id: {$attribute['id']}\n";
-            echo "attribute value id: {$attribute['ValueId']}\n";
             $result[] = [
                 $attribute['id'] => $attribute['ValueId']
             ];
         }
-        print_r("Normalize attributes functon\n");
-        print_r($result);
         return $result;
     }
 
