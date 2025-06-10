@@ -156,6 +156,7 @@ class HepsiburadaListingHandler
                 $attribute['id'] => $attribute['ValueId']
             ];
         }
+        return $result;
     }
 
     private function buildProductAttributes(array $product, array $variantAttributes): array
