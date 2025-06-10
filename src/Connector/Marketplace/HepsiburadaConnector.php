@@ -428,6 +428,44 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         $this->updateCategoryAndAttributes();
     }
 
+    public function createListing($data)
+    {
+        echo "-------------------------------API SENDING DATA Hepsiburada CONNECTOR-----------------------------------------------------------\n";
+        $jsonData = json_encode($data);
+        if ($jsonData === false) {
+            echo "Error encoding data to JSON: " . json_last_error_msg() . "\n";
+            throw new \Exception("Failed to encode data to JSON for Hepsiburada API: " . json_last_error_msg());
+        }
+        $multipartData = [
+            [
+                'name'     => 'file',
+                'contents' => $jsonData,
+                'filename' => 'integrator.json',
+                'headers'  => [
+                    'Content-Type' => 'application/json',
+                ],
+            ],
+        ];
+        $headers = [
+            'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
+            "User-Agent" => "colorfullworlds_dev",
+            'Accept' => 'application/json'
+        ];
+        $response = $this->httpClient->request(
+            'POST',
+            "https://mpop-sit.hepsiburada.com/product/api/products/import?version=1",
+            [
+                'headers' => $headers,
+                'multipart' => $multipartData,
+            ]
+        );
+        print_r($response->getContent());
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+        }
+    }
+
     private function updateCategoryAndAttributes()
     {
 //        $this->downloadCategories();

@@ -56,7 +56,11 @@ class HepsiburadaListingHandler
         $this->logger->info("[" . __METHOD__ . "] ✅ Filled Attribute Data ");
         $normalizedHepsiburadaData = $this->normalizeHepsiburadaData($filledAttributeData);
         $this->logger->info("[" . __METHOD__ . "] ✅ Normalized Hepsiburada Data ");
-        print_r($normalizedHepsiburadaData);
+        //print_r($normalizedHepsiburadaData);
+        $hepsiburadaConnector = new HepsiburadaConnector(Marketplace::getById(265919));
+        $result = $hepsiburadaConnector->createListing($normalizedHepsiburadaData);
+        $this->logger->info("[" . __METHOD__ . "] ✅  Result batch:\n" . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        print_r($result);
     }
 
     public function fillAttributeData(array $data): array
