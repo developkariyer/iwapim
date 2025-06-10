@@ -258,12 +258,12 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
 
 
 
-        $this->downloadCategories();
-        $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
-        echo "Ciceksepeti Category List Updated\n";
-        foreach ($categoryIdList as $categoryId) {
-            $this->getCategoryAttributesAndSaveDatabase($categoryId);
-        }
+//        $this->downloadCategories();
+//        $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
+//        echo "Ciceksepeti Category List Updated\n";
+//        foreach ($categoryIdList as $categoryId) {
+//            $this->getCategoryAttributesAndSaveDatabase($categoryId);
+//        }
 //       $this->passiveVariant();
     }
 

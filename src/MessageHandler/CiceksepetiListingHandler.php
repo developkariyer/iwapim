@@ -20,6 +20,7 @@ use App\Logger\LoggerFactory;
 class CiceksepetiListingHandler
 {
     private LoggerInterface $logger;
+
     public function __construct(ListingHelperService $listingHelperService)
     {
         $this->listingHelper = $listingHelperService;
