@@ -52,7 +52,93 @@ class HepsiburadaListingHandler
         $this->logger->info("[" . __METHOD__ . "] ✅ Category Data Fetched ");
         $geminiFilledData = $this->geminiProcess($listingInfo, $categories);
         $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Filled ");
+        $filledAttributeData =  $this->fillAttributeData($geminiFilledData);
+        $this->logger->info("[" . __METHOD__ . "] ✅ Filled Attribute Data ");
         print_r($geminiFilledData);
+    }
+
+    public function fillAttributeData(array $data): array
+    {
+        if (empty($data)) {
+            $this->logger->error("[" . __METHOD__ . "] ❌  No product data provided to fill attributes ");
+            return [];
+        }
+        foreach ($data as $sku => &$product) {
+            $this->logger->info("[" . __METHOD__ . "] 🔵 IWASKU: {$product['stockCode']} ");
+            if (empty($product['geminiCategoryId'])) {
+                $this->logger->error("[" . __METHOD__ . "] ❌ Missing CategoryId Product {$product['stockCode']} Has No CategoryID ");
+                continue;
+            }
+            $categoryInfo = $this->getCategoryInfo($product['geminiCategoryId']);
+            if (!$categoryInfo) {
+                continue;
+            }
+            $variantAttributes = $this->getVariantAttributes($product['geminiCategoryId']);
+//            if (empty($variantAttributes['color']) && empty($variantAttributes['size'])) {
+//                $this->logger->error("[" . __METHOD__ . "] ❌ Size AttributeId Not Found: {$product['stockCode']} ");
+//                continue;
+//            }
+//            $product['Attributes'] = $this->buildProductAttributes(
+//                $product,
+//                $variantAttributes
+//            );
+        }
+        return $data;
+    }
+
+    private function getCategoryInfo(int $categoryId): ?array
+    {
+        $categorySql = "SELECT category_name FROM iwa_hepsiburada_categories WHERE id = :categoryId";
+        $categoryData = Utility::fetchFromSql($categorySql, ['categoryId' => $categoryId]);
+        if (empty($categoryData) || !isset($categoryData[0])) {
+            $this->logger->error("[" . __METHOD__ . "] ❌ Category Error Category Not Found For categoryId: {$categoryId}");
+            return null;
+        }
+        $categoryName = $categoryData[0]['category_name'] ?? null;
+        $this->logger->info("[" . __METHOD__ . "] ✅ Category Found CategoryId: {$categoryId}, Name: {$categoryName}");
+        return [
+            'id' => $categoryId,
+            'name' => $categoryName
+        ];
+    }
+
+    private function getVariantAttributes(int $categoryId): array
+    {
+        $result = [
+            'color' => null,
+            'size' => null
+        ];
+        $attributeColorSql = "SELECT attribute_id, attribute_name FROM iwa_hepsiburada_category_attributes 
+                          WHERE category_id = :categoryId 
+                          AND type = 'variantAttributes' 
+                          AND attribute_name = 'Renk' 
+                          LIMIT 1";
+        $colorData = Utility::fetchFromSql($attributeColorSql, ['categoryId' => $categoryId]);
+        if (!empty($colorData) && isset($colorData[0])) {
+            $result['color'] = [
+                'id' => $colorData[0]['attribute_id'],
+                'name' => $colorData[0]['attribute_name']
+            ];
+            $this->logger->info("[" . __METHOD__ . "] ✅ Color Attribute Found: ID: {$result['color']['id']}, Name: {$result['color']['name']}");
+        } else {
+            $this->logger->error("[" . __METHOD__ . "] ❌ Color Attribute Not Found For CategoryId: {$categoryId}");
+        }
+        $attributeSizeSql = "SELECT attribute_id, attribute_name FROM iwa_hepsiburada_category_attributes 
+                         WHERE category_id = :categoryId 
+                         AND type = 'variantAttributes' 
+                         AND attribute_name = 'Ölçü' 
+                         LIMIT 1";
+        $sizeData = Utility::fetchFromSql($attributeSizeSql, ['categoryId' => $categoryId]);
+        if (!empty($sizeData) && isset($sizeData[0])) {
+            $result['size'] = [
+                'id' => $sizeData[0]['attribute_id'],
+                'name' => $sizeData[0]['attribute_name']
+            ];
+            $this->logger->info("[" . __METHOD__ . "] ✅ Size Attribute Found: ID: {$result['size']['id']}, Name: {$result['size']['name']}");
+        } else {
+            $this->logger->error("[" . __METHOD__ . "] ❌ [Size Attribute] Not Found For CategoryId: {$categoryId}");
+        }
+        return $result;
     }
 
     private function geminiProcess($data, $categories)
