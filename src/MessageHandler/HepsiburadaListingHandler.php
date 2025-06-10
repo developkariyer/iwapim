@@ -122,13 +122,13 @@ class HepsiburadaListingHandler
 //            }
 //            $result[] = $item;
         }
-        $this->logger->info("[" . __METHOD__ . "] 📦 Listing Data Ready " . count($result) . " Product(s) Formatted For Hepsiburada Listing.");
-        $result = json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-        if ($result === false) {
-            $this->logger->error("[" . __METHOD__ . "] ❌ JSON Encode Error Failed To Encode Formatted Listing Data.");
-            return false;
-        }
-        return $result;
+//        $this->logger->info("[" . __METHOD__ . "] 📦 Listing Data Ready " . count($result) . " Product(s) Formatted For Hepsiburada Listing.");
+//        $result = json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+//        if ($result === false) {
+//            $this->logger->error("[" . __METHOD__ . "] ❌ JSON Encode Error Failed To Encode Formatted Listing Data.");
+//            return false;
+//        }
+//        return $result;
     }
 
     private function normalizeAttributes($attributes)
