@@ -54,12 +54,16 @@ class CiceksepetiListingHandler
         $categories = $this->getCiceksepetiCategoriesDetails();
         $this->logger->info("[" . __METHOD__ . "] ✅ Category Data Fetched ");
         $geminiFilledData = $this->geminiProcess($listingInfo, $categories);
+        if (!$geminiFilledData) {
+            $this->logger->error("[" . __METHOD__ . "] ❌ Gemini Api Error ");
+            return;
+        }
         $controlGeminiResult = $this->controlGeminiFilledData($geminiFilledData);
         if (!$controlGeminiResult) {
             $this->logger->error("[" . __METHOD__ . "] ❌ Gemini Api Data Control Failed  ");
             return;
         }
-        $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Filled ");
+        $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Filled Successfully");
         print_r(json_encode($geminiFilledData));
 //        $filledAttributeData =  $this->fillAttributeData($geminiFilledData);
 //        $this->logger->info("[" . __METHOD__ . "] ✅ Filled Attribute Data ");
@@ -72,7 +76,7 @@ class CiceksepetiListingHandler
 //        print_r($result);
     }
 
-    private function controlGeminiFilledData($data)
+    private function controlGeminiFilledData($data): bool
     {
          foreach ($data as $product) {
              if (is_null($product['geminiCategoryId']) || is_null($product['geminiTitle']) || is_null($product['geminiDescription']) || is_null($product['geminiColor'])) {
@@ -102,6 +106,9 @@ class CiceksepetiListingHandler
         $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Api Send Data ");
         $geminiApiResult = GeminiConnector::chat($prompt, 'ciceksepeti');
         $geminiResult = $this->parseGeminiResult($geminiApiResult);
+        if (!$geminiResult) {
+            return null;
+        }
         foreach ($data as &$product) {
             $product['geminiCategoryId']   = $geminiResult['categoryId'] ?? null;
             $product['geminiTitle']        = $geminiResult['title'] ?? null;
@@ -167,12 +174,16 @@ class CiceksepetiListingHandler
         EOD;
     }
 
-    private function parseGeminiResult($result)
+    private function parseGeminiResult($result): ?array
     {
-        $json = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
+        if (!isset($result['candidates'][0]['content']['parts'][0]['text']) || !is_string($result['candidates'][0]['content']['parts'][0]['text'])) {
+            $this->logger->error("[" . __METHOD__ . "] ❌ Gemini Api Parse Result Error No Data Found  ");
+            return null;
+        }
+        $json = $result['candidates'][0]['content']['parts'][0]['text'];
         $json = preg_replace('/[\x00-\x1F\x7F]/u', '', $json);
         $data = json_decode($json, true);
-        return (json_last_error() === JSON_ERROR_NONE) ? $data : null;
+        return (json_last_error() === JSON_ERROR_NONE && is_array($data)) ? $data : null;
     }
 
     private function getCiceksepetiCategoriesDetails(): false|array|string
