@@ -100,16 +100,15 @@ class ListingHelperService
         $stockQuantity = $apiJsonShopify['inventoryQuantity'] ?? '';
         $salesPrice = $apiJsonShopify['price'] ?? '';
         //$images = $this->getShopifyImages($parentApiJsonShopify);
-        $images = [];
-        if (!$shopifyIsActive || empty($images) || empty($title) || empty($description) || empty($stockQuantity) || empty($salesPrice) ) {
-            return [];
-        }
+//        if (!$shopifyIsActive || empty($images) || empty($title) || empty($description) || empty($stockQuantity) || empty($salesPrice) ) {
+//            return [];
+//        }
         return [
             'title' => $title,
             'description' => $description,
             'stockQuantity' => $stockQuantity,
             'salesPrice' => $salesPrice,
-            'images' => $images
+            //'images' => $images
         ];
     }
 
