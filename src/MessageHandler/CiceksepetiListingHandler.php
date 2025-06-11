@@ -60,7 +60,7 @@ class CiceksepetiListingHandler
             return;
         }
         $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Filled ");
-        print_r($geminiFilledData);
+        print_r(json_encode($geminiFilledData, true));
 //        $filledAttributeData =  $this->fillAttributeData($geminiFilledData);
 //        $this->logger->info("[" . __METHOD__ . "] ✅ Filled Attribute Data ");
 //        $normalizedCiceksepetiData = $this->normalizeCiceksepetiData($filledAttributeData);
@@ -98,7 +98,6 @@ class CiceksepetiListingHandler
             ];
         }
         $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Created Variant Count: " . count($geminiData['variants']));
-        print_r($geminiData);
         $prompt = $this->generateListingPrompt(json_encode(['products' => $geminiData], JSON_UNESCAPED_UNICODE), $categories);
         $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Api Send Data ");
         $geminiApiResult = GeminiConnector::chat($prompt, 'ciceksepeti');

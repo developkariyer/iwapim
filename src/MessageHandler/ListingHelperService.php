@@ -34,7 +34,6 @@ class ListingHelperService
             $logger->error("[" . __METHOD__ . "] ❌ No variant IDs found");
             return null;
         }
-        print_r($variantIds);
         $result = [];
         foreach ($variantIds as $variantId) {
             $referenceMarketplaceVariantProduct = VariantProduct::getById($variantId);
