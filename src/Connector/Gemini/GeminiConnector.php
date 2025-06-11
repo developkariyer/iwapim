@@ -6,6 +6,7 @@ use Symfony\Component\HttpClient\HttpClient;
  * MODELS
  * gemini-2.0-flash (LAST REQUEST 404 ERROR)
  * gemini-2.5-flash-preview-04-17
+ * gemini-2.5-flash-preview-05-20
  * */
 class GeminiConnector
 {
@@ -69,7 +70,7 @@ class GeminiConnector
         ]
     ];
 
-    public static function chat($message, string $platform = 'default', $model='gemini-2.5-flash-preview-04-17', $maxRetries = 3, $initialDelay  = 30)
+    public static function chat($message, string $platform = 'default', $model='gemini-2.5-flash-preview-05-20', $maxRetries = 3, $initialDelay  = 30)
     {
         $geminiApiKey = $_ENV['GEMINI_API_KEY'];
         $httpClient = HttpClient::create();
