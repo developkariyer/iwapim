@@ -51,7 +51,7 @@ class ListingHelperService
             $referenceMarketplaceMainProductIdentifier = $referenceMarketplaceMainProduct->getProductIdentifier();
             $referenceMarketplaceMainProductIwasku = $referenceMarketplaceMainProduct->getIwasku();
             $referenceMarketplaceMainProductSize = $referenceMarketplaceMainProduct->getVariationSize();
-            $referenceMarketplaceMainProductSizeLabel =  $this->findSizeLabelFromMap($referenceMarketplaceMainProductSize, $sizesAndLabels) ?? '';
+           // $referenceMarketplaceMainProductSizeLabel =  $this->findSizeLabelFromMap($referenceMarketplaceMainProductSize, $sizesAndLabels) ?? '';
             $referenceMarketplaceMainProductColor = $referenceMarketplaceMainProduct->getVariationColor();
             $referenceMarketplaceMainProductEanGtin = $referenceMarketplaceMainProduct->getEanGtin() ?? '';
             if (empty($referenceMarketplaceMainProductIdentifier) || empty($referenceMarketplaceMainProductIwasku) || empty($referenceMarketplaceMainProductSize) || empty($referenceMarketplaceMainProductColor)) {
@@ -62,7 +62,7 @@ class ListingHelperService
               'mainProductCode' => $referenceMarketplaceMainProductIdentifier,
               'stockCode' => $referenceMarketplaceMainProductIwasku,
               'size' => $referenceMarketplaceMainProductSize,
-              'sizeLabel' => $referenceMarketplaceMainProductSizeLabel,
+              //'sizeLabel' => $referenceMarketplaceMainProductSizeLabel,
               'color' => $referenceMarketplaceMainProductColor,
               'ean' => $referenceMarketplaceMainProductEanGtin,
               //'sizeLabelMap' => $sizesAndLabels,
