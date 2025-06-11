@@ -67,20 +67,20 @@ class ListingHelperService
               'ean' => $referenceMarketplaceMainProductEanGtin,
               'sizeLabelMap' => $sizesAndLabels,
             ];
-//            $additionalData = match ($referenceMarketplaceType) {
-//                'Shopify' => $this->getShopifyAdditionalData($referenceMarketplaceVariantProduct),
-//                default => null,
-//            };
-//            if (empty($additionalData)) {
-//                $logger->error("[" . __METHOD__ . "] ❌ Reference marketplace $referenceMarketplaceKey variant product:$variantId additional data is empty");
-//                continue;
-//            }
+            $additionalData = match ($referenceMarketplaceType) {
+                'Shopify' => $this->getShopifyAdditionalData($referenceMarketplaceVariantProduct),
+                default => null,
+            };
+            if (empty($additionalData)) {
+                $logger->error("[" . __METHOD__ . "] ❌ Reference marketplace $referenceMarketplaceKey variant product:$variantId additional data is empty");
+                continue;
+            }
 //            $images = $this->mainProductAllListingImages($referenceMarketplaceMainProduct);
 //            if (!empty($images)) {
 //                $additionalData['images'] = $images;
 //            }
-            //$mergedData = array_merge($baseProductData, $additionalData);
-            //$result[] = $mergedData;
+            $mergedData = array_merge($baseProductData, $additionalData);
+            $result[] = $mergedData;
         }
         $resultCount = count($result);
         $mainProductCodes = array_column($result, 'mainProductCode');
@@ -92,24 +92,24 @@ class ListingHelperService
 
     private function getShopifyAdditionalData($referenceMarketplaceVariantProduct)
     {
-        $parentApiJsonShopify = json_decode($referenceMarketplaceVariantProduct->jsonRead('parentResponseJson'), true);
-        $apiJsonShopify = json_decode($referenceMarketplaceVariantProduct->jsonRead('apiResponseJson'), true);
-        $shopifyIsActive = isset($parentApiJsonShopify['status']) && $parentApiJsonShopify['status'] === 'ACTIVE';
-        $title = $parentApiJsonShopify['title'] ?? '';
-        $description = $parentApiJsonShopify['descriptionHtml'] ?? '';
-        $stockQuantity = $apiJsonShopify['inventoryQuantity'] ?? '';
-        $salesPrice = $apiJsonShopify['price'] ?? '';
-        $images = $this->getShopifyImages($parentApiJsonShopify);
-        if (!$shopifyIsActive || empty($images) || empty($title) || empty($description) || empty($stockQuantity) || empty($salesPrice) ) {
-            return [];
-        }
-        return [
-            'title' => $title,
-            'description' => $description,
-            'stockQuantity' => $stockQuantity,
-            'salesPrice' => $salesPrice,
-            'images' => $images
-        ];
+//        $parentApiJsonShopify = json_decode($referenceMarketplaceVariantProduct->jsonRead('parentResponseJson'), true);
+//        $apiJsonShopify = json_decode($referenceMarketplaceVariantProduct->jsonRead('apiResponseJson'), true);
+//        $shopifyIsActive = isset($parentApiJsonShopify['status']) && $parentApiJsonShopify['status'] === 'ACTIVE';
+//        $title = $parentApiJsonShopify['title'] ?? '';
+//        $description = $parentApiJsonShopify['descriptionHtml'] ?? '';
+//        $stockQuantity = $apiJsonShopify['inventoryQuantity'] ?? '';
+//        $salesPrice = $apiJsonShopify['price'] ?? '';
+//        $images = $this->getShopifyImages($parentApiJsonShopify);
+//        if (!$shopifyIsActive || empty($images) || empty($title) || empty($description) || empty($stockQuantity) || empty($salesPrice) ) {
+//            return [];
+//        }
+//        return [
+//            'title' => $title,
+//            'description' => $description,
+//            'stockQuantity' => $stockQuantity,
+//            'salesPrice' => $salesPrice,
+//            'images' => $images
+//        ];
     }
 
     private function getShopifyImages($parentApiJsonShopify): array | null
