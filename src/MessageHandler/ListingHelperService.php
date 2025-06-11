@@ -99,7 +99,8 @@ class ListingHelperService
         $description = $parentApiJsonShopify['descriptionHtml'] ?? '';
         $stockQuantity = $apiJsonShopify['inventoryQuantity'] ?? '';
         $salesPrice = $apiJsonShopify['price'] ?? '';
-        $images = $this->getShopifyImages($parentApiJsonShopify);
+        //$images = $this->getShopifyImages($parentApiJsonShopify);
+        $images = [];
         if (!$shopifyIsActive || empty($images) || empty($title) || empty($description) || empty($stockQuantity) || empty($salesPrice) ) {
             return [];
         }
