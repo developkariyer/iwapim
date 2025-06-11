@@ -36,7 +36,7 @@ class ListingHelperService
         }
         print_r($variantIds);
         $result = [];
-        /*foreach ($variantIds as $variantId) {
+        foreach ($variantIds as $variantId) {
             $referenceMarketplaceVariantProduct = VariantProduct::getById($variantId);
             if (!$referenceMarketplaceVariantProduct instanceof VariantProduct) {
                 $logger->error("[" . __METHOD__ . "] ❌ Reference marketplace  variant product not found: $variantId");
@@ -47,7 +47,7 @@ class ListingHelperService
                 $logger->error("[" . __METHOD__ . "] ❌ Reference marketplace $referenceMarketplaceKey variant product not found $variantId");
                 continue;
             }
-            $sizesAndLabels = $this->getSizeLabelFromParent($referenceMarketplaceMainProduct);
+            //$sizesAndLabels = $this->getSizeLabelFromParent($referenceMarketplaceMainProduct);
             $referenceMarketplaceMainProductIdentifier = $referenceMarketplaceMainProduct->getProductIdentifier();
             $referenceMarketplaceMainProductIwasku = $referenceMarketplaceMainProduct->getIwasku();
             $referenceMarketplaceMainProductSize = $referenceMarketplaceMainProduct->getVariationSize();
@@ -65,7 +65,7 @@ class ListingHelperService
               'sizeLabel' => $referenceMarketplaceMainProductSizeLabel,
               'color' => $referenceMarketplaceMainProductColor,
               'ean' => $referenceMarketplaceMainProductEanGtin,
-              'sizeLabelMap' => $sizesAndLabels,
+              //'sizeLabelMap' => $sizesAndLabels,
             ];
             $additionalData = match ($referenceMarketplaceType) {
                 'Shopify' => $this->getShopifyAdditionalData($referenceMarketplaceVariantProduct),
@@ -87,7 +87,7 @@ class ListingHelperService
         $mainProductCode = !empty($mainProductCodes) ? $mainProductCodes[0] : 'N/A';
         $statusIcon = $variantIdsCount === $resultCount ? "✅" : "⚠️";
         $logger->info("[" . __METHOD__ . "] $statusIcon Processed Reference Marketplace: $referenceMarketplaceKey variant IDs: $resultCount / $variantIdsCount | Main Product Code: $mainProductCode");
-        return $result;*/
+        return $result;
     }
 
     private function getShopifyAdditionalData($referenceMarketplaceVariantProduct)
