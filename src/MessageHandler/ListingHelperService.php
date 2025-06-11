@@ -34,6 +34,7 @@ class ListingHelperService
             $logger->error("[" . __METHOD__ . "] ❌ No variant IDs found");
             return null;
         }
+        print_r($variantIds);
         $result = [];
         foreach ($variantIds as $variantId) {
             $referenceMarketplaceVariantProduct = VariantProduct::getById($variantId);
@@ -74,10 +75,10 @@ class ListingHelperService
                 $logger->error("[" . __METHOD__ . "] ❌ Reference marketplace $referenceMarketplaceKey variant product:$variantId additional data is empty");
                 continue;
             }
-            $images = $this->mainProductAllListingImages($referenceMarketplaceMainProduct);
-            if (!empty($images)) {
-                $additionalData['images'] = $images;
-            }
+//            $images = $this->mainProductAllListingImages($referenceMarketplaceMainProduct);
+//            if (!empty($images)) {
+//                $additionalData['images'] = $images;
+//            }
             $mergedData = array_merge($baseProductData, $additionalData);
             $result[] = $mergedData;
         }
@@ -98,7 +99,7 @@ class ListingHelperService
         $description = $parentApiJsonShopify['descriptionHtml'] ?? '';
         $stockQuantity = $apiJsonShopify['inventoryQuantity'] ?? '';
         $salesPrice = $apiJsonShopify['price'] ?? '';
-        $images = $this->getShopifyImages($parentApiJsonShopify);
+        //$images = $this->getShopifyImages($parentApiJsonShopify);
         if (!$shopifyIsActive || empty($images) || empty($title) || empty($description) || empty($stockQuantity) || empty($salesPrice) ) {
             return [];
         }
@@ -107,7 +108,7 @@ class ListingHelperService
             'description' => $description,
             'stockQuantity' => $stockQuantity,
             'salesPrice' => $salesPrice,
-            'images' => $images
+           // 'images' => $images
         ];
     }
 
