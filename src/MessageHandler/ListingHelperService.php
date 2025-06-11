@@ -117,20 +117,22 @@ class ListingHelperService
         $images = [];
         if (isset($parentApiJsonShopify['media']['nodes'])) {
             foreach ($parentApiJsonShopify['media']['nodes'] as $node) {
-                if (
-                    isset($node['mediaContentType'], $node['preview']['image']['url'], $node['preview']['image']['width'], $node['preview']['image']['height']) &&
-                    $node['mediaContentType'] === 'IMAGE'
-                ) {
-                    $imageUrl = $node['preview']['image']['url'];
-                    $headers = @get_headers($imageUrl);
-                    if ($headers && strpos($headers[0], '200') !== false) {
-                        $images[] = [
-                            'url' => $imageUrl,
-                            'width' => $node['preview']['image']['width'],
-                            'height' => $node['preview']['image']['height'],
-                        ];
-                    }
-                }
+
+
+//                if (
+//                    isset($node['mediaContentType'], $node['preview']['image']['url'], $node['preview']['image']['width'], $node['preview']['image']['height']) &&
+//                    $node['mediaContentType'] === 'IMAGE'
+//                ) {
+//                    $imageUrl = $node['preview']['image']['url'];
+//                    $headers = @get_headers($imageUrl);
+//                    if ($headers && strpos($headers[0], '200') !== false) {
+//                        $images[] = [
+//                            'url' => $imageUrl,
+//                            'width' => $node['preview']['image']['width'],
+//                            'height' => $node['preview']['image']['height'],
+//                        ];
+//                    }
+//                }
             }
         }
         return $images;
