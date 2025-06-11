@@ -50,11 +50,10 @@ class CiceksepetiListingHandler
     {
         $this->logger->info("[" . __METHOD__ . "] ✅ Processing New Listing ");
         $listingInfo = $this->listingHelper->getPimListingsInfo($message, $this->logger);
-        print_r($listingInfo);
         $this->logger->info("[" . __METHOD__ . "] ✅ Pim Listings Info Fetched ");
-//        $categories = $this->getCiceksepetiCategoriesDetails();
-//        $this->logger->info("[" . __METHOD__ . "] ✅ Category Data Fetched ");
-//        $geminiFilledData = $this->geminiProcess($listingInfo, $categories);
+        $categories = $this->getCiceksepetiCategoriesDetails();
+        $this->logger->info("[" . __METHOD__ . "] ✅ Category Data Fetched ");
+        $geminiFilledData = $this->geminiProcess($listingInfo, $categories);
 //        $controlGeminiResult = $this->controlGeminiFilledData($geminiFilledData);
 //        if (!$controlGeminiResult) {
 //            $this->logger->error("[" . __METHOD__ . "] ❌ Gemini Api Data Control Failed  ");
@@ -103,7 +102,8 @@ class CiceksepetiListingHandler
             ];
         }
         $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Created Variant Count: " . count($geminiData['variants']));
-        $prompt = $this->generateListingPrompt(json_encode(['products' => $geminiData], JSON_UNESCAPED_UNICODE), $categories);
+        print_r($geminiData);
+        /*$prompt = $this->generateListingPrompt(json_encode(['products' => $geminiData], JSON_UNESCAPED_UNICODE), $categories);
         $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Api Send Data ");
         $geminiApiResult = GeminiConnector::chat($prompt, 'ciceksepeti');
         $geminiResult = $this->parseGeminiResult($geminiApiResult);
@@ -119,7 +119,7 @@ class CiceksepetiListingHandler
                 }
             }
         }
-        return $data;
+        return $data;*/
     }
 
     private function generateListingPrompt($jsonString, $categories): string
