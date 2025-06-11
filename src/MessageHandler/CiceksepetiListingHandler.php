@@ -60,7 +60,7 @@ class CiceksepetiListingHandler
             return;
         }
         $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Filled ");
-        print_r(json_encode($geminiFilledData, true));
+        print_r(json_encode($geminiFilledData));
 //        $filledAttributeData =  $this->fillAttributeData($geminiFilledData);
 //        $this->logger->info("[" . __METHOD__ . "] ✅ Filled Attribute Data ");
 //        $normalizedCiceksepetiData = $this->normalizeCiceksepetiData($filledAttributeData);
