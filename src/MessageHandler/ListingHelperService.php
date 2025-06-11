@@ -47,11 +47,11 @@ class ListingHelperService
                 $logger->error("[" . __METHOD__ . "] ❌ Reference marketplace $referenceMarketplaceKey variant product not found $variantId");
                 continue;
             }
-            //$sizesAndLabels = $this->getSizeLabelFromParent($referenceMarketplaceMainProduct);
+            $sizesAndLabels = $this->getSizeLabelFromParent($referenceMarketplaceMainProduct);
             $referenceMarketplaceMainProductIdentifier = $referenceMarketplaceMainProduct->getProductIdentifier();
             $referenceMarketplaceMainProductIwasku = $referenceMarketplaceMainProduct->getIwasku();
             $referenceMarketplaceMainProductSize = $referenceMarketplaceMainProduct->getVariationSize();
-           // $referenceMarketplaceMainProductSizeLabel =  $this->findSizeLabelFromMap($referenceMarketplaceMainProductSize, $sizesAndLabels) ?? '';
+            $referenceMarketplaceMainProductSizeLabel =  $this->findSizeLabelFromMap($referenceMarketplaceMainProductSize, $sizesAndLabels) ?? '';
             $referenceMarketplaceMainProductColor = $referenceMarketplaceMainProduct->getVariationColor();
             $referenceMarketplaceMainProductEanGtin = $referenceMarketplaceMainProduct->getEanGtin() ?? '';
             if (empty($referenceMarketplaceMainProductIdentifier) || empty($referenceMarketplaceMainProductIwasku) || empty($referenceMarketplaceMainProductSize) || empty($referenceMarketplaceMainProductColor)) {
@@ -62,25 +62,25 @@ class ListingHelperService
               'mainProductCode' => $referenceMarketplaceMainProductIdentifier,
               'stockCode' => $referenceMarketplaceMainProductIwasku,
               'size' => $referenceMarketplaceMainProductSize,
-              //'sizeLabel' => $referenceMarketplaceMainProductSizeLabel,
+              'sizeLabel' => $referenceMarketplaceMainProductSizeLabel,
               'color' => $referenceMarketplaceMainProductColor,
               'ean' => $referenceMarketplaceMainProductEanGtin,
-              //'sizeLabelMap' => $sizesAndLabels,
+              'sizeLabelMap' => $sizesAndLabels,
             ];
-            $additionalData = match ($referenceMarketplaceType) {
-                'Shopify' => $this->getShopifyAdditionalData($referenceMarketplaceVariantProduct),
-                default => null,
-            };
-            if (empty($additionalData)) {
-                $logger->error("[" . __METHOD__ . "] ❌ Reference marketplace $referenceMarketplaceKey variant product:$variantId additional data is empty");
-                continue;
-            }
+//            $additionalData = match ($referenceMarketplaceType) {
+//                'Shopify' => $this->getShopifyAdditionalData($referenceMarketplaceVariantProduct),
+//                default => null,
+//            };
+//            if (empty($additionalData)) {
+//                $logger->error("[" . __METHOD__ . "] ❌ Reference marketplace $referenceMarketplaceKey variant product:$variantId additional data is empty");
+//                continue;
+//            }
 //            $images = $this->mainProductAllListingImages($referenceMarketplaceMainProduct);
 //            if (!empty($images)) {
 //                $additionalData['images'] = $images;
 //            }
-            $mergedData = array_merge($baseProductData, $additionalData);
-            $result[] = $mergedData;
+            //$mergedData = array_merge($baseProductData, $additionalData);
+            //$result[] = $mergedData;
         }
         $resultCount = count($result);
         $mainProductCodes = array_column($result, 'mainProductCode');
