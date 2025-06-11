@@ -51,7 +51,7 @@ class CiceksepetiListingHandler
         $this->logger->info("[" . __METHOD__ . "] ✅ Processing New Listing ");
         $listingInfo = $this->listingHelper->getPimListingsInfo($message, $this->logger);
         print_r($listingInfo);
-//        $this->logger->info("[" . __METHOD__ . "] ✅ Pim Listings Info Fetched ");
+        $this->logger->info("[" . __METHOD__ . "] ✅ Pim Listings Info Fetched ");
 //        $categories = $this->getCiceksepetiCategoriesDetails();
 //        $this->logger->info("[" . __METHOD__ . "] ✅ Category Data Fetched ");
 //        $geminiFilledData = $this->geminiProcess($listingInfo, $categories);

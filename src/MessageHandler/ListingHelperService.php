@@ -117,7 +117,7 @@ class ListingHelperService
         $images = [];
         if (isset($parentApiJsonShopify['media']['nodes'])) {
             foreach ($parentApiJsonShopify['media']['nodes'] as $node) {
-                if ( isset($node['mediaContentType'], $node['preview']['image']['url'], $node['preview']['image']['width'], $node['preview']['image']['height']) && $node['mediaContentType'] === 'IMAGE') {
+                if (isset($node['mediaContentType'], $node['preview']['image']['url'], $node['preview']['image']['width'], $node['preview']['image']['height']) && $node['mediaContentType'] === 'IMAGE') {
                     $images[] = [
                             'url' => $node['preview']['image']['url'],
                             'width' => $node['preview']['image']['width'],
