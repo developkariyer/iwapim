@@ -34,8 +34,9 @@ class ListingHelperService
             $logger->error("[" . __METHOD__ . "] ❌ No variant IDs found");
             return null;
         }
+        print_r($variantIds);
         $result = [];
-        foreach ($variantIds as $variantId) {
+        /*foreach ($variantIds as $variantId) {
             $referenceMarketplaceVariantProduct = VariantProduct::getById($variantId);
             if (!$referenceMarketplaceVariantProduct instanceof VariantProduct) {
                 $logger->error("[" . __METHOD__ . "] ❌ Reference marketplace  variant product not found: $variantId");
@@ -86,7 +87,7 @@ class ListingHelperService
         $mainProductCode = !empty($mainProductCodes) ? $mainProductCodes[0] : 'N/A';
         $statusIcon = $variantIdsCount === $resultCount ? "✅" : "⚠️";
         $logger->info("[" . __METHOD__ . "] $statusIcon Processed Reference Marketplace: $referenceMarketplaceKey variant IDs: $resultCount / $variantIdsCount | Main Product Code: $mainProductCode");
-        return $result;
+        return $result;*/
     }
 
     private function getShopifyAdditionalData($referenceMarketplaceVariantProduct)
