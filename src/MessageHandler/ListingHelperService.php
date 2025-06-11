@@ -77,7 +77,7 @@ class ListingHelperService
             }
             $images = $this->mainProductAllListingImages($referenceMarketplaceMainProduct);
             if (!empty($images)) {
-                $additionalData['images'][] = $images;
+                $additionalData['images'] = array_merge($additionalData['images'], $images);
             }
             $mergedData = array_merge($baseProductData, $additionalData);
             $result[] = $mergedData;
@@ -154,7 +154,7 @@ class ListingHelperService
         }
         foreach ($listingItems as $listingItem) {
             $marketplace = $listingItem->getMarketplaceType();
-            if (!$listingItem instanceof VariantProduct || $marketplace == 'Etsy') {
+            if (!$listingItem instanceof VariantProduct || $marketplace == 'Etsy' || $marketplace == 'Shopify') {
                 continue;
             }
             $images = array_merge($images, $this->getListingImages($listingItem));
