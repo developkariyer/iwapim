@@ -181,16 +181,41 @@ class ListingHelperService
             if (!empty($parsed['query'])) {
                 $imageUrl .= '?' . $parsed['query'];
             }
-            $headers = @get_headers($imageUrl);
-            if ($headers && strpos($headers[0], '200') !== false) {
-                $images[] = [
-                    'url' => $imageUrl,
-                    'width' => $image->getWidth(),
-                    'height' => $image->getHeight()
-                ];
-            }
+            $images[] = [
+                'url' => $imageUrl,
+                'width' => $image->getWidth(),
+                'height' => $image->getHeight()
+            ];
         }
         return $images;
+
+//        $images = [];
+//        $imageGallery = $listingItem->getImageGallery();
+//        $host = \Pimcore\Tool::getHostUrl();
+//        foreach ($imageGallery as $hotspotImage) {
+//            $image = $hotspotImage->getImage();
+//            if (!$image) {
+//                continue;
+//            }
+//            $imageUrl = $host . $image->getFullPath();
+//            $imageUrl = preg_replace('/^http:/i', 'https:', $imageUrl);
+//            $imageUrl = str_replace('mesa.', '', $imageUrl);
+//            $parsed = parse_url($imageUrl);
+//            $encodedPath = implode('/', array_map('rawurlencode', explode('/', $parsed['path'] ?? '')));
+//            $imageUrl = $parsed['scheme'] . '://' . $parsed['host'] . $encodedPath;
+//            if (!empty($parsed['query'])) {
+//                $imageUrl .= '?' . $parsed['query'];
+//            }
+//            $headers = @get_headers($imageUrl);
+//            if ($headers && strpos($headers[0], '200') !== false) {
+//                $images[] = [
+//                    'url' => $imageUrl,
+//                    'width' => $image->getWidth(),
+//                    'height' => $image->getHeight()
+//                ];
+//            }
+//        }
+//        return $images;
     }
 
     private function findSizeLabelFromMap($size, $sizesAndLabels)
