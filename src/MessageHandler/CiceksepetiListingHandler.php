@@ -134,7 +134,7 @@ class CiceksepetiListingHandler
             Bu JSON'da eksik alan olan kategoriyi verdiğim kategori bilgilerine göre bulmanı istiyorum.
             Gönderdiğim veri de stockCode yer almaktadır çıktı formatında bunu kullanacaksın.
             -**title**: Title bilgisini değiştirmeden size veya renk bilgisi içeriyorsa bunu kaldır başka herhangi bir müdahalede bulunma tüm variantlar için aynı.
-            -**description**: Açıklama bilgisini değiştirmeden size bilgilerini kaldır başka herhangi bir müdahalede bulunma tüm variantlar için aynı.
+            -**description**: Açıklama bilgisini değiştirmeden size bilgilerini kaldır başka herhangi bir müdahalede bulunma tüm variantlar için aynı. Olduğu gibi kullan fazladan br etiketleri üretme
             -**categoryId**: Kategori verisinden en uygun kategoriyi bul id sini al ve kaydet
             -**color**: 
                 - renk bilgisi verideki color fieldı Türkçe ye çevir çevirdiğinde çiçeksepetinde bulunan çok bilinen renklerden olsun Eğer iki renk varsa her iki rengi de çevir, teke düşürme iki rengide örneğin:
