@@ -69,10 +69,10 @@ class CiceksepetiListingHandler
         $normalizedCiceksepetiData = $this->normalizeCiceksepetiData($filledAttributeData);
         $this->logger->info("[" . __METHOD__ . "] ✅ Normalized Ciceksepeti Data ");
         print_r($normalizedCiceksepetiData);
-//        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
-//        $result = $ciceksepetiConnector->createListing($normalizedCiceksepetiData);
-//        $this->logger->info("✅ [CiceksepetiConnector] Result batch:\n" . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-//        print_r($result);
+        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
+        $result = $ciceksepetiConnector->createListing($normalizedCiceksepetiData);
+        $this->logger->info("✅ [CiceksepetiConnector] Result batch:\n" . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        print_r($result);
     }
 
     private function controlGeminiFilledData($data): bool
