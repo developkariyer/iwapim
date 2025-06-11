@@ -170,6 +170,7 @@ class AutoListingCommand extends AbstractCommand
 
     private function processUpdateList($updateProductList, $targetMarketplaceId, $referenceMarketplaceId, $toMarketplace): void
     {
+        print_r($updateProductList);
 //        $message = new ProductListingMessage(
 //            'update_list',
 //            $targetMarketplaceId,
