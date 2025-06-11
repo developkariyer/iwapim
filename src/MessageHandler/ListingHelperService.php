@@ -99,16 +99,16 @@ class ListingHelperService
         $description = $parentApiJsonShopify['descriptionHtml'] ?? '';
         $stockQuantity = $apiJsonShopify['inventoryQuantity'] ?? '';
         $salesPrice = $apiJsonShopify['price'] ?? '';
-        //$images = $this->getShopifyImages($parentApiJsonShopify);
-//        if (!$shopifyIsActive || empty($images) || empty($title) || empty($description) || empty($stockQuantity) || empty($salesPrice) ) {
-//            return [];
-//        }
+        $images = $this->getShopifyImages($parentApiJsonShopify);
+        if (!$shopifyIsActive || empty($images) || empty($title) || empty($description) || empty($stockQuantity) || empty($salesPrice) ) {
+            return [];
+        }
         return [
             'title' => $title,
             'description' => $description,
             'stockQuantity' => $stockQuantity,
             'salesPrice' => $salesPrice,
-            //'images' => $images
+            'images' => $images
         ];
     }
 
@@ -117,6 +117,13 @@ class ListingHelperService
         $images = [];
         if (isset($parentApiJsonShopify['media']['nodes'])) {
             foreach ($parentApiJsonShopify['media']['nodes'] as $node) {
+                if ( isset($node['mediaContentType'], $node['preview']['image']['url'], $node['preview']['image']['width'], $node['preview']['image']['height']) && $node['mediaContentType'] === 'IMAGE') {
+                    $images[] = [
+                            'url' => $node['preview']['image']['url'],
+                            'width' => $node['preview']['image']['width'],
+                            'height' => $node['preview']['image']['height']
+                    ];
+                }
 
 
 //                if (
