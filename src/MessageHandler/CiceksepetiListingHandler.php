@@ -64,12 +64,11 @@ class CiceksepetiListingHandler
             return;
         }
         $this->logger->info("[" . __METHOD__ . "] ✅ Gemini Data Filled Successfully");
-        print_r(json_encode($geminiFilledData));
-//        $filledAttributeData =  $this->fillAttributeData($geminiFilledData);
-//        $this->logger->info("[" . __METHOD__ . "] ✅ Filled Attribute Data ");
-//        $normalizedCiceksepetiData = $this->normalizeCiceksepetiData($filledAttributeData);
-//        $this->logger->info("[" . __METHOD__ . "] ✅ Normalized Ciceksepeti Data ");
-//        print_r($normalizedCiceksepetiData);
+        $filledAttributeData =  $this->fillAttributeData($geminiFilledData);
+        $this->logger->info("[" . __METHOD__ . "] ✅ Filled Attribute Data ");
+        $normalizedCiceksepetiData = $this->normalizeCiceksepetiData($filledAttributeData);
+        $this->logger->info("[" . __METHOD__ . "] ✅ Normalized Ciceksepeti Data ");
+        print_r($normalizedCiceksepetiData);
 //        $ciceksepetiConnector = new CiceksepetiConnector(Marketplace::getById(265384));
 //        $result = $ciceksepetiConnector->createListing($normalizedCiceksepetiData);
 //        $this->logger->info("✅ [CiceksepetiConnector] Result batch:\n" . json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
