@@ -12,6 +12,8 @@ use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 
 class HepsiburadaConnector extends MarketplaceConnectorAbstract
 {
@@ -386,16 +388,16 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         $jsonDataR = $this->getFromCache("createListing.json");
         $tempFile = tempnam(sys_get_temp_dir(), 'createListing_') . '.json';
         file_put_contents($tempFile, json_encode($jsonDataR));
+        $formFields = [
+            'file' => DataPart::fromPath($tempFile)
+        ];
+        $formData = new FormDataPart($formFields);
         $response = $this->httpClient->request('POST', "https://mpop-sit.hepsiburada.com/product/api/products/import?version=1", [
-            'headers' => [
+            'headers' => array_merge($formData->getPreparedHeaders()->toArray(), [
                 'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
-                "User-Agent" => "colorfullworlds_dev",
-                'Accept' => 'application/json',
-                'Content-Type' => 'multipart/form-data'
-            ],
-            'body' => [
-                'file' =>  fopen($tempFile, 'r')
-            ]
+                'User-Agent' => 'colorfullworlds_dev',
+            ]),
+            'body' => $formData->bodyToIterable()
         ]);
         unlink($tempFile);
         print_r($response->getContent());
