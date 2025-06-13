@@ -389,7 +389,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             'file' => new DataPart($jsonContent, 'createListing.json', 'application/json')
         ];
         $formData = new FormDataPart($formFields);
-        $response = $this->httpClient->request('POST', "https://mpop-sit.hepsiburada.com/product/api/products/import?version=1", [
+        $response = $this->httpClient->request('POST', "https://mpop.hepsiburada.com/product/api/products/import?version=1", [
             'headers' => array_merge($formData->getPreparedHeaders()->toArray(), [
                 'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
                 'User-Agent' => 'colorfullworlds_dev',
