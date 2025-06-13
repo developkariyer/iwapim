@@ -17,13 +17,6 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
 {
     public static string $marketplaceType = 'Hepsiburada';
 
-    /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface|RandomException
-     */
     public function download(bool $forceDownload = false): void
     {
         if (!$forceDownload && $this->getListingsFromCache()) {
@@ -68,13 +61,6 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         $this->putListingsToCache();
     }
 
-    /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     */
     protected function getProduct($hbSku): array
     {
         $page = 0;
@@ -100,13 +86,6 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         return $response->toArray();
     }
 
-    /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     */
     public function downloadAttributes(): void
     {
         echo "Downloading Attributes\n";
@@ -134,10 +113,6 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         return rtrim($attributeString, "-");
     }
 
-    /**
-     * @throws DuplicateFullPathException
-     * @throws Exception
-     */
     public function import($updateFlag, $importFlag): void
     {
         if (empty($this->listings)) {
@@ -183,14 +158,6 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         }  
     }
 
-    /**
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws \Doctrine\DBAL\Exception
-     * @throws RedirectionExceptionInterface
-     * @throws TransportExceptionInterface|RandomException
-     */
     public function setInventory(VariantProduct $listing, int $targetValue, $sku = null, $country = null, $locationId = null): void
     {
         $attributes = json_decode($listing->jsonRead('apiResponseJson'), true)['attributes'];
@@ -229,15 +196,6 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         $this->putToCache($filename, ['request'=>$body, 'response'=>$combinedData]);
     }
 
-    /**
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws \Doctrine\DBAL\Exception
-     * @throws RandomException
-     */
     public function setPrice(VariantProduct $listing, string $targetPrice, $targetCurrency = null, $sku = null, $country = null): void
     {
         if (empty($targetPrice)) {
@@ -291,13 +249,6 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
         $this->putToCache($filename, ['request'=>$body, 'response'=>$combinedData]);
     }
 
-    /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     */
     public function getBatchRequestResult($id, $type): array
     {
         $response = $this->httpClient->request('GET', "https://listing-external.hepsiburada.com/listings/merchantid/{$this->marketplace->getSellerId()}/{$type}/id/{$id}", [
