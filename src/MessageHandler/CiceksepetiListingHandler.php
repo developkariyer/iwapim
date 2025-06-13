@@ -1,7 +1,6 @@
 <?php
 namespace App\MessageHandler;
 
-
 use App\Connector\Gemini\GeminiConnector;
 use App\Connector\Marketplace\CiceksepetiConnector;
 use App\Message\ProductListingMessage;
