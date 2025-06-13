@@ -384,22 +384,26 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     public function createListing($data)
     {
         echo "-------------------------------API SENDING DATA Hepsiburada CONNECTOR-----------------------------------------------------------\n";
-        $this->putToCache('createListing.json', $data);
-        print_r($this->getFromCache('createListing.json'));
-//        $response = $this->httpClient->request('POST', "https://mpop-sit.hepsiburada.com/product/api/products/import?version=1", [
-//            'headers' =>  [
-//                'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
-//                'User-Agent' => 'colorfullworlds_dev',
-//                'Accept' => 'application/json',
-//                'Content-Type' => 'multipart/form-data'
-//            ],
-//            'body' => $this->getFromCache('createListing.json')
-//        ]);
-//        print_r($response->getContent());
-//        $statusCode = $response->getStatusCode();
-//        if ($statusCode !== 200) {
-//            echo "Error: $statusCode\n";
-//        }
+        $json = json_encode($data, JSON_UNESCAPED_UNICODE);
+        file_put_contents('/tmp/createListing.json', $json);
+        $formFields = [
+            'file' => DataPart::fromPath('/tmp/createListing.json')
+        ];
+        $formData = new FormDataPart($formFields);
+        $response = $this->httpClient->request('POST', "https://mpop-sit.hepsiburada.com/product/api/products/import?version=1", [
+            'headers' => array_merge($formData->getPreparedHeaders()->toArray(), [
+                'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
+                'User-Agent' => 'colorfullworlds_dev',
+                'Accept' => 'application/json',
+            ]),
+            'body' => $formData->bodyToIterable()
+        ]);
+
+        print_r($response->getContent(false));
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            echo "Error: $statusCode\n";
+        }
     }
 
     private function updateCategoryAndAttributes()
