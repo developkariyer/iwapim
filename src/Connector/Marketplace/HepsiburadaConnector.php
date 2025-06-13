@@ -384,10 +384,9 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     public function createListing($data)
     {
         echo "-------------------------------API SENDING DATA Hepsiburada CONNECTOR-----------------------------------------------------------\n";
-        $this->putToCache('createListing.json', $data);
-        $fileContent = $this->getFromCache('createListing.json');
+        $jsonContent = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
         $formFields = [
-            'file' => new DataPart($fileContent, 'createListing.json', 'application/json')
+            'file' => new DataPart($jsonContent, 'createListing.json', 'application/json')
         ];
         $formData = new FormDataPart($formFields);
         $response = $this->httpClient->request('POST', "https://mpop-sit.hepsiburada.com/product/api/products/import?version=1", [
@@ -395,15 +394,14 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
                 'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
                 'User-Agent' => 'colorfullworlds_dev',
                 'Accept' => 'application/json',
-                'Content-Type' => 'multipart/form-data'
             ]),
             'body' => $formData->bodyToIterable()
         ]);
-
         print_r($response->getContent(false));
         $statusCode = $response->getStatusCode();
-        if ($statusCode !== 200) {
+        if ($statusCode >= 400) {
             echo "Error: $statusCode\n";
+            echo "Response: " . $response->getContent(false) . "\n";
         }
     }
 
