@@ -393,8 +393,7 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
             'headers' => array_merge($formData->getPreparedHeaders()->toArray(), [
                 'Authorization' => 'Basic ' . base64_encode($this->marketplace->getSellerId() . ':' . $this->marketplace->getServiceKey()),
                 'User-Agent' => 'colorfullworlds_dev',
-                'Accept' => 'application/json',
-                'Content-Type' => 'multipart/form-data'
+                'Accept' => 'application/json'
             ]),
             'body' => $formData->bodyToIterable()
         ]);
