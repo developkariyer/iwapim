@@ -384,10 +384,10 @@ class HepsiburadaConnector extends MarketplaceConnectorAbstract
     public function createListing($data)
     {
         echo "-------------------------------API SENDING DATA Hepsiburada CONNECTOR-----------------------------------------------------------\n";
-        $json = json_encode($data, JSON_UNESCAPED_UNICODE);
-        file_put_contents('/tmp/createListing.json', $json);
+        $this->putToCache('createListing.json', $data);
+        $fileContent = $this->getFromCache('createListing.json');
         $formFields = [
-            'file' => DataPart::fromPath('/tmp/createListing.json')
+            'file' => new DataPart($fileContent, 'createListing.json', 'application/json')
         ];
         $formData = new FormDataPart($formFields);
         $response = $this->httpClient->request('POST', "https://mpop-sit.hepsiburada.com/product/api/products/import?version=1", [
