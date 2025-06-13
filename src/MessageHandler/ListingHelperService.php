@@ -1,7 +1,6 @@
 <?php
 namespace App\MessageHandler;
 
-
 use App\Model\DataObject\Marketplace;
 use App\Model\DataObject\Product;
 use App\Model\DataObject\VariantProduct;

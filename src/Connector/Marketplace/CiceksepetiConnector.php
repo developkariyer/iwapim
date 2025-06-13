@@ -227,44 +227,8 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
     
     public function downloadInventory(): void
     {
-        //65597460-0891-49ca-a97d-6024941e4942 PROD CA-057 KUBA MAP
-        //fce777f8-b7c1-49e8-b6fe-b5baf5f727de PROD IJ-004
-        //34a56d8e-1b15-4877-b40e-e109bd7a9f12 PROD CA-120
-        //2b26fe29-eada-4234-aacd-f918c082c95e PROD CM-008 IMAGE ERROR
-        //223da069-8021-4d3f-beb3-c41a12a86481 PROD CM-008 REPEAT
-        //cf3f06ab-0804-4462-8172-8eb591cfbf8b PROD CM-002
-        //361eb507-5ae3-460b-90e0-f4db0fe5cf19 PROD CM-087
-        //2a1d1993-4b9d-4e6a-aac3-371468228bfc PROD CM-189
-        //d8247f70-5cfa-4a31-a716-33577fe27cd3
-        //d15702ea-5c2b-4e94-9dd2-edd80e99f858
-        //87b74947-8d88-456f-9b24-48a6e6be0e31
-
         print_r(json_encode($this->getBatchRequestResult("6d502ff9-678a-40d3-abc6-5370832f96e9")));
 
-
-
-
-
-        //4f245922-d66f-4bb0-b8b6-4f9c3258b3e4
-//        $ids = [
-//        ];
-//        foreach ($ids as $id) {
-//            echo "ID: $id\n";
-//            $variantProduct = VariantProduct::getById($id);
-//            $price = $variantProduct->getSalePrice();
-//            $targetPrice = $price * 2;
-//            $this->setPrice($variantProduct, $targetPrice, "TRY", "TRY");
-//        }
-
-
-
-//        $this->downloadCategories();
-//        $categoryIdList = $this->getCiceksepetiListingCategoriesIdList();
-//        echo "Ciceksepeti Category List Updated\n";
-//        foreach ($categoryIdList as $categoryId) {
-//            $this->getCategoryAttributesAndSaveDatabase($categoryId);
-//        }
-//       $this->passiveVariant();
     }
 
     public function getCiceksepetiListingCategoriesIdList(): array
@@ -369,7 +333,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
         $this->processCategoriesAndSaveDatabase($categories['categories']);
     }
 
-    public function processCategoriesAndSaveDatabase($categories, $path = '') // leaf category save
+    public function processCategoriesAndSaveDatabase($categories, $path = '')
     {
         foreach ($categories as $category) {
             if (!isset($category['id']) || !isset($category['name'])) {
@@ -620,7 +584,7 @@ class CiceksepetiConnector extends MarketplaceConnectorAbstract
      * @throws DecodingExceptionInterface
      * @throws ClientExceptionInterface
      */
-    public function getBatchRequestResult($batchId): array // same body 1/min, different body 5/sec
+    public function getBatchRequestResult($batchId): array
     {
         $url = static::$apiUrl['batchStatus'] . $batchId;
         $response = $this->httpClient->request('GET', $url);

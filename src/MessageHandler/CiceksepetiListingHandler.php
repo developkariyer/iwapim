@@ -26,9 +26,6 @@ class CiceksepetiListingHandler
         $this->listingHelper = $listingHelperService;
     }
 
-    /**
-     * @throws Exception
-     */
     public function __invoke(ProductListingMessage $message): void
     {
         if (method_exists($message, 'getLogger') && $message->getLogger() instanceof LoggerInterface) {
