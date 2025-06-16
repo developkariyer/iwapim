@@ -20,7 +20,7 @@ use Pimcore\Model\Asset;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 
-#[IsGranted('ROLE_PIMCORE_ADMIN')]
+#[IsGranted(new Expression("is_granted('ROLE_STICKERMANAGER') or is_granted('ROLE_PIMCORE_ADMIN')"))]
 class ProductDimensionsController extends FrontendController
 {
     /**
