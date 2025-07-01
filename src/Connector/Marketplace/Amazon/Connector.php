@@ -110,15 +110,14 @@ class Connector extends MarketplaceConnectorAbstract
      */
     public function download(bool $forceDownload = false): void
     {
-        $this->reportsHelper->downloadAllReports($forceDownload);
-//        if ($forceDownload || !$this->getListingsFromCache($forceDownload)) {
-//            $this->reportsHelper->downloadAllReports($forceDownload);
-//            $this->listingsHelper->getListings($forceDownload);
-//            $this->putListingsToCache();
-//        }
-//        foreach ($this->listings as $asin=>$listing) {
-//            $this->putToCache("ASIN_{$asin}.json", $listing);
-//        }
+        if ($forceDownload || !$this->getListingsFromCache($forceDownload)) {
+            $this->reportsHelper->downloadAllReports($forceDownload);
+            $this->listingsHelper->getListings($forceDownload);
+            $this->putListingsToCache();
+        }
+        foreach ($this->listings as $asin=>$listing) {
+            $this->putToCache("ASIN_{$asin}.json", $listing);
+        }
     }
 
     /**
