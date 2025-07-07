@@ -161,7 +161,7 @@ class PrepareOrderTableCommand extends AbstractCommand
     {
         $updateVariantSql = "
             UPDATE iwa_marketplace_orders_line_items
-            SET iwasku = :iwasku, parent_identifier  = :identifier, product_type = :productType, variant_name = :variantName, parent_name = :parentName
+            SET iwasku = :iwasku, parent_identifier  = :identifier, product_category = :productCategory, product_type = :productType, variant_name = :variantName, parent_name = :parentName
             WHERE variant_id = :uniqueMarketplaceId AND marketplace_type= :marketplaceType;";
 
         $variantObject = match ($marketplaceType) {
@@ -204,6 +204,10 @@ class PrepareOrderTableCommand extends AbstractCommand
                     echo "Identifier is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
                     return;
                 }
+                $productCategory = $parent->getInheritedField('ProductCategory');
+                if (!$productCategory) {
+                    echo "Product category is required for adding/updating VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
+                }
             } else {
                 echo "Main product is not a parent product for VariantProduct with uniqueMarketplaceId $uniqueMarketplaceId\n";
                 return;
@@ -221,6 +225,7 @@ class PrepareOrderTableCommand extends AbstractCommand
             Utility::executeSql($updateVariantSql, [
                 'iwasku' => $iwasku,
                 'identifier' => $identifier,
+                'productCategory' => $productCategory,
                 'productType' => $productType,
                 'variantName' => $variantName,
                 'parentName' => $parentName,
