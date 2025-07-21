@@ -32,7 +32,7 @@ class ExportCommand extends AbstractCommand
 //
 //        }
 
-        $mainProducts = $this->getMainProducts(10, 0);
+        $mainProducts = $this->getMainProducts(3, 0);
         foreach ($mainProducts as $product) {
             $id = $product->getId();
             $name = $product->getName();
