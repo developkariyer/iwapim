@@ -61,8 +61,7 @@ class ExportCommand extends AbstractCommand
     private function getVariantsProduct($productIdentifier)
     {
         $variantProductListing = new ProductListing();
-        $variantProductListing->setCondition("productLevel = 1");
-        $variantProductListing->setCondition("productIdentifier = '$productIdentifier'");
+        $variantProductListing->setCondition("productLevel = 1 AND productIdentifier = '$productIdentifier'");
         return $variantProductListing->load();
     }
 
