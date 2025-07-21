@@ -41,6 +41,7 @@ class ExportCommand extends AbstractCommand
             $variationColorList = $product->getVariationColorList();
             $description = $product->getDescription();
             $image = $product->getImage()?->getFullPath() ?? '';
+            
 
 
             echo $id."\n";
