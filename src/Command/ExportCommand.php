@@ -51,6 +51,7 @@ class ExportCommand extends AbstractCommand
                     'setProductIwaskus' => $this->getSetProductIwaskus($variant),
                     'sticker4x6eu' => $variant->getSticker4x6eu()->getFullPath() ?? '',
                     'sticker4x6iwasku' => $variant->getSticker4x6iwasku()->getFullPath() ?? '',
+                    'marketplaceList' => $this->getListingsMarketplace($variant),
                 ];
             }
             $export[] = $productData;
@@ -105,4 +106,14 @@ class ExportCommand extends AbstractCommand
         }
         return $iwaskus;
     }
+
+    private function getListingsMarketplace($variant) {
+        $listingMarketplace = [];
+        $listings = $variant->getListings();
+        foreach ($listings as $listing) {
+            $listingMarketplace[] = $listing->getMarketplace()->getMarketplaceKey();
+        }
+        return $listingMarketplace;
+    }
+
 }
