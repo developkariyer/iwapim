@@ -38,10 +38,19 @@ class ExportCommand extends AbstractCommand
             $name = $product->getName();
             $identifier = $product->getProductIdentifier();
             $variationSizeList = $product->getVariationSizeList();
+            $variationColorList = $product->getVariationColorList();
+            $description = $product->getDescription();
+            $image = $product->getImage();
+
+
             echo $id."\n";
             echo $name."\n";
-            echo $variationSizeList."\n";
             echo $identifier."\n";
+            echo $variationSizeList."\n";
+            echo $variationColorList."\n";
+            echo $description."\n";
+            echo $image."\n";
+
             echo "========================\n";
         }
 
