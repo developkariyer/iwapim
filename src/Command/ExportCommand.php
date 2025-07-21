@@ -94,7 +94,7 @@ class ExportCommand extends AbstractCommand
         foreach ($result as $row) {
             $asin = $row['asin'];
             $fnsku = $row['fnsku'];
-            if (!isset($asin_fnsku_map[$asin])) {
+            if (!isset($asinMap[$asin])) {
                 $asinMap[$asin] = [];
             }
             if (!in_array($fnsku, $asinMap[$asin])) {
