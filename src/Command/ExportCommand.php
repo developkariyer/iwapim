@@ -111,7 +111,7 @@ class ExportCommand extends AbstractCommand
         $listingMarketplace = [];
         $listings = $variant->getListingItems();
         foreach ($listings as $listing) {
-            $listingMarketplace[] = $listing->getMarketplace()->getMarketplaceKey();
+            $listingMarketplace[] = $listing->getMarketplace()->getKey();
         }
         return $listingMarketplace;
     }
