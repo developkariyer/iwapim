@@ -39,6 +39,15 @@ class ExportCommand extends AbstractCommand
                     'iwasku' => $variant->getIwasku(),
                     'ean' => $variant->getEanGtin(),
                     'asinMap' => $this->getAsin($variant->getIwasku()),
+                    'productWidth' => $variant->getProductDimension1(),
+                    'productHeight' => $variant->getProductDimension2(),
+                    'productLength' => $variant->getProductDimension3(),
+                    'productWeight' => $variant->getProductWeight(),
+                    'packageWidth' => $variant->getPackageDimension1(),
+                    'packageHeight' => $variant->getPackageDimension2(),
+                    'packageLength' => $variant->getPackageDimension3(),
+                    'packageWeight' => $variant->getPackageWeight(),
+                    'desi5000' => $variant->getDesi5000(),
                 ];
             }
             $export[] = $productData;
