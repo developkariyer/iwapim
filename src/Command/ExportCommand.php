@@ -36,6 +36,7 @@ class ExportCommand extends AbstractCommand
         foreach ($mainProducts as $product) {
             $id = $product->getId();
             $name = $product->getName();
+            $category = $product->getProductCategory();
             $identifier = $product->getProductIdentifier();
             $variationSizeList = $product->getVariationSizeList();
             $variationColorList = $product->getVariationColorList();
@@ -45,6 +46,7 @@ class ExportCommand extends AbstractCommand
 
             echo $id."\n";
             echo $name."\n";
+            echo $category."\n";
             echo $identifier."\n";
             echo $variationSizeList."\n";
             echo $variationColorList."\n";
