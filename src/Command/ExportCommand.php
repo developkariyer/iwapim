@@ -35,7 +35,10 @@ class ExportCommand extends AbstractCommand
         $mainProducts = $this->getMainProducts(10, 0);
         foreach ($mainProducts as $product) {
             $name = $product->getName();
+            $variationSizeList = $product->getVariationSizeList();
+
             echo $name."\n";
+            echo $variationSizeList."\n";
         }
 
         return Command::SUCCESS;
