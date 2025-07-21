@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Model\DataObject\Product;
 use Pimcore\Console\AbstractCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -46,7 +47,8 @@ class ExportCommand extends AbstractCommand
                     'packageWidth' => $variant->getInheritedField('packageDimension1'),
                     'packageHeight' => $variant->getInheritedField('packageDimension2'),
                     'packageLength' => $variant->getInheritedField('packageDimension3'),
-                    'packageWeight' => $variant->getInheritedField('packageWeight')
+                    'packageWeight' => $variant->getInheritedField('packageWeight'),
+                    'setProductIwaskus' => $this->getSetProductIwaskus($variant),
                 ];
             }
             $export[] = $productData;
@@ -90,4 +92,13 @@ class ExportCommand extends AbstractCommand
         return $asinMap;
     }
 
+    private function getSetProductIwaskus($variant)
+    {
+        $iwaskus = [];
+        $setProducts = $variant->getBundleProducts();
+        foreach ($setProducts as $setProduct) {
+            $iwaskus[$setProduct->getIwasku()] = $setProduct->getAmount();
+        }
+        return $iwaskus;
+    }
 }
