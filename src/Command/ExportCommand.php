@@ -38,7 +38,8 @@ class ExportCommand extends AbstractCommand
                 $productData['variants'][] = [
                     'iwasku' => $variant->getIwasku(),
                     'ean' => $variant->getEanGtin(),
-                    'asinMap' => $this->getAsin($variant->getIwasku())
+                    //'asinMap' => $this->getAsin($variant->getIwasku()),
+                    'level' => $variant->getProductLevel(),
                 ];
             }
             $export[] = $productData;
