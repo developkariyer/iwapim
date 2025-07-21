@@ -41,8 +41,7 @@ class ExportCommand extends AbstractCommand
             $variationColorList = $product->getVariationColorList();
             $description = $product->getDescription();
             $image = $product->getImage()?->getFullPath() ?? '';
-            
-
+            $variants = $this->getVariantsProduct($identifier);
 
             echo $id."\n";
             echo $name."\n";
@@ -51,7 +50,11 @@ class ExportCommand extends AbstractCommand
             echo $variationColorList."\n";
             echo $description."\n";
             echo $image."\n";
-
+            foreach ($variants as $variant) {
+                $iwasku = $variant->getIwasku();
+                echo $iwasku."\n";
+                echo "************************\n";
+            }
             echo "========================\n";
         }
 
@@ -66,6 +69,14 @@ class ExportCommand extends AbstractCommand
         $mainProductListing->setCondition("productLevel = 0");
         $mainProducts = $mainProductListing->load();
         return $mainProducts;
+    }
+
+    private function getVariantsProduct($productIdentifier)
+    {
+        $variantProductListing = new ProductListing();
+        $variantProductListing->setCondition("productLevel = 1");
+        $variantProductListing->setCondition("productIdentifier = '$productIdentifier'");
+        return $variantProductListing->load();
     }
 
 }
