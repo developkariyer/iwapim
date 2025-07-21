@@ -67,7 +67,7 @@ class ExportCommand extends AbstractCommand
 
     private function getAsin($iwasku)
     {
-        $sql = "SELECT asin, fnsku FROM iwa_inventory where iwasku = '$iwasku' and iwasku not null";
+        $sql = "SELECT asin, fnsku FROM iwa_inventory where iwasku = '$iwasku' and iwasku is not null";
         $result = Utility::fetchFromSql($sql);
         $asinMap = [];
         foreach ($result as $row) {
