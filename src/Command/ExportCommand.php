@@ -97,7 +97,9 @@ class ExportCommand extends AbstractCommand
         $iwaskus = [];
         $setProducts = $variant->getBundleProducts();
         foreach ($setProducts as $setProduct) {
-            $iwaskus[$variant->getIwasku()] = $setProduct->getData()['amount'];
+            $objectId = $setProduct->getObjectId();
+            $setObject = Product::getById($objectId);
+            $iwaskus[$setObject->getIwasku()] = $setProduct->getData()['amount'];
         }
         return $iwaskus;
     }
