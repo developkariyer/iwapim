@@ -60,6 +60,7 @@ class ExportCommand extends AbstractCommand
 
                 echo $iwasku."\n";
                 echo $ean."\n";
+                echo $asinMap."\n";
                 echo "************************\n";
             }
             echo "========================\n";
