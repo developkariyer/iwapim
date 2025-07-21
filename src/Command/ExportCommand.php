@@ -20,52 +20,30 @@ class ExportCommand extends AbstractCommand
 {
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-//        $productListing = new ProductListing();
-//        $productListing->setLimit(10);
-//        $productListing->setOffset(0);
-//        $products = $productListing->load();
-//        foreach ($products as $product) {
-//            $level = $product->getProductLevel();
-//            $productKey = $product->getKey();
-//            echo  $productKey."\n";
-//            echo  $level."\n";
-//
-//
-//        }
-
+        $export = [];
         $mainProducts = $this->getMainProducts(3, 0);
         foreach ($mainProducts as $product) {
-            $id = $product->getId();
-            $name = $product->getName();
-            $category = $product->getProductCategory();
-            $identifier = $product->getProductIdentifier();
-            $variationSizeList = $product->getVariationSizeList();
-            $variationColorList = $product->getVariationColorList();
-            $description = $product->getDescription();
-            $image = $product->getImage()?->getFullPath() ?? '';
-            $variants = $this->getVariantsProduct($identifier);
-
-            echo $id."\n";
-            echo $name."\n";
-            echo $category."\n";
-            echo $identifier."\n";
-            echo $variationSizeList."\n";
-            echo $variationColorList."\n";
-            echo $description."\n";
-            echo $image."\n";
-            foreach ($variants as $variant) {
-                $iwasku = $variant->getIwasku();
-                $ean = $variant->getEanGtin();
-                $asinMap = $this->getAsin($iwasku);
-
-                echo $iwasku."\n";
-                echo $ean."\n";
-                print_r($asinMap);
-                echo "************************\n";
+            $productData = [
+                'id' => $product->getId(),
+                'name' => $product->getName(),
+                'category' => $product->getProductCategory(),
+                'identifier' => $product->getProductIdentifier(),
+                'variationSizeList' => $product->getVariationSizeList(),
+                'variationColorList' => $product->getVariationColorList(),
+                'description' => $product->getDescription(),
+                'image' => $product->getImage()?->getFullPath() ?? ''
+            ];
+            $productData['variants'] = [];
+            foreach ($this->getVariantsProduct($product->getProductIdentifier()) as $variant) {
+                $productData['variants'][] = [
+                    'iwasku' => $variant->getIwasku(),
+                    'ean' => $variant->getEanGtin(),
+                    'asinMap' => $this->getAsin($variant->getIwasku())
+                ];
             }
-            echo "========================\n";
+            $export[] = $productData;
         }
-
+        echo json_encode($export, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         return Command::SUCCESS;
     }
 
