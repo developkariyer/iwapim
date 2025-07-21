@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\DataObject\Product\Listing as ProductListing;
+use App\Utils\Utility;
 
 #[AsCommand(
     name: 'app:export',
@@ -54,7 +55,11 @@ class ExportCommand extends AbstractCommand
             echo $image."\n";
             foreach ($variants as $variant) {
                 $iwasku = $variant->getIwasku();
+                $ean = $variant->getEanGtin();
+                $asinMap = $this->getAsin($iwasku);
+
                 echo $iwasku."\n";
+                echo $ean."\n";
                 echo "************************\n";
             }
             echo "========================\n";
@@ -79,6 +84,24 @@ class ExportCommand extends AbstractCommand
         $variantProductListing->setCondition("productLevel = 1");
         $variantProductListing->setCondition("productIdentifier = '$productIdentifier'");
         return $variantProductListing->load();
+    }
+
+    private function getAsin($iwasku)
+    {
+        $sql = "SELECT asin, fnsku FROM iwa_inventory where iwasku = '$iwasku'";
+        $result = Utility::fetchFromSql($sql);
+        $asinMap = [];
+        foreach ($result as $row) {
+            $asin = $row['asin'];
+            $fnsku = $row['fnsku'];
+            if (!isset($asin_fnsku_map[$asin])) {
+                $asinMap[$asin] = [];
+            }
+            if (!in_array($fnsku, $asinMap[$asin])) {
+                $asinMap[$asin][] = $fnsku;
+            }
+        }
+        return $asinMap;
     }
 
 }
