@@ -62,7 +62,7 @@ class ExportCommand extends AbstractCommand
         $mainProductListing = new ProductListing();
         $mainProductListing->setLimit($limit);
         $mainProductListing->setOffset($offset);
-        $mainProductListing->setCondition("productLevel = 0 and productIdentifier = 'IMS-001'");
+        $mainProductListing->setCondition("productLevel = 0");
         $mainProducts = $mainProductListing->load();
         return $mainProducts;
     }
