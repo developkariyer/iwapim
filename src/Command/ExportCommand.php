@@ -49,7 +49,7 @@ class ExportCommand extends AbstractCommand
                     'packageLength' => $variant->getInheritedField('packageDimension3'),
                     'packageWeight' => $variant->getInheritedField('packageWeight'),
                     'setProductIwaskus' => $this->getSetProductIwaskus($variant),
-                    'sticker4x6eu' => PIMCORE_PROJECT_ROOT  . $variant->getSticker4x6eu()->getFullPath() ?? '',
+                    'sticker4x6eu' => $_SERVER['HTTPS']  . $variant->getSticker4x6eu()->getFullPath() ?? '',
                 ];
             }
             $export[] = $productData;
