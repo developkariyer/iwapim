@@ -49,6 +49,7 @@ class ExportCommand extends AbstractCommand
                     'packageLength' => $variant->getInheritedField('packageDimension3'),
                     'packageWeight' => $variant->getInheritedField('packageWeight'),
                     'setProductIwaskus' => $this->getSetProductIwaskus($variant),
+                    'sticker4x6eu' => $variant->getSticker4x6eu()->getFullPath() ?? '',
                 ];
             }
             $export[] = $productData;
@@ -62,7 +63,7 @@ class ExportCommand extends AbstractCommand
         $mainProductListing = new ProductListing();
         $mainProductListing->setLimit($limit);
         $mainProductListing->setOffset($offset);
-        $mainProductListing->setCondition("productLevel = 0");
+        $mainProductListing->setCondition("productLevel = 0 and productIdentifier = 'IT-004'");
         $mainProducts = $mainProductListing->load();
         return $mainProducts;
     }
