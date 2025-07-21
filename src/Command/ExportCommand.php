@@ -39,15 +39,14 @@ class ExportCommand extends AbstractCommand
                     'iwasku' => $variant->getIwasku(),
                     'ean' => $variant->getEanGtin(),
                     'asinMap' => $this->getAsin($variant->getIwasku()),
-                    'productWidth' => $variant->getProductDimension1(),
-                    'productHeight' => $variant->getProductDimension2(),
-                    'productLength' => $variant->getProductDimension3(),
-                    'productWeight' => $variant->getProductWeight(),
-                    'packageWidth' => $variant->getPackageDimension1(),
-                    'packageHeight' => $variant->getPackageDimension2(),
-                    'packageLength' => $variant->getPackageDimension3(),
-                    'packageWeight' => $variant->getPackageWeight(),
-                    'desi5000' => $variant->getDesi5000(),
+                    'productWidth' => $variant->getInheritedField('productDimension1'),
+                    'productHeight' => $variant->getInheritedField('productDimension2'),
+                    'productLength' => $variant->getInheritedField('productDimension3'),
+                    'productWeight' => $variant->getInheritedField('productWeight'),
+                    'packageWidth' => $variant->getInheritedField('packageDimension1'),
+                    'packageHeight' => $variant->getInheritedField('packageDimension2'),
+                    'packageLength' => $variant->getInheritedField('packageDimension3'),
+                    'packageWeight' => $variant->getInheritedField('packageWeight')
                 ];
             }
             $export[] = $productData;
