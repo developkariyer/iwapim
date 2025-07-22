@@ -41,7 +41,8 @@ class ExportCommand extends AbstractCommand
                 'variationColorList' => $product->getVariationColorList() ?? '',
                 'description' => $product->getDescription() ?? '',
                 'productCode' => $product->getProductCode() ?? '',
-                'image' => $product->getImage()?->getFullPath() ?? ''
+                'image' => $product->getImage()?->getFullPath() ?? '',
+                'published' => $product->isPublished(),
             ];
             $productData['variants'] = [];
             foreach ($this->getVariantsProduct($product->getProductIdentifier()) as $variant) {
@@ -65,6 +66,7 @@ class ExportCommand extends AbstractCommand
                     'sticker4x6iwasku' => $variant->getSticker4x6iwasku()?->getFullPath() ?? '',
                     'marketplaceList' => $this->getListingsMarketplace($variant),
                     'brandList' => $this->getBrandList($variant),
+                    'published' => $product->isPublished(),
                 ];
             }
             $export[] = $productData;
