@@ -51,6 +51,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 throw new Exception('Failed to get token: ' . $response->getContent(false));
             }
             $data = $response->toArray();
+            print_r($data);
             $this->marketplace->setWayfairAccessTokenProd($data['access_token']);
             $this->marketplace->save();
         } catch(Exception $e) {
