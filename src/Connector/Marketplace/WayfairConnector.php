@@ -51,7 +51,6 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 throw new Exception('Failed to get token: ' . $response->getContent(false));
             }
             $data = $response->toArray();
-            print_r($data);
             $this->marketplace->setWayfairAccessTokenProd($data['access_token']);
             $this->marketplace->save();
         } catch(Exception $e) {
@@ -122,55 +121,6 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             return;
         }
         $this->prepareToken();
-        $query = <<<GRAPHQL
-            query getDropshipPurchaseOrders {
-                getDropshipPurchaseOrders(
-                    limit: 100,
-                    sortOrder: ASC
-                ) {
-                    poNumber,
-                    poDate,
-                    estimatedShipDate,
-                    customerName,
-                    customerAddress1,
-                    customerAddress2,
-                    customerCity,
-                    customerState,
-                    customerPostalCode,
-                    orderType,
-                    shippingInfo {
-                        shipSpeed,
-                        carrierCode
-                    },
-                    packingSlipUrl,
-                    warehouse {
-                        id,
-                        name
-                    },
-                    products {
-                        partNumber,
-                        quantity,
-                        price,
-                        isCancelled,
-                        event {
-                            startDate,
-                            endDate
-                        }
-                    }
-                }
-            }
-            GRAPHQL;
-        $response = $this->httpClient->request('POST',static::$apiUrl['url'], [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessTokenProd(),
-                'Content-Type' => 'application/json'
-            ],
-            'json' => ['query' => $query]
-        ]);
-        if ($response->getStatusCode() !== 200) {
-            throw new Exception('Failed to get orders: ' . $response->getContent(false));
-        }
-        print_r($response->toArray());
 
 //        try {
 //            $sqlLastUpdatedAt = "
@@ -276,6 +226,61 @@ class WayfairConnector extends MarketplaceConnectorAbstract
 //            echo "Orders downloaded: $ordersCount\n";
 //            $lastUpdatedAt = $lastDate;
 //        }while($ordersCount === $limit);
+    }
+
+    public function queryOpenOrdersSandbox()
+    {
+        $query = <<<GRAPHQL
+            query getDropshipPurchaseOrders {
+                getDropshipPurchaseOrders(
+                    limit: 10,
+                    hasResponse: false,
+                    sortOrder: ASC
+                ) {
+                    poNumber,
+                    poDate,
+                    estimatedShipDate,
+                    customerName,
+                    customerAddress1,
+                    customerAddress2,
+                    customerCity,
+                    customerState,
+                    customerPostalCode,
+                    orderType,
+                    shippingInfo {
+                        shipSpeed,
+                        carrierCode
+                    },
+                    packingSlipUrl,
+                    warehouse {
+                        id,
+                        name
+                    },
+                    products {
+                        partNumber,
+                        quantity,
+                        price,
+                        isCancelled,
+                        event {
+                            startDate,
+                            endDate
+                        }
+                    }
+                }
+            }
+            GRAPHQL;
+        $response = $this->httpClient->request('POST',static::$apiUrl['url'], [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessTokenProd(),
+                'Content-Type' => 'application/json'
+            ],
+            'json' => ['query' => $query]
+        ]);
+        if ($response->getStatusCode() !== 200) {
+            throw new Exception('Failed to get orders: ' . $response->getContent(false));
+        }
+        print_r($response->toArray());
+
     }
 
     public function downloadReturns(): void
