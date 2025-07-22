@@ -22,7 +22,7 @@ class ExportCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $export = [];
-        $mainProducts = $this->getMainProducts(3, 0);
+        $mainProducts = $this->getMainProducts(10, 0);
         foreach ($mainProducts as $product) {
             $productData = [
                 'id' => $product->getId(),
@@ -66,7 +66,7 @@ class ExportCommand extends AbstractCommand
         $mainProductListing = new ProductListing();
         $mainProductListing->setLimit($limit);
         $mainProductListing->setOffset($offset);
-        $mainProductListing->setCondition("productLevel = 0 and productIdentifier = 'IT-004'");
+        $mainProductListing->setCondition("productLevel = 0");
         $mainProducts = $mainProductListing->load();
         return $mainProducts;
     }
