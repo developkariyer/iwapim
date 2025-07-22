@@ -50,7 +50,7 @@ class ExportCommand extends AbstractCommand
                     'packageWeight' => $variant->getInheritedField('packageWeight'),
                     'setProductIwaskus' => $this->getSetProductIwaskus($variant),
                     'sticker4x6eu' => $variant->getSticker4x6eu()->getFullPath() ?? '',
-                    'sticker4x6iwasku' => $variant->getSticker4x6iwasku()->getFullPath() ?? '',
+                    'sticker4x6iwasku' => $variant->getSticker4x6iwasku()?->getFullPath() ?? '',
                     'marketplaceList' => $this->getListingsMarketplace($variant),
                     'brandList' => $this->getBrandList($variant),
                 ];
