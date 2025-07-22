@@ -45,7 +45,7 @@ class ExportCommand extends AbstractCommand
                 }
             }
             foreach ($export as $product) {
-                $allProducts[] = $product->toArray();
+                $allProducts[] = $product;
             }
             echo "offset = $offset\n";
             $offset += $limit;
@@ -186,9 +186,9 @@ class ExportCommand extends AbstractCommand
                 }
             }
             $product['isDirty'] = !empty($dirtySizes);
-            if (!empty($dirtySizes)) {
-                echo "Dirty Sizes: " . implode(', ', $dirtySizes) . "\n";
-            }
+//            if (!empty($dirtySizes)) {
+//                echo "Dirty Sizes: " . implode(', ', $dirtySizes) . "\n";
+//            }
         }
         return $data;
     }
