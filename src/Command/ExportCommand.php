@@ -147,8 +147,8 @@ class ExportCommand extends AbstractCommand
                 $size = trim($size);
                 if ($size === '') continue;
                 if (
-                    preg_match('/^\d+x\d+(cm|m)?$/i', $size) ||
-                    preg_match('/^\d+(cm|m)?$/i', $size)
+                    preg_match('/^\d+(\.\d+)?x\d+(\.\d+)?(cm|m)?$/i', $size) ||
+                    preg_match('/^\d+(\.\d+)?(cm|m)?$/i', $size)
                 ) {
                     $cleans[] = $size;
                 } else {
@@ -158,6 +158,7 @@ class ExportCommand extends AbstractCommand
             if (!empty($dirtySizes)) {
                 echo "Dirty Sizes: " . implode(', ', $dirtySizes) . "\n";
             }
+
         }
 
     }
