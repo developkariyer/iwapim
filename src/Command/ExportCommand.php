@@ -21,18 +21,41 @@ class ExportCommand extends AbstractCommand
 {
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-
-        $export = $this->checkData();
-        foreach ($export as &$product) {
-            if (!$product['isDirty']) {
-                $product['sizeTable'] = $this->parseSizeListForTableFormat($product['variationSizeList']);
-            }
-        }
-        echo json_encode($export, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $this->exportAllProductsToJson();
+//        $export = $this->checkData();
+//        foreach ($export as &$product) {
+//            if (!$product['isDirty']) {
+//                $product['sizeTable'] = $this->parseSizeListForTableFormat($product['variationSizeList']);
+//            }
+//        }
+//        echo json_encode($export, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         return Command::SUCCESS;
     }
 
-    private function prepareProductData()
+    public function exportAllProductsToJson()
+    {
+        $limit = 50;
+        $offset = 0;
+        $allProducts = [];
+        while (true) {
+            $export = $this->checkData($limit, $offset);
+            foreach ($export as &$product) {
+                if (!$product['isDirty']) {
+                    $product['sizeTable'] = $this->parseSizeListForTableFormat($product['variationSizeList']);
+                }
+            }
+            foreach ($export as $product) {
+                $allProducts[] = $product->toArray();
+            }
+            echo "offset = $offset\n";
+            $offset += $limit;
+        }
+        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/exportProduct.json';
+        file_put_contents($filePath, json_encode($allProducts, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        echo "Exported to: " . $filePath . "\n";
+    }
+
+    private function prepareProductData($limit, $offset)
     {
         $export = [];
         $mainProducts = $this->getMainProducts(10, 0);
@@ -144,9 +167,9 @@ class ExportCommand extends AbstractCommand
         return $brandList;
     }
 
-    private function checkData()
+    private function checkData($limit, $offset)
     {
-        $data = $this->prepareProductData();
+        $data = $this->prepareProductData($limit, $offset);
         foreach ($data as &$product) {
             $sizeList = $product['variationSizeList'];
             $dirtySizes = [];
