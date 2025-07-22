@@ -24,7 +24,9 @@ class ExportCommand extends AbstractCommand
 
         $export = $this->checkData();
         foreach ($export as &$product) {
-            $product['sizeTable'] = $this->parseSizeListForTableFormat($product['variationSizeList']);
+            if (!$product['isDirty']) {
+                $product['sizeTable'] = $this->parseSizeListForTableFormat($product['variationSizeList']);
+            }
         }
         echo json_encode($export, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         return Command::SUCCESS;
