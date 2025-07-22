@@ -121,6 +121,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             return;
         }
         $this->prepareToken();
+        $this->queryOpenOrdersSandbox();
 
 //        try {
 //            $sqlLastUpdatedAt = "
