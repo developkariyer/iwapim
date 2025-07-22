@@ -23,6 +23,9 @@ class ExportCommand extends AbstractCommand
     {
 
         $export = $this->checkData();
+        foreach ($export as &$product) {
+            $product['sizeTable'] = $this->parseSizeListForTableFormat($product['variationSizeList']);
+        }
         echo json_encode($export, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         return Command::SUCCESS;
     }
@@ -164,5 +167,36 @@ class ExportCommand extends AbstractCommand
         }
         return $data;
     }
+
+    private function parseSizeListForTableFormat($variationSizeList)
+    {
+        $results = [];
+        $parts = preg_split('/[\r\n,]+/', trim($variationSizeList));
+        $defaultLabels = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'];
+        $labelIndex = 0;
+        foreach ($parts as $size) {
+            $size = trim($size);
+            if ($size === '') continue;
+            if (
+                preg_match('/^(\d+(\.\d+)?)x(\d+(\.\d+)?)(cm|m)?$/i', $size, $sz)
+            ) {
+                $width = (float)$sz[1];
+                $height = (float)$sz[3];
+                $label = $defaultLabels[$labelIndex] ?? ('+' . end($defaultLabels));
+                $labelIndex++;
+                $results[] = [$width, $height, $label];
+            } elseif (
+                preg_match('/^(\d+(\.\d+)?)(cm|m)?$/i', $size, $sz2)
+            ) {
+                $width = (float)$sz2[1];
+                $height = (float)$sz2[1];
+                $label = $defaultLabels[$labelIndex] ?? ('+' . end($defaultLabels));
+                $labelIndex++;
+                $results[] = [$width, $height, $label];
+            }
+        }
+        return $results;
+    }
+
 
 }
