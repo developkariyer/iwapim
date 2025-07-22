@@ -234,7 +234,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         $query = <<<GRAPHQL
             query getDropshipPurchaseOrders {
                 getDropshipPurchaseOrders(
-                    limit: 5,
+                    limit: 50,
                     hasResponse: false,
                     sortOrder: ASC
                 ) {
