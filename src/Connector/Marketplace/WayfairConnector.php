@@ -16,9 +16,9 @@ class WayfairConnector extends MarketplaceConnectorAbstract
 {
     private static array $apiUrl = [
         'oauth' => 'https://sso.auth.wayfair.com/oauth/token',
-        'catalog' => 'https://sandbox.api.wayfair.com/v1/supplier-catalog-api/graphql',
-        'url' => 'https://sandbox.api.wayfair.com/v1/graphql',
-        'returnOrder' => 'https://sandbox.api.wayfair.io/v1/supplier-order-api/graphql'
+        'catalog' => 'https://api.wayfair.com/v1/supplier-catalog-api/graphql',
+        'url' => 'https://api.wayfair.com/v1/graphql',
+        'returnOrder' => 'https://api.wayfair.io/v1/supplier-order-api/graphql'
     ];
     public static string $marketplaceType = 'Wayfair';
 
@@ -41,7 +41,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                     'grant_type' => 'client_credentials',
                     'client_id' => $this->marketplace->getWayfairClientIdProd(),
                     'client_secret' => $this->marketplace->getWayfairSecretKeyProd(),
-                    'audience' => 'https://sandbox.api.wayfair.com/'
+                    'audience' => 'https://api.wayfair.com/'
                 ]
             ]);
             if ($response->getStatusCode() !== 200) {
