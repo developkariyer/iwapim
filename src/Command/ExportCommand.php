@@ -21,28 +21,36 @@ class ExportCommand extends AbstractCommand
 {
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+
+        //echo json_encode($export, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $this->checkData();
+        return Command::SUCCESS;
+    }
+
+    private function prepareProductData()
+    {
         $export = [];
         $mainProducts = $this->getMainProducts(10, 0);
         foreach ($mainProducts as $product) {
             $productData = [
                 'id' => $product->getId(),
-                'name' => $product->getName(),
-                'category' => $product->getProductCategory(),
-                'identifier' => $product->getProductIdentifier(),
-                'variationSizeList' => $product->getVariationSizeList(),
-                'variationColorList' => $product->getVariationColorList(),
-                'description' => $product->getDescription(),
-                'productCode' => $product->getProductCode(),
+                'name' => $product->getName() ?? '',
+                'category' => $product->getProductCategory() ?? '',
+                'identifier' => $product->getProductIdentifier() ?? '',
+                'variationSizeList' => $product->getVariationSizeList() ?? '',
+                'variationColorList' => $product->getVariationColorList() ?? '',
+                'description' => $product->getDescription() ?? '',
+                'productCode' => $product->getProductCode() ?? '',
                 'image' => $product->getImage()?->getFullPath() ?? ''
             ];
             $productData['variants'] = [];
             foreach ($this->getVariantsProduct($product->getProductIdentifier()) as $variant) {
                 $productData['variants'][] = [
-                    'iwasku' => $variant->getIwasku(),
-                    'productCode' => $variant->getProductCode(),
-                    'ean' => $variant->getEanGtin(),
+                    'iwasku' => $variant->getIwasku() ?? '',
+                    'productCode' => $variant->getProductCode() ?? '',
+                    'ean' => $variant->getEanGtin() ?? '',
                     'asinMap' => $this->getAsin($variant->getIwasku()),
-                    'productWidth' => $variant->getInheritedField('productDimension1'),
+                    'productWidth' => $variant->getInheritedField('productDimension1') ,
                     'productHeight' => $variant->getInheritedField('productDimension2'),
                     'productLength' => $variant->getInheritedField('productDimension3'),
                     'productWeight' => $variant->getInheritedField('productWeight'),
@@ -59,8 +67,7 @@ class ExportCommand extends AbstractCommand
             }
             $export[] = $productData;
         }
-        echo json_encode($export, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        return Command::SUCCESS;
+        return $export;
     }
 
     private function getMainProducts($limit, $offset)
@@ -126,6 +133,30 @@ class ExportCommand extends AbstractCommand
             $brandList[] = $brand->getKey();
         }
         return $brandList;
+    }
+
+    private function checkData()
+    {
+        $data = $this->prepareProductData();
+        foreach ($data as $product) {
+            $sizeList = $product['variationSizeList'];
+            $sizes = preg_split('/\r?\n/', trim($sizeList));
+            $dirtySizes = [];
+            foreach ($sizes as $size) {
+                $size = trim($size);
+                if (empty($size)) {
+                    continue;
+                }
+                if (!preg_match('/^\d+x\d+$/', $size)) {
+                    $dirtySizes[] = $size;
+                }
+            }
+            if (!empty($dirtySizes)) {
+                echo "Dirty Sizes: " . implode(', ', $dirtySizes) . "\n";
+            }
+
+        }
+
     }
 
 }
