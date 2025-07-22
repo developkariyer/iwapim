@@ -22,8 +22,8 @@ class ExportCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
 
-        //echo json_encode($export, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        $this->checkData();
+        $export = $this->checkData();
+        echo json_encode($export, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         return Command::SUCCESS;
     }
 
@@ -138,10 +138,9 @@ class ExportCommand extends AbstractCommand
     private function checkData()
     {
         $data = $this->prepareProductData();
-        foreach ($data as $product) {
+        foreach ($data as &$product) {
             $sizeList = $product['variationSizeList'];
             $dirtySizes = [];
-            $cleans = [];
             $parts = preg_split('/[\r\n,]+/', trim($sizeList));
             foreach ($parts as $size) {
                 $size = trim($size);
@@ -150,17 +149,16 @@ class ExportCommand extends AbstractCommand
                     preg_match('/^\d+(\.\d+)?x\d+(\.\d+)?(cm|m)?$/i', $size) ||
                     preg_match('/^\d+(\.\d+)?(cm|m)?$/i', $size)
                 ) {
-                    $cleans[] = $size;
                 } else {
                     $dirtySizes[] = $size;
                 }
             }
+            $product['isDirty'] = !empty($dirtySizes);
             if (!empty($dirtySizes)) {
                 echo "Dirty Sizes: " . implode(', ', $dirtySizes) . "\n";
             }
-
         }
-
+        return $data;
     }
 
 }
