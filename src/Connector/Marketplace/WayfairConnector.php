@@ -16,9 +16,9 @@ class WayfairConnector extends MarketplaceConnectorAbstract
 {
     private static array $apiUrl = [
         'oauth' => 'https://sso.auth.wayfair.com/oauth/token',
-        'catalog' => 'https://api.wayfair.com/v1/supplier-catalog-api/graphql',
-        'url' => 'https://api.wayfair.com/v1/graphql',
-        'returnOrder' => 'https://api.wayfair.io/v1/supplier-order-api/graphql'
+        'catalog' => 'https://sandbox.api.wayfair.com/v1/supplier-catalog-api/graphql',
+        'url' => 'https://sandbox.api.wayfair.com/v1/graphql',
+        'returnOrder' => 'https://sandbox.api.wayfair.io/v1/supplier-order-api/graphql'
     ];
     public static string $marketplaceType = 'Wayfair';
 
@@ -31,6 +31,9 @@ class WayfairConnector extends MarketplaceConnectorAbstract
      */
     public function prepareToken(): void
     {
+        if ($this->marketplace->getKey() != 'WayfairUK') {
+            return;
+        }
         try {
             $response = $this->httpClient->request('POST', static::$apiUrl['oauth'],[
                 'headers' => [
@@ -41,7 +44,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                     'grant_type' => 'client_credentials',
                     'client_id' => $this->marketplace->getWayfairClientIdProd(),
                     'client_secret' => $this->marketplace->getWayfairSecretKeyProd(),
-                    'audience' => 'https://api.wayfair.com/'
+                    'audience' => 'https://sandbox.api.wayfair.com/'
                 ]
             ]);
             if ($response->getStatusCode() !== 200) {
@@ -114,6 +117,9 @@ class WayfairConnector extends MarketplaceConnectorAbstract
      */
     public function downloadOrders(): void
     {
+        if ($this->marketplace->getKey() != 'WayfairUK') {
+            return;
+        }
         $this->prepareToken();
         $query = <<<GRAPHQL
             query getDropshipPurchaseOrders {
