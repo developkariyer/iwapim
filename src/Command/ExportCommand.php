@@ -81,6 +81,8 @@ class ExportCommand extends AbstractCommand
             $productData['variants'] = [];
             foreach ($this->getVariantsProduct($product->getProductIdentifier()) as $variant) {
                 $productData['variants'][] = [
+                    'key' => $variant->getKey() ?? '',
+                    'name' => $variant->getName() ?? '',
                     'iwasku' => $variant->getIwasku() ?? '',
                     'productCode' => $variant->getProductCode() ?? '',
                     'ean' => $variant->getEanGtin() ?? '',
