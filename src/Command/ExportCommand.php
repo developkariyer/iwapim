@@ -140,21 +140,24 @@ class ExportCommand extends AbstractCommand
         $data = $this->prepareProductData();
         foreach ($data as $product) {
             $sizeList = $product['variationSizeList'];
-            $sizes = preg_split('/\r?\n/', trim($sizeList));
             $dirtySizes = [];
-            foreach ($sizes as $size) {
+            $cleans = [];
+            $parts = preg_split('/[\r\n,]+/', trim($sizeList));
+            foreach ($parts as $size) {
                 $size = trim($size);
-                if (empty($size)) {
-                    continue;
-                }
-                if (!preg_match('/^\d+x\d+$/', $size)) {
+                if ($size === '') continue;
+                if (
+                    preg_match('/^\d+x\d+(cm|m)?$/i', $size) ||
+                    preg_match('/^\d+(cm|m)?$/i', $size)
+                ) {
+                    $cleans[] = $size;
+                } else {
                     $dirtySizes[] = $size;
                 }
             }
             if (!empty($dirtySizes)) {
                 echo "Dirty Sizes: " . implode(', ', $dirtySizes) . "\n";
             }
-
         }
 
     }
