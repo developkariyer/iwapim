@@ -39,6 +39,9 @@ class ExportCommand extends AbstractCommand
         $allProducts = [];
         while (true) {
             $export = $this->checkData($limit, $offset);
+            if (empty($export)) {
+                break;
+            }
             foreach ($export as &$product) {
                 if (!$product['isDirty']) {
                     $product['sizeTable'] = $this->parseSizeListForTableFormat($product['variationSizeList']);
@@ -58,7 +61,10 @@ class ExportCommand extends AbstractCommand
     private function prepareProductData($limit, $offset)
     {
         $export = [];
-        $mainProducts = $this->getMainProducts(10, 0);
+        $mainProducts = $this->getMainProducts($limit, $offset);
+        if (empty($mainProducts)) {
+            return $export;
+        }
         foreach ($mainProducts as $product) {
             $productData = [
                 'id' => $product->getId(),
@@ -170,6 +176,9 @@ class ExportCommand extends AbstractCommand
     private function checkData($limit, $offset)
     {
         $data = $this->prepareProductData($limit, $offset);
+        if (empty($data)) {
+            return [];
+        }
         foreach ($data as &$product) {
             $sizeList = $product['variationSizeList'];
             $dirtySizes = [];
