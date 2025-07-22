@@ -49,6 +49,8 @@ class ExportCommand extends AbstractCommand
                     'iwasku' => $variant->getIwasku() ?? '',
                     'productCode' => $variant->getProductCode() ?? '',
                     'ean' => $variant->getEanGtin() ?? '',
+                    'variationSize' => $variant->getVariationSize() ?? '',
+                    'variationColor' => $variant->getVariationColor() ?? '',
                     'asinMap' => $this->getAsin($variant->getIwasku()),
                     'productWidth' => $variant->getInheritedField('productDimension1') ,
                     'productHeight' => $variant->getInheritedField('productDimension2'),
