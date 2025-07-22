@@ -32,12 +32,14 @@ class ExportCommand extends AbstractCommand
                 'variationSizeList' => $product->getVariationSizeList(),
                 'variationColorList' => $product->getVariationColorList(),
                 'description' => $product->getDescription(),
+                'productCode' => $product->getProductCode(),
                 'image' => $product->getImage()?->getFullPath() ?? ''
             ];
             $productData['variants'] = [];
             foreach ($this->getVariantsProduct($product->getProductIdentifier()) as $variant) {
                 $productData['variants'][] = [
                     'iwasku' => $variant->getIwasku(),
+                    'productCode' => $variant->getProductCode(),
                     'ean' => $variant->getEanGtin(),
                     'asinMap' => $this->getAsin($variant->getIwasku()),
                     'productWidth' => $variant->getInheritedField('productDimension1'),
