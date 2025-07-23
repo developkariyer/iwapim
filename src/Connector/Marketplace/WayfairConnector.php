@@ -31,9 +31,9 @@ class WayfairConnector extends MarketplaceConnectorAbstract
      */
     public function prepareToken(): void
     {
-//        if ($this->marketplace->getKey() != 'WayfairUK') {
-//            return;
-//        }
+        if ($this->marketplace->getKey() == 'WayfairUK') {
+            return;
+        }
         try {
             $response = $this->httpClient->request('POST', static::$apiUrl['oauth'],[
                 'headers' => [
@@ -117,9 +117,9 @@ class WayfairConnector extends MarketplaceConnectorAbstract
      */
     public function downloadOrders(): void
     {
-//        if ($this->marketplace->getKey() != 'WayfairUK') {
-//            return;
-//        }
+        if ($this->marketplace->getKey() == 'WayfairUK') {
+            return;
+        }
 //        $this->prepareToken();
 //        $this->queryOpenOrdersSandbox();
 
