@@ -270,18 +270,30 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 }
             }
             GRAPHQL;
-        $response = $this->httpClient->request('POST',static::$apiUrl['url'], [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessTokenProd(),
-                'Content-Type' => 'application/json'
-            ],
-            'json' => ['query' => $query]
-        ]);
-        $status = $response->getStatusCode();
-        $content = $response->getContent(false);
+        try {
+            $response = $this->httpClient->request('POST', static::$apiUrl['url'], [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessTokenProd(),
+                    'Content-Type' => 'application/json'
+                ],
+                'json' => ['query' => $query]
+            ]);
 
-        echo "Status: $status\n";
-        echo "Response:\n$content\n";
+            $status = $response->getStatusCode();
+            $content = $response->getContent(false);
+
+            echo "<pre>";
+            echo "Status: $status\n";
+            echo "Raw Content:\n";
+            echo $content;
+            echo "</pre>";
+
+        } catch (\Throwable $e) {
+            echo "<pre>";
+            echo "Hata oluştu:\n";
+            echo $e->getMessage();
+            echo "</pre>";
+        }
         //print_r($response->toArray());
 
     }
