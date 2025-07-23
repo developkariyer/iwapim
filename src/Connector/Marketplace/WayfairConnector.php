@@ -51,7 +51,6 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 throw new Exception('Failed to get token: ' . $response->getContent(false));
             }
             $data = $response->toArray();
-            print_r($data);
             $this->marketplace->setWayfairAccessTokenProd($data['access_token']);
             $this->marketplace->save();
         } catch(Exception $e) {
@@ -121,7 +120,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         if ($this->marketplace->getKey() == 'Wayfair') {
             return;
         }
-        $this->prepareToken();
+        //$this->prepareToken();
         $this->queryOpenOrdersSandbox();
 
 //        try {
@@ -278,6 +277,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             ],
             'json' => ['query' => $query]
         ]);
+        print_r($response);
         if ($response->getStatusCode() !== 200) {
             throw new Exception('Failed to get orders: ' . $response->getContent(false));
         }
