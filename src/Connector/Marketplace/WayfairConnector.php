@@ -277,6 +277,8 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             ],
             'json' => ['query' => $query]
         ]);
+        print_r($response->toArray());
+
         if ($response->getStatusCode() !== 200) {
             throw new Exception('Failed to get orders: ' . $response->getContent(false));
         }
