@@ -43,16 +43,15 @@ class ExportCommand extends AbstractCommand
                 break;
             }
             foreach ($export as &$product) {
-                //$product['sizeTable'] =
-                $this->parseSizeListForTableFormat($product['variationSizeList']);
+                $product['sizeTable'] = $this->parseSizeListForTableFormat($product['variationSizeList']);
                 $allProducts[] = $product;
             }
             echo "offset = $offset\n";
             $offset += $limit;
         }
-//        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/exportProduct.json';
-//        file_put_contents($filePath, json_encode($allProducts, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-//        echo "Exported to: " . $filePath . "\n";
+        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/exportProduct.json';
+        file_put_contents($filePath, json_encode($allProducts, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        echo "Exported to: " . $filePath . "\n";
 
 //        $limit = 50;
 //        $offset = 0;
