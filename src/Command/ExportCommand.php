@@ -36,6 +36,7 @@ class ExportCommand extends AbstractCommand
     {
         $limit = 50;
         $offset = 0;
+        $allProducts = [];
         while (true) {
             $export = $this->prepareProductData($limit, $offset);
             if (empty($export)) {
@@ -43,11 +44,14 @@ class ExportCommand extends AbstractCommand
             }
             foreach ($export as &$product) {
                 $product['sizeTable'] = $this->parseSizeListForTableFormat($product);
-                print_r($product);
+                $allProducts[] = $product;
             }
             echo "offset = $offset\n";
             $offset += $limit;
         }
+        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/exportProduct.json';
+        file_put_contents($filePath, json_encode($allProducts, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        echo "Exported to: " . $filePath . "\n";
 
 //        $limit = 50;
 //        $offset = 0;
