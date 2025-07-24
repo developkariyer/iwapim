@@ -273,7 +273,7 @@ class ExportCommand extends AbstractCommand
             'XXL' => '2XL'
         ];
         $defaultLabelIndex = 0;
-        $parts = preg_split('/[\r\n,]+/', trim($variationSizeList));
+        $parts = preg_split('/[\r\n]+/', trim($variationSizeList));
         $parsedNumericValues = [];
         $parsedDimensionValues = [];
         $parsedSimpleLabels = [];
