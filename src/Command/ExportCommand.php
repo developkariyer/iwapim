@@ -320,7 +320,9 @@ class ExportCommand extends AbstractCommand
             $results[] = $labelArray;
         }
         //print_r($results);
-        print_r($customItems);
+        if (!empty($customItems)) {
+            print_r($customItems);
+        }
         return $results;
     }
 
