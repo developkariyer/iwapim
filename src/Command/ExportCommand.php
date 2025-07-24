@@ -43,7 +43,7 @@ class ExportCommand extends AbstractCommand
                 break;
             }
             foreach ($export as &$product) {
-                $product['sizeTable'] = $this->parseSizeListForTableFormat($product['variationSizeList']);
+                $product['sizeTable'] = $this->parseSizeListForTableFormat($product['variationSizeList'], $product['id']);
                 $allProducts[] = $product;
             }
             echo "offset = $offset\n";
@@ -254,7 +254,7 @@ class ExportCommand extends AbstractCommand
 //    }
 
 
-    private function parseSizeListForTableFormat($variationSizeList)
+    private function parseSizeListForTableFormat($variationSizeList, $productId)
     {
         if (empty($variationSizeList)) {
             return [];
@@ -335,6 +335,7 @@ class ExportCommand extends AbstractCommand
         }
         //print_r($results);
         if (!empty($customItems)) {
+            echo $productId . " Custom Items: ";
             print_r($customItems);
         }
         return $results;
