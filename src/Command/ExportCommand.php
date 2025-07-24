@@ -250,12 +250,10 @@ class ExportCommand extends AbstractCommand
 
     private function parseSizeListForTableFormat($variationSizeList)
     {
-        // Sonuçların ve sıralı etiketlerin hazırlanması
         $results = [];
         $defaultLabels = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'];
-        $labelIndex = 0; // Sayısal ölçüler için sıralı etiket atamakta kullanılacak.
+        $labelIndex = 0;
 
-        // Farklı yazımları standart etiketlere çeviren harita
         $labelMap = [
             'SMALL'   => 'S',
             'MEDIUM'  => 'M',
@@ -270,7 +268,6 @@ class ExportCommand extends AbstractCommand
             'XXSMALL' => 'XXS',
         ];
 
-        // Girdi metnini virgül, noktalı virgül veya yeni satıra göre ayır
         $parts = preg_split('/[\r\n,;]+/', trim($variationSizeList));
         $customItems = [];
 
@@ -283,20 +280,19 @@ class ExportCommand extends AbstractCommand
                 $unit = $m[3] ?? '';
                 $width = $m[1] . $unit;
                 $height = $m[2] . $unit;
-                // Etiket belirtilmediği için sıradaki etiketi ata
                 $label = $defaultLabels[$labelIndex++] ?? 'Beden-' . $labelIndex;
                 $results[] = [$width, $height, $label];
                 continue;
             }
 
-            // Kural 2: "50cm", "120" gibi tekil sayısal ölçüleri yakala (Kare kabul edilebilir)
-            if (preg_match('/^(\d+(?:\.\d+)?)\s*(cm|mm|m)?$/iu', $item, $m)) {
+            // Kural 2: "50cm", "120", "x30cm" gibi tekil sayısal ölçüleri yakala (Kare kabul edilebilir)
+            // *** DÜZELTME BURADA: Regex'in başına 'x?' eklendi. ***
+            if (preg_match('/^x?(\d+(?:\.\d+)?)\s*(cm|mm|m)?$/iu', $item, $m)) {
                 $unit = $m[2] ?? '';
                 $value = $m[1] . $unit;
-                // Eski kodunuzdaki gibi en ve boyu aynı kabul edelim
+                // en ve boyu aynı kabul edelim
                 $width = $value;
                 $height = $value;
-                // Etiket belirtilmediği için sıradaki etiketi ata
                 $label = $defaultLabels[$labelIndex++] ?? 'Beden-' . $labelIndex;
                 $results[] = [$width, $height, $label];
                 continue;
@@ -305,23 +301,19 @@ class ExportCommand extends AbstractCommand
             // Kural 3: "S", "Medium", "XLarge" gibi standart beden etiketlerini yakala
             $normalLabel = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $item));
             if (isset($labelMap[$normalLabel])) {
-                // Genişlik ve yükseklik yok, sadece etiket var
                 $results[] = [null, null, $labelMap[$normalLabel]];
                 continue;
             }
 
             // Kural 4: "En: 150cm" gibi etiketli ölçüleri yakala
             if (preg_match('/^([a-zA-Z]+)[\:\- ]+([\d.xX]+(?:\s?(?:cm|mm|m))?)$/iu', $item, $m)) {
-                // Değeri genişlik olarak alalım, etiket olarak da başındaki kelimeyi kullanalım
                 $results[] = [trim($m[2]), null, strtoupper($m[1])];
                 continue;
             }
 
-            // Yukarıdaki kuralların hiçbirine uymuyorsa, custom listesine ekle
             $customItems[] = $item;
         }
 
-        // İsteğiniz üzerine, eşleşmeyenleri ekrana yazdır.
         if (!empty($customItems)) {
             echo "----------------------------------------\n";
             echo "İşlenemeyen 'Custom' Değerler:\n";
@@ -331,7 +323,6 @@ class ExportCommand extends AbstractCommand
             echo "----------------------------------------\n";
         }
 
-        // Sadece işlenmiş ve [genişlik, yükseklik, etiket] formatına getirilmiş sonuçları döndür.
         return $results;
     }
 
