@@ -255,17 +255,9 @@ class ExportCommand extends AbstractCommand
         $labelIndex = 0;
 
         $labelMap = [
-            'SMALL'   => 'S',
-            'MEDIUM'  => 'M',
-            'LARGE'   => 'L',
-            'XL'      => 'XL',
-            'XLARGE'  => 'XL',
-            'XXL'     => '2XL',
-            '3XL'     => '3XL',
-            '4XL'     => '4XL',
-            '5XL'     => '5XL',
-            'XSMALL'  => 'XS',
-            'XXSMALL' => 'XXS',
+            'SMALL' => 'S', 'MEDIUM' => 'M', 'LARGE' => 'L', 'XL' => 'XL',
+            'XLARGE' => 'XL', 'XXL' => '2XL', '3XL' => '3XL', '4XL' => '4XL',
+            '5XL' => '5XL', 'XSMALL' => 'XS', 'XXSMALL' => 'XXS',
         ];
 
         $parts = preg_split('/[\r\n,;]+/', trim($variationSizeList));
@@ -275,7 +267,18 @@ class ExportCommand extends AbstractCommand
             $item = trim($raw);
             if ($item === '') continue;
 
-            // Kural 1: "50x70cm", "100x120", "80 x 90 mm" gibi GxY formatını yakala
+            // *** YENİ EKLENEN KURAL ***
+            // Kural 0: "10x12x9cm" gibi ÜÇ BOYUTLU (GxYxD) formatını yakala. Bu en önce kontrol edilmeli.
+            if (preg_match('/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(cm|mm|m)?$/iu', $item, $m)) {
+                // Veri kaybı olmasın diye tüm ölçüyü ilk sütuna yazıyoruz.
+                $width = $item;
+                $height = null; // Yükseklik alanı bu format için kullanılmıyor.
+                $label = $defaultLabels[$labelIndex++] ?? 'Beden-' . $labelIndex;
+                $results[] = [$width, $height, $label];
+                continue;
+            }
+
+            // Kural 1: "50x70cm" gibi İKİ BOYUTLU (GxY) formatını yakala.
             if (preg_match('/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(cm|mm|m)?$/iu', $item, $m)) {
                 $unit = $m[3] ?? '';
                 $width = $m[1] . $unit;
@@ -285,32 +288,31 @@ class ExportCommand extends AbstractCommand
                 continue;
             }
 
-            // Kural 2: "50cm", "120", "x30cm" gibi tekil sayısal ölçüleri yakala (Kare kabul edilebilir)
-            // *** DÜZELTME BURADA: Regex'in başına 'x?' eklendi. ***
+            // Kural 2: "50cm", "x30cm" gibi TEKİL sayısal ölçüleri yakala.
             if (preg_match('/^x?(\d+(?:\.\d+)?)\s*(cm|mm|m)?$/iu', $item, $m)) {
                 $unit = $m[2] ?? '';
                 $value = $m[1] . $unit;
-                // en ve boyu aynı kabul edelim
                 $width = $value;
-                $height = $value;
+                $height = $value; // Kare kabul ediliyor.
                 $label = $defaultLabels[$labelIndex++] ?? 'Beden-' . $labelIndex;
                 $results[] = [$width, $height, $label];
                 continue;
             }
 
-            // Kural 3: "S", "Medium", "XLarge" gibi standart beden etiketlerini yakala
+            // Kural 3: "S", "Medium" gibi standart beden etiketlerini yakala.
             $normalLabel = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $item));
             if (isset($labelMap[$normalLabel])) {
                 $results[] = [null, null, $labelMap[$normalLabel]];
                 continue;
             }
 
-            // Kural 4: "En: 150cm" gibi etiketli ölçüleri yakala
+            // Kural 4: "En: 150cm" gibi etiketli ölçüleri yakala.
             if (preg_match('/^([a-zA-Z]+)[\:\- ]+([\d.xX]+(?:\s?(?:cm|mm|m))?)$/iu', $item, $m)) {
                 $results[] = [trim($m[2]), null, strtoupper($m[1])];
                 continue;
             }
 
+            // Yukarıdaki kuralların hiçbirine uymuyorsa, custom listesine ekle.
             $customItems[] = $item;
         }
 
