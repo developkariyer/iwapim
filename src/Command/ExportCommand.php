@@ -339,6 +339,7 @@ class ExportCommand extends AbstractCommand
             print_r($customItems);
             echo "\n Size List: \n";
             print_r($variationSizeList);
+            echo "\n";
         }
         return $results;
     }
