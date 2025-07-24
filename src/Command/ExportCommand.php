@@ -286,7 +286,7 @@ class ExportCommand extends AbstractCommand
                 $parsedDimensionValues[] = $key;
                 continue;
             }
-            if (preg_match('/(\d+)(\s?)(mm|cm|m)?/i', $part, $matches)) {
+            if (preg_match('/(\d+)(\s?)(mm|cm|m)/i', $part, $matches)) {
                 $value = (int)$matches[1];
                 $parsedNumericValues[] = $value;
                 continue;
