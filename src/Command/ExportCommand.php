@@ -42,7 +42,7 @@ class ExportCommand extends AbstractCommand
                 break;
             }
             foreach ($export as &$product) {
-                print_r($this->parseSizeListForTableFormat($product['variationSizeList']));
+                $this->parseSizeListForTableFormat($product['variationSizeList']);
             }
             echo "offset = $offset\n";
             $offset += $limit;
