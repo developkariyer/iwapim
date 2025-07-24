@@ -250,98 +250,89 @@ class ExportCommand extends AbstractCommand
 
     private function parseSizeListForTableFormat($variationSizeList)
     {
-        $results = []; // Standart formata uyanlar için [genişlik, yükseklik, derinlik, etiket]
-        $custom = [];  // Standart formata uymayan, özel değerler
+        // Sonuçların ve sıralı etiketlerin hazırlanması
+        $results = [];
+        $defaultLabels = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'];
+        $labelIndex = 0; // Sayısal ölçüler için sıralı etiket atamakta kullanılacak.
 
-        // Bilinen beden etiketleri ve bunların standart gösterimleri
-        $sizeLabels = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'];
+        // Farklı yazımları standart etiketlere çeviren harita
         $labelMap = [
-            'SMALL'    => 'S',
-            'MEDIUM'   => 'M',
-            'LARGE'    => 'L',
-            'XL'       => 'XL',
-            'XLARGE'   => 'XL',
-            'XXL'      => '2XL',
-            '3XL'      => '3XL',
-            '4XL'      => '4XL',
-            '5XL'      => '5XL',
-            'XSMALL'   => 'XS',
-            'XXSMALL'  => 'XXS',
-            // Bu etiketler standart beden tablosuna girmez, özel olarak değerlendirilir.
-            'SET'      => null,
-            'TEK'      => null,
-            'TEKEBAT'  => null,
-            'STANDART' => null,
-            'STANDARD' => null,
+            'SMALL'   => 'S',
+            'MEDIUM'  => 'M',
+            'LARGE'   => 'L',
+            'XL'      => 'XL',
+            'XLARGE'  => 'XL',
+            'XXL'     => '2XL',
+            '3XL'     => '3XL',
+            '4XL'     => '4XL',
+            '5XL'     => '5XL',
+            'XSMALL'  => 'XS',
+            'XXSMALL' => 'XXS',
         ];
 
-        // Girdi metnini satırlara/parçalara ayır
+        // Girdi metnini virgül, noktalı virgül veya yeni satıra göre ayır
         $parts = preg_split('/[\r\n,;]+/', trim($variationSizeList));
+        $customItems = [];
 
         foreach ($parts as $raw) {
             $item = trim($raw);
             if ($item === '') continue;
 
-            // Kural 1: "100x50x20cm", "50x70", "120 cm" gibi sayısal ölçüleri yakala
-            if (preg_match('/^x?(\d{1,4})(?:[-\sx](\d{1,4}))?(?:[-\sx](\d{1,4}))?(?:\s*(cm|mm|m))?/iu', $item, $m)) {
-                $unit = $m[4] ?? '';
+            // Kural 1: "50x70cm", "100x120", "80 x 90 mm" gibi GxY formatını yakala
+            if (preg_match('/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(cm|mm|m)?$/iu', $item, $m)) {
+                $unit = $m[3] ?? '';
                 $width = $m[1] . $unit;
-                $height = isset($m[2]) && $m[2] ? $m[2] . $unit : '';
-                $depth = isset($m[3]) && $m[3] ? $m[3] . $unit : '';
-                $results[] = [$width, $height, $depth, null];
+                $height = $m[2] . $unit;
+                // Etiket belirtilmediği için sıradaki etiketi ata
+                $label = $defaultLabels[$labelIndex++] ?? 'Beden-' . $labelIndex;
+                $results[] = [$width, $height, $label];
                 continue;
             }
 
-            // Kural 2: "50 - 70cm" gibi aralıkları yakala ve iki ayrı satır olarak ekle
-            if (preg_match('/(\d{1,4})\s*-\s*(\d{1,4})(cm|mm|m)?/iu', $item, $m)) {
-                $label = ($m[3] ?? '');
-                $results[] = [$m[1] . $label, '', '', null];
-                $results[] = [$m[2] . $label, '', '', null];
+            // Kural 2: "50cm", "120" gibi tekil sayısal ölçüleri yakala (Kare kabul edilebilir)
+            if (preg_match('/^(\d+(?:\.\d+)?)\s*(cm|mm|m)?$/iu', $item, $m)) {
+                $unit = $m[2] ?? '';
+                $value = $m[1] . $unit;
+                // Eski kodunuzdaki gibi en ve boyu aynı kabul edelim
+                $width = $value;
+                $height = $value;
+                // Etiket belirtilmediği için sıradaki etiketi ata
+                $label = $defaultLabels[$labelIndex++] ?? 'Beden-' . $labelIndex;
+                $results[] = [$width, $height, $label];
                 continue;
             }
 
-            // Kural 3: "5 adet", "2'li set" gibi özel ifadeleri yakala
-            if (preg_match('/(\d+\s*adet|\d+\'li|\d+\'lü|ikili|üçlü|dörtlü)/i', $item)) {
-                $custom[] = $item;
-                continue;
-            }
-
-            // Kural 4: "Set", "Tek Ebat", "Standart" gibi genel ifadeleri yakala
-            if (preg_match('/^(set|tek(ebat)?|standart|standard)/iu', $item)) {
-                $custom[] = $item;
-                continue;
-            }
-
-            // Metni temizleyerek standart beden etiketleriyle (S, M, L vb.) karşılaştır
+            // Kural 3: "S", "Medium", "XLarge" gibi standart beden etiketlerini yakala
             $normalLabel = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $item));
-            if (array_key_exists($normalLabel, $labelMap) && $labelMap[$normalLabel]) {
-                $results[] = ['', '', '', $labelMap[$normalLabel]];
+            if (isset($labelMap[$normalLabel])) {
+                // Genişlik ve yükseklik yok, sadece etiket var
+                $results[] = [null, null, $labelMap[$normalLabel]];
                 continue;
             }
 
-            // Doğrudan "S", "M", "L" gibi yazılanları yakala
-            if (in_array(strtoupper($item), $sizeLabels)) {
-                $results[] = ['', '', '', strtoupper($item)];
-                continue;
-            }
-
-            // Kural 5: "En: 50cm", "Boy: 70x90" gibi etiketli ölçüleri yakala
+            // Kural 4: "En: 150cm" gibi etiketli ölçüleri yakala
             if (preg_match('/^([a-zA-Z]+)[\:\- ]+([\d.xX]+(?:\s?(?:cm|mm|m))?)$/iu', $item, $m)) {
-                $lbl = strtoupper($m[1]);
-                $val = trim($m[2]);
-                // Etiketi S, M, L gibi standart bir etikete çevirmeye çalış, olmazsa orijinalini kullan
-                $results[] = [$val, '', '', $labelMap[$lbl] ?? $lbl];
+                // Değeri genişlik olarak alalım, etiket olarak da başındaki kelimeyi kullanalım
+                $results[] = [trim($m[2]), null, strtoupper($m[1])];
                 continue;
             }
 
-            // Yukarıdaki kuralların hiçbirine uymuyorsa, "custom" listesine ekle
-            $custom[] = $item;
+            // Yukarıdaki kuralların hiçbirine uymuyorsa, custom listesine ekle
+            $customItems[] = $item;
         }
 
-        return [
-            'sizes'  => $results,
-            'custom' => $custom
-        ];
+        // İsteğiniz üzerine, eşleşmeyenleri ekrana yazdır.
+        if (!empty($customItems)) {
+            echo "----------------------------------------\n";
+            echo "İşlenemeyen 'Custom' Değerler:\n";
+            foreach ($customItems as $custom) {
+                echo " - " . $custom . "\n";
+            }
+            echo "----------------------------------------\n";
+        }
+
+        // Sadece işlenmiş ve [genişlik, yükseklik, etiket] formatına getirilmiş sonuçları döndür.
+        return $results;
     }
 
 
