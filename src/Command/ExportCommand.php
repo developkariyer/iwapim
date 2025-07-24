@@ -250,73 +250,77 @@ class ExportCommand extends AbstractCommand
 
     private function parseSizeListForTableFormat($product)
     {
-        $variationSizeList = $product['variationSizeList'];
+        $variationSizeList = $product['variationSizeList'] ?? '';
+        if (empty($variationSizeList)) {
+            return [];
+        }
         $results = [];
-        $defaultLabels = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', 'XS', 'XXS'];
-        $labelIndex = 0;
-        $labelMap = [
-            'SMALL' => 'S', 'MEDIUM' => 'M', 'LARGE' => 'L', 'XLARGE' => 'XL',
-            'XSMALL' => 'XS', 'XXSMALL' => 'XXS'
-        ];
-        $parts = preg_split('/[\r\n,;]+/', trim($variationSizeList));
         $customItems = [];
+        $defaultLabels = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', 'XS', 'XXS'];
+        $labelMap = [
+            'SMALL'   => 'S',    'MEDIUM' => 'M',    'LARGE' => 'L',
+            'XLARGE'  => 'XL',   'XSMALL' => 'XS',   'XXSMALL' => 'XXS'
+        ];
+        $labelIndex = 0;
+        $parts = preg_split('/[\r\n,;]+/', trim($variationSizeList));
         foreach ($parts as $raw) {
             $item = trim($raw);
             if ($item === '') continue;
-            if (preg_match('/^([a-zA-Z0-9]+)\s*-\s*([\d.xX]+(?:\s*(?:cm|mm|m))?)$/iu', $item, $m)) {
-                $label = strtoupper($m[1]);
-                $dimension = trim($m[2]);
-                $results[] = [$dimension, null, $labelMap[$label] ?? $label];
-                continue;
-            }
-            if (preg_match('/^([\d.xX]+(?:\s*(?:cm|mm|m))?)\s*\((.+)\)$/iu', $item, $m)) {
-                $dimension = trim($m[1]);
-                $label = strtoupper(trim($m[2]));
-                $results[] = [$dimension, null, $label];
-                continue;
-            }
-            if (preg_match('/^([\d.xX\s*cmm]+)\s*-\s*([\d.xX\s*cmm]+)$/iu', $item, $m)) {
-                $rangeParts = [trim($m[1]), trim($m[2])];
+            $rangeParts = preg_split('/\s*-\s*/', $item, 2);
+            if (count($rangeParts) === 2 && preg_match('/\d/', $rangeParts[0]) && preg_match('/\d/', $rangeParts[1])) {
                 foreach ($rangeParts as $rangePart) {
-                    if (preg_match('/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(cm|mm|m)?/iu', $rangePart, $sz)) {
-                        $results[] = [($sz[1].($sz[3]??'')), ($sz[2].($sz[3]??'')), $defaultLabels[$labelIndex++] ?? 'Beden-'.$labelIndex];
-                    } elseif (preg_match('/^x?(\d+(?:\.\d+)?)\s*(cm|mm|m)?/iu', $rangePart, $sz)) {
-                        $results[] = [($sz[1].($sz[2]??'')), ($sz[1].($sz[2]??'')), $defaultLabels[$labelIndex++] ?? 'Beden-'.$labelIndex];
+                    preg_match_all('/(\d+(?:\.\d+)?)/', $rangePart, $matches);
+                    if (!empty($matches[1])) {
+                        $dms = array_map('floatval', $matches[1]);
+                        $dms[] = $defaultLabels[$labelIndex++] ?? 'Beden-'.$labelIndex;
+                        $results[] = $dms;
                     }
                 }
                 continue;
             }
-            if (preg_match('/^(\d+(?:\.\d+)?(?:\s*x\s*\d+(?:\.\d+)?){2,})\s*(cm|mm|m)?/iu', $item, $m)) {
-                $results[] = [$m[1] . ($m[2] ?? ''), null, $defaultLabels[$labelIndex++] ?? 'Beden-'.$labelIndex];
+            if (preg_match('/^([a-zA-Z0-9]+)[\s:-]+(.+)$/iu', $item, $m)) {
+                $label = strtoupper(trim($m[1]));
+                $dimensionPart = trim($m[2]);
+                preg_match_all('/(\d+(?:\.\d+)?)/', $dimensionPart, $matches);
+                if (!empty($matches[1])) {
+                    $dms = array_map('floatval', $matches[1]);
+                    $dms[] = $labelMap[$label] ?? $label;
+                    $results[] = $dms;
+                }
                 continue;
             }
-            if (preg_match('/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(cm|mm|m)?(?:\s*\(.*\))?$/iu', $item, $m)) {
-                $unit = $m[3] ?? '';
-                $results[] = [$m[1].$unit, $m[2].$unit, $defaultLabels[$labelIndex++] ?? 'Beden-'.$labelIndex];
+            if (preg_match('/^(.+?)\s*\((.+)\)$/iu', $item, $m)) {
+                $dimensionPart = trim($m[1]);
+                $label = strtoupper(trim($m[2]));
+                preg_match_all('/(\d+(?:\.\d+)?)/', $dimensionPart, $matches);
+                if (!empty($matches[1])) {
+                    $dms = array_map('floatval', $matches[1]);
+                    $dms[] = $label;
+                    $results[] = $dms;
+                }
                 continue;
             }
-            if (preg_match('/^x?(\d+(?:\.\d+)?)\s*(cm|mm|m)?(?:\s*\(.*\))?$/iu', $item, $m)) {
-                $value = $m[1] . ($m[2] ?? '');
-                $results[] = [$value, $value, $defaultLabels[$labelIndex++] ?? 'Beden-'.$labelIndex];
-                continue;
+            preg_match_all('/(\d+(?:\.\d+)?)/', $item, $matches);
+            if (!empty($matches[1])) {
+                if (preg_match('/^[x\d\s\.,cm]*$/i', preg_replace('/\s+/', '', $item))) {
+                    $dms = array_map('floatval', $matches[1]);
+                    $dms[] = $defaultLabels[$labelIndex++] ?? 'Beden-'.$labelIndex;
+                    $results[] = $dms;
+                    continue;
+                }
             }
             $upperItem = strtoupper($item);
-            if (in_array($upperItem, $defaultLabels)) {
-                $results[] = [null, null, $upperItem];
-                continue;
-            }
             $normalLabel = strtoupper(preg_replace('/[^A-Za-z]/', '', $item));
-            if (isset($labelMap[$normalLabel])) {
-                $results[] = [null, null, $labelMap[$normalLabel]];
+            if (in_array($upperItem, $defaultLabels)) {
+                $results[] = [$upperItem];
                 continue;
             }
-            if (preg_match('/^([a-zA-Z]+)[\:\- ]+([\d.xX]+(?:\s?(?:cm|mm|m))?)$/iu', $item, $m)) {
-                $results[] = [trim($m[2]), null, strtoupper($m[1])];
+            if (isset($labelMap[$normalLabel])) {
+                $results[] = [$labelMap[$normalLabel]];
                 continue;
             }
             $customItems[] = $item;
         }
-
         if (!empty($customItems)) {
             echo "----------------------------------------\n";
             echo "İşlenemeyen 'Custom' Değerler:\n";
@@ -325,7 +329,6 @@ class ExportCommand extends AbstractCommand
             }
             echo "----------------------------------------\n";
         }
-        print_r($results);
         return $results;
     }
 
