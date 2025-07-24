@@ -319,7 +319,7 @@ class ExportCommand extends AbstractCommand
         foreach ($parsedStandardLabels as $labelArray) {
             $results[] = $labelArray;
         }
-        print_r($results);
+        //print_r($results);
         // print_r($customItems);
         return $results;
     }
