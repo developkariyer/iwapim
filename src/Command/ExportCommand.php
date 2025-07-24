@@ -43,15 +43,15 @@ class ExportCommand extends AbstractCommand
                 break;
             }
             foreach ($export as &$product) {
-                $product['sizeTable'] = $this->parseSizeListForTableFormat($product);
+                $product['sizeTable'] = $this->parseSizeListForTableFormat($product['variationSizeList']);
                 $allProducts[] = $product;
             }
             echo "offset = $offset\n";
             $offset += $limit;
         }
-        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/exportProduct.json';
-        file_put_contents($filePath, json_encode($allProducts, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-        echo "Exported to: " . $filePath . "\n";
+//        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/exportProduct.json';
+//        file_put_contents($filePath, json_encode($allProducts, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+//        echo "Exported to: " . $filePath . "\n";
 
 //        $limit = 50;
 //        $offset = 0;
@@ -254,127 +254,75 @@ class ExportCommand extends AbstractCommand
 //    }
 
 
-    private function parseSizeListForTableFormat(&$product)
+    private function parseSizeListForTableFormat($variationSizeList)
     {
-        $variationSizeList = $product['variationSizeList'] ?? '';
         if (empty($variationSizeList)) {
             return [];
         }
         $results = [];
         $customItems = [];
-        $selectableOptions = [];
-        $defaultLabels = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', 'XS', 'XXS'];
-        $labelMap = [
-            'SMALL'   => 'S', 'MEDIUM' => 'M', 'LARGE' => 'L',
-            'XLARGE'  => 'XL', 'XSMALL' => 'XS', 'XXSMALL' => 'XXS'
-        ];
-        $labelIndex = 0;
-        $parts = preg_split('/[\r\n,;]+/', trim($variationSizeList));
-        foreach ($parts as $raw) {
-            $item = trim($raw);
-            if ($item === '') continue;
-            $rangeParts = preg_split('/\s*-\s*/', $item, 2);
-            if (count($rangeParts) === 2 && preg_match('/\d/', $rangeParts[0]) && preg_match('/\d/', $rangeParts[1])) {
-                foreach ($rangeParts as $rangePart) {
-                    preg_match_all('/(\d+(?:\.\d+)?)/', $rangePart, $matches);
-                    if (!empty($matches[1])) {
-                        $dms = array_map('floatval', $matches[1]);
-                        $dms[] = $defaultLabels[$labelIndex++] ?? 'Beden-'.$labelIndex;
-                        $results[] = $dms;
-                    }
-                }
+        $defaultLabels = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL', '11XL', '12XL'];
+        $defaultLabelIndex = 0;
+        $parts = preg_split('/[\r\n,]+/', trim($variationSizeList));
+        $parsedNumericValues = [];
+        $parsedDimensionValues = [];
+        $parsedSimpleLabels = [];
+        $parsedStandardLabels = [];
+        foreach ($parts as $part) {
+            $part = trim($part);
+            if ($part === '') continue;
+            if (preg_match('/(\d+)[xX](\d+)/', $part, $matches)) {
+                $a = (int)$matches[1];
+                $b = (int)$matches[2];
+                $key = [$a, $b];
+                $parsedDimensionValues[] = $key;
                 continue;
             }
-            if (preg_match('/^([a-zA-Z0-9]+)[\s:-]+(.+)$/iu', $item, $m)) {
-                $label = strtoupper(trim($m[1]));
-                $dimensionPart = trim($m[2]);
-                $normalizedLabel = $labelMap[$label] ?? $label;
-                $selectableOptions[] = $normalizedLabel;
-                preg_match_all('/(\d+(?:\.\d+)?)/', $dimensionPart, $matches);
-                if (!empty($matches[1])) {
-                    $dms = array_map('floatval', $matches[1]);
-                    $dms[] = $normalizedLabel;
-                    $results[] = $dms;
-                } else {
-                    $results[] = [$normalizedLabel];
-                }
+            if (preg_match('/(\d+)[xX](\d+)[xX](\d+)/', $part, $matches)) {
+                $a = (int)$matches[1];
+                $b = (int)$matches[2];
+                $c = (int)$matches[3];
+                $key = [$a, $b, $c];
+                $parsedDimensionValues[] = $key;
                 continue;
             }
-            if (preg_match('/^(.+?)\s*\((.+)\)$/iu', $item, $m)) {
-                $dimensionPart = trim($m[1]);
-                $label = strtoupper(trim($m[2]));
-                $selectableOptions[] = $label;
-                preg_match_all('/(\d+(?:\.\d+)?)/', $dimensionPart, $matches);
-                if (!empty($matches[1])) {
-                    $dms = array_map('floatval', $matches[1]);
-                    $dms[] = $label;
-                    $results[] = $dms;
-                } else {
-                    $results[] = [$label];
-                }
+            if (preg_match('/(\d+)(\s?)(mm|cm|m)?/i', $part, $matches)) {
+                $value = (int)$matches[1];
+                $parsedNumericValues[] = $value;
                 continue;
             }
-            if (preg_match('/^\d+\s*(adet|\'li|\'lü)$/i', $item)) {
-                $results[] = [$item];
-                $selectableOptions[] = $item;
+            if (in_array(strtoupper($part), $defaultLabels)) {
+                $parsedSimpleLabels[] = [strtoupper($part)];
                 continue;
             }
-            preg_match_all('/(\d+(?:\.\d+)?)/', $item, $matches);
-            if (!empty($matches[1])) {
-                if (preg_match('/^[x\d\s\.,cm]*$/i', preg_replace('/\s+/', '', $item))) {
-                    $dms = array_map('floatval', $matches[1]);
-                    $dms[] = $defaultLabels[$labelIndex++] ?? 'Beden-'.$labelIndex;
-                    $results[] = $dms;
-                    continue;
-                }
-            }
-            $upperItem = strtoupper($item);
-            $normalLabel = strtoupper(preg_replace('/[^A-Za-z]/', '', $item));
-            if (in_array($upperItem, $defaultLabels)) {
-                $results[] = [$upperItem];
-                $selectableOptions[] = $upperItem;
+            if (preg_match('/tek\s?ebat|standart/i', $part)) {
+                $parsedStandardLabels[] = ['S'];
                 continue;
             }
-            if (isset($labelMap[$normalLabel])) {
-                $label = $labelMap[$normalLabel];
-                $results[] = [$label];
-                $selectableOptions[] = $label;
-                continue;
-            }
-            $customItems[] = $item;
+            $customItems[] = $part;
         }
-        if (!empty($customItems)) {
-            $customValuesForTable = [];
-            foreach (array_unique($customItems) as $custom) {
-                $customValuesForTable[] = ['value' => $custom];
-            }
-            $product['customTable'] = array_merge([['value' => 'Custom']], $customValuesForTable);
+        usort($parsedDimensionValues, function($a, $b) {
+            return $a <=> $b;
+        });
+        foreach ($parsedDimensionValues as $dims) {
+            $label = $defaultLabels[$defaultLabelIndex++] ?? end($defaultLabels);
+            $results[] = array_merge($dims, [$label]);
         }
-        if (!empty($product['variants']) && !empty($selectableOptions)) {
-            $normalizedSelectableOptions = [];
-            foreach(array_unique($selectableOptions) as $opt) {
-                $cleaned = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $opt));
-                $normalized = $labelMap[$cleaned] ?? $cleaned;
-                if(!in_array($normalized, $normalizedSelectableOptions)) {
-                    $normalizedSelectableOptions[] = $normalized;
-                }
-            }
-            foreach ($product['variants'] as &$variant) {
-                if (!empty($variant['variationSize'])) {
-                    $variantLabel = $variant['variationSize'];
-                    $cleanedVariantLabel = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $variantLabel));
-                    $normalizedVariantLabel = $labelMap[$cleanedVariantLabel] ?? $cleanedVariantLabel;
-                    if (in_array($normalizedVariantLabel, $normalizedSelectableOptions)) {
-                        $variant['customField'] = $variant['variationSize'];
-                        $variant['variationSize'] = '';
-                    }
-                }
-            }
-            unset($variant);
+        sort($parsedNumericValues);
+        foreach ($parsedNumericValues as $val) {
+            $label = $defaultLabels[$defaultLabelIndex++] ?? end($defaultLabels);
+            $results[] = [$val, $label];
         }
+        foreach ($parsedSimpleLabels as $labelArray) {
+            $results[] = $labelArray;
+        }
+        foreach ($parsedStandardLabels as $labelArray) {
+            $results[] = $labelArray;
+        }
+        print_r($results);
+        // print_r($customItems);
         return $results;
     }
-
 
 
 }
