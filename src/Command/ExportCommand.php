@@ -262,6 +262,16 @@ class ExportCommand extends AbstractCommand
         $results = [];
         $customItems = [];
         $defaultLabels = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL', '11XL', '12XL'];
+        $stringLabels = [
+            'Small' => 'S',
+            'Medium' => 'M',
+            'Large' => 'L',
+            'XLarge' => 'XL',
+            'Xlarge' => 'XL',
+            '2xLarge' => '2XL',
+            '2XLarge' => '2XL',
+            'XXL' => '2XL'
+        ];
         $defaultLabelIndex = 0;
         $parts = preg_split('/[\r\n,]+/', trim($variationSizeList));
         $parsedNumericValues = [];
@@ -270,6 +280,10 @@ class ExportCommand extends AbstractCommand
         $parsedStandardLabels = [];
         foreach ($parts as $part) {
             $part = trim($part);
+            if (isset($stringLabels[$part])) {
+                $results[] = [$stringLabels[$part]];
+                continue;
+            }
             if ($part === '') continue;
             if (preg_match('/(\d+)[xX](\d+)/', $part, $matches)) {
                 $a = (int)$matches[1];
