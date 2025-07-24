@@ -285,23 +285,23 @@ class ExportCommand extends AbstractCommand
                 continue;
             }
             if ($part === '') continue;
-            if (preg_match('/(\d+)[xX](\d+)/', $part, $matches)) {
-                $a = (int)$matches[1];
-                $b = (int)$matches[2];
+            if (preg_match('/(\d+(?:[.,]\d+)?)[xX](\d+(?:[.,]\d+)?)/', $part, $matches)) {
+                $a = (float) str_replace(',', '.', $matches[1]);
+                $b = (float) str_replace(',', '.', $matches[2]);
                 $key = [$a, $b];
                 $parsedDimensionValues[] = $key;
                 continue;
             }
-            if (preg_match('/(\d+)[xX](\d+)[xX](\d+)/', $part, $matches)) {
-                $a = (int)$matches[1];
-                $b = (int)$matches[2];
-                $c = (int)$matches[3];
+            if (preg_match('/(\d+(?:[.,]\d+)?)[xX](\d+(?:[.,]\d+)?)[xX](\d+(?:[.,]\d+)?)/', $part, $matches)) {
+                $a = (float) str_replace(',', '.', $matches[1]);
+                $b = (float) str_replace(',', '.', $matches[2]);
+                $c = (float) str_replace(',', '.', $matches[3]);
                 $key = [$a, $b, $c];
                 $parsedDimensionValues[] = $key;
                 continue;
             }
-            if (preg_match('/(\d+)(\s?)(mm|cm|m)/i', $part, $matches)) {
-                $value = (int)$matches[1];
+            if (preg_match('/(\d+(?:[.,]\d+)?)\s*(mm|cm|m)/i', $part, $matches)) {
+                $value = (float) str_replace(',', '.', $matches[1]);
                 $parsedNumericValues[] = $value;
                 continue;
             }
