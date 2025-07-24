@@ -329,6 +329,7 @@ class ExportCommand extends AbstractCommand
             }
             echo "----------------------------------------\n";
         }
+        print_r($results);
         return $results;
     }
 
