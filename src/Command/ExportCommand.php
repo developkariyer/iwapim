@@ -43,6 +43,7 @@ class ExportCommand extends AbstractCommand
             }
             foreach ($export as &$product) {
                 $this->parseSizeListForTableFormat($product);
+                print_r($product);
             }
             echo "offset = $offset\n";
             $offset += $limit;
@@ -248,7 +249,7 @@ class ExportCommand extends AbstractCommand
 //        return $results;
 //    }
 
-    private function parseSizeListForTableFormat($product)
+    private function parseSizeListForTableFormat(&$product)
     {
         $variationSizeList = $product['variationSizeList'] ?? '';
         if (empty($variationSizeList)) {
@@ -322,14 +323,38 @@ class ExportCommand extends AbstractCommand
             $customItems[] = $item;
         }
         if (!empty($customItems)) {
-            echo "----------------------------------------\n";
-            echo "İşlenemeyen 'Custom' Değerler:\n";
+            $customValuesForTable = [];
             foreach ($customItems as $custom) {
-                echo " - " . $custom . "\n";
+                $customValuesForTable[] = ['value' => $custom];
             }
-            echo "----------------------------------------\n";
+            $product['customTable'] = array_merge(
+                [['value' => 'Custom']],
+                $customValuesForTable
+            );
         }
-        print_r($results);
+        if (!empty($product['variants']) && !empty($selectableOptions)) {
+            $normalizedSelectableOptions = [];
+            foreach(array_unique($selectableOptions) as $opt) {
+                $cleaned = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $opt));
+                $normalized = $labelMap[$cleaned] ?? $cleaned;
+                if(!in_array($normalized, $normalizedSelectableOptions)) {
+                    $normalizedSelectableOptions[] = $normalized;
+                }
+            }
+            foreach ($product['variants'] as &$variant) {
+                if (!empty($variant['variationSize'])) {
+                    $variantLabel = $variant['variationSize'];
+                    $cleanedVariantLabel = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $variantLabel));
+                    $normalizedVariantLabel = $labelMap[$cleanedVariantLabel] ?? $cleanedVariantLabel;
+                    if (in_array($normalizedVariantLabel, $normalizedSelectableOptions)) {
+                        $variant['customField'] = $variant['variationSize'];
+                        $variant['variationSize'] = '';
+                    }
+                }
+            }
+            unset($variant);
+        }
+//        print_r($results);
         return $results;
     }
 
