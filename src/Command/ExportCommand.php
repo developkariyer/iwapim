@@ -250,83 +250,96 @@ class ExportCommand extends AbstractCommand
 
     private function parseSizeListForTableFormat($variationSizeList)
     {
-        $results = [];
-        $custom = [];
+        $results = []; // Standart formata uyanlar için [genişlik, yükseklik, derinlik, etiket]
+        $custom = [];  // Standart formata uymayan, özel değerler
 
-        // Sıraya göre S, M, L, XL eşlemesi için
+        // Bilinen beden etiketleri ve bunların standart gösterimleri
         $sizeLabels = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'];
-        // Standart isim eşlemesi
         $labelMap = [
-            'SMALL'   => 'S',
-            'MEDIUM'  => 'M',
-            'LARGE'   => 'L',
-            'XL'      => 'XL',
-            'XLARGE'  => 'XL',
-            'XXL'     => '2XL',
-            '3XL'     => '3XL',
-            '4XL'     => '4XL',
-            '5XL'     => '5XL',
-            'XSMALL'  => 'XS',
-            'XXSMALL' => 'XXS',
-            'SET'     => null,
-            'TEK'     => null,
-            'TEKEBAT' => null,
+            'SMALL'    => 'S',
+            'MEDIUM'   => 'M',
+            'LARGE'    => 'L',
+            'XL'       => 'XL',
+            'XLARGE'   => 'XL',
+            'XXL'      => '2XL',
+            '3XL'      => '3XL',
+            '4XL'      => '4XL',
+            '5XL'      => '5XL',
+            'XSMALL'   => 'XS',
+            'XXSMALL'  => 'XXS',
+            // Bu etiketler standart beden tablosuna girmez, özel olarak değerlendirilir.
+            'SET'      => null,
+            'TEK'      => null,
+            'TEKEBAT'  => null,
             'STANDART' => null,
             'STANDARD' => null,
         ];
 
+        // Girdi metnini satırlara/parçalara ayır
         $parts = preg_split('/[\r\n,;]+/', trim($variationSizeList));
+
         foreach ($parts as $raw) {
             $item = trim($raw);
             if ($item === '') continue;
+
+            // Kural 1: "100x50x20cm", "50x70", "120 cm" gibi sayısal ölçüleri yakala
             if (preg_match('/^x?(\d{1,4})(?:[-\sx](\d{1,4}))?(?:[-\sx](\d{1,4}))?(?:\s*(cm|mm|m))?/iu', $item, $m)) {
-                $width = $m[1] . ($m[4] ?? '');
-                $height = isset($m[2]) && $m[2] ? $m[2] . ($m[4] ?? '') : '';
-                $depth = isset($m[3]) && $m[3] ? $m[3] . ($m[4] ?? '') : '';
+                $unit = $m[4] ?? '';
+                $width = $m[1] . $unit;
+                $height = isset($m[2]) && $m[2] ? $m[2] . $unit : '';
+                $depth = isset($m[3]) && $m[3] ? $m[3] . $unit : '';
                 $results[] = [$width, $height, $depth, null];
                 continue;
             }
+
+            // Kural 2: "50 - 70cm" gibi aralıkları yakala ve iki ayrı satır olarak ekle
             if (preg_match('/(\d{1,4})\s*-\s*(\d{1,4})(cm|mm|m)?/iu', $item, $m)) {
                 $label = ($m[3] ?? '');
                 $results[] = [$m[1] . $label, '', '', null];
                 $results[] = [$m[2] . $label, '', '', null];
                 continue;
             }
-            if (preg_match('/\d+\s*adet/i', $item)) {
+
+            // Kural 3: "5 adet", "2'li set" gibi özel ifadeleri yakala
+            if (preg_match('/(\d+\s*adet|\d+\'li|\d+\'lü|ikili|üçlü|dörtlü)/i', $item)) {
                 $custom[] = $item;
                 continue;
             }
-            if (preg_match('/^(set|tek(ebat)?|standart|standard|2\'li|3\'lü|dörtlü|ikili|üçlü)/iu', $item)) {
+
+            // Kural 4: "Set", "Tek Ebat", "Standart" gibi genel ifadeleri yakala
+            if (preg_match('/^(set|tek(ebat)?|standart|standard)/iu', $item)) {
                 $custom[] = $item;
                 continue;
             }
+
+            // Metni temizleyerek standart beden etiketleriyle (S, M, L vb.) karşılaştır
             $normalLabel = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $item));
             if (array_key_exists($normalLabel, $labelMap) && $labelMap[$normalLabel]) {
                 $results[] = ['', '', '', $labelMap[$normalLabel]];
                 continue;
             }
+
+            // Doğrudan "S", "M", "L" gibi yazılanları yakala
             if (in_array(strtoupper($item), $sizeLabels)) {
                 $results[] = ['', '', '', strtoupper($item)];
                 continue;
             }
-            if (preg_match('/^([a-zA-Z]+)[\:\- ]+([\d.xX]+(\s?cm|\s?mm|\s?m)*)$/iu', $item, $m)) {
+
+            // Kural 5: "En: 50cm", "Boy: 70x90" gibi etiketli ölçüleri yakala
+            if (preg_match('/^([a-zA-Z]+)[\:\- ]+([\d.xX]+(?:\s?(?:cm|mm|m))?)$/iu', $item, $m)) {
                 $lbl = strtoupper($m[1]);
                 $val = trim($m[2]);
+                // Etiketi S, M, L gibi standart bir etikete çevirmeye çalış, olmazsa orijinalini kullan
                 $results[] = [$val, '', '', $labelMap[$lbl] ?? $lbl];
                 continue;
             }
+
+            // Yukarıdaki kuralların hiçbirine uymuyorsa, "custom" listesine ekle
             $custom[] = $item;
         }
-        echo "Detected sizes:\n";
-        foreach ($results as $r) {
-            echo json_encode($r, JSON_UNESCAPED_UNICODE) . "\n";
-        }
-        echo "\nCustom (Kalanlar):\n";
-        foreach ($custom as $c) {
-            echo $c . "\n";
-        }
+
         return [
-            'sizes' => $results,
+            'sizes'  => $results,
             'custom' => $custom
         ];
     }
