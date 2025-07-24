@@ -36,26 +36,40 @@ class ExportCommand extends AbstractCommand
     {
         $limit = 50;
         $offset = 0;
-        $allProducts = [];
         while (true) {
-            $export = $this->checkData($limit, $offset);
+            $export = $this->prepareProductData($limit, $offset);
             if (empty($export)) {
                 break;
             }
             foreach ($export as &$product) {
-                if (!$product['isDirty']) {
-                    $product['sizeTable'] = $this->parseSizeListForTableFormat($product['variationSizeList']);
-                }
-            }
-            foreach ($export as $product) {
-                $allProducts[] = $product;
+                print_r($this->parseSizeListForTableFormat($product['variationSizeList']));
             }
             echo "offset = $offset\n";
             $offset += $limit;
         }
-        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/exportProduct.json';
-        file_put_contents($filePath, json_encode($allProducts, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-        echo "Exported to: " . $filePath . "\n";
+
+//        $limit = 50;
+//        $offset = 0;
+//        $allProducts = [];
+//        while (true) {
+//            $export = $this->checkData($limit, $offset);
+//            if (empty($export)) {
+//                break;
+//            }
+//            foreach ($export as &$product) {
+//                if (!$product['isDirty']) {
+//                    $product['sizeTable'] = $this->parseSizeListForTableFormat($product['variationSizeList']);
+//                }
+//            }
+//            foreach ($export as $product) {
+//                $allProducts[] = $product;
+//            }
+//            echo "offset = $offset\n";
+//            $offset += $limit;
+//        }
+//        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/exportProduct.json';
+//        file_put_contents($filePath, json_encode($allProducts, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+//        echo "Exported to: " . $filePath . "\n";
     }
 
     private function prepareProductData($limit, $offset)
@@ -204,35 +218,119 @@ class ExportCommand extends AbstractCommand
         return $data;
     }
 
+//    private function parseSizeListForTableFormat($variationSizeList)
+//    {
+//        $results = [];
+//        $parts = preg_split('/[\r\n,]+/', trim($variationSizeList));
+//        $defaultLabels = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'];
+//        $labelIndex = 0;
+//        foreach ($parts as $size) {
+//            $size = trim($size);
+//            if ($size === '') continue;
+//            if (
+//                preg_match('/^(\d+(\.\d+)?)x(\d+(\.\d+)?)(cm|m)?$/i', $size, $sz)
+//            ) {
+//                $width = (float)$sz[1];
+//                $height = (float)$sz[3];
+//                $label = $defaultLabels[$labelIndex] ?? ('+' . end($defaultLabels));
+//                $labelIndex++;
+//                $results[] = [$width, $height, $label];
+//            } elseif (
+//                preg_match('/^(\d+(\.\d+)?)(cm|m)?$/i', $size, $sz2)
+//            ) {
+//                $width = (float)$sz2[1];
+//                $height = (float)$sz2[1];
+//                $label = $defaultLabels[$labelIndex] ?? ('+' . end($defaultLabels));
+//                $labelIndex++;
+//                $results[] = [$width, $height, $label];
+//            }
+//        }
+//        return $results;
+//    }
+
     private function parseSizeListForTableFormat($variationSizeList)
     {
         $results = [];
-        $parts = preg_split('/[\r\n,]+/', trim($variationSizeList));
-        $defaultLabels = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'];
-        $labelIndex = 0;
-        foreach ($parts as $size) {
-            $size = trim($size);
-            if ($size === '') continue;
-            if (
-                preg_match('/^(\d+(\.\d+)?)x(\d+(\.\d+)?)(cm|m)?$/i', $size, $sz)
-            ) {
-                $width = (float)$sz[1];
-                $height = (float)$sz[3];
-                $label = $defaultLabels[$labelIndex] ?? ('+' . end($defaultLabels));
-                $labelIndex++;
-                $results[] = [$width, $height, $label];
-            } elseif (
-                preg_match('/^(\d+(\.\d+)?)(cm|m)?$/i', $size, $sz2)
-            ) {
-                $width = (float)$sz2[1];
-                $height = (float)$sz2[1];
-                $label = $defaultLabels[$labelIndex] ?? ('+' . end($defaultLabels));
-                $labelIndex++;
-                $results[] = [$width, $height, $label];
+        $custom = [];
+
+        // Sıraya göre S, M, L, XL eşlemesi için
+        $sizeLabels = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'];
+        // Standart isim eşlemesi
+        $labelMap = [
+            'SMALL'   => 'S',
+            'MEDIUM'  => 'M',
+            'LARGE'   => 'L',
+            'XL'      => 'XL',
+            'XLARGE'  => 'XL',
+            'XXL'     => '2XL',
+            '3XL'     => '3XL',
+            '4XL'     => '4XL',
+            '5XL'     => '5XL',
+            'XSMALL'  => 'XS',
+            'XXSMALL' => 'XXS',
+            'SET'     => null,
+            'TEK'     => null,
+            'TEKEBAT' => null,
+            'STANDART' => null,
+            'STANDARD' => null,
+        ];
+
+        $parts = preg_split('/[\r\n,;]+/', trim($variationSizeList));
+        foreach ($parts as $raw) {
+            $item = trim($raw);
+            if ($item === '') continue;
+            if (preg_match('/^x?(\d{1,4})(?:[-\sx](\d{1,4}))?(?:[-\sx](\d{1,4}))?(?:\s*(cm|mm|m))?/iu', $item, $m)) {
+                $width = $m[1] . ($m[4] ?? '');
+                $height = isset($m[2]) && $m[2] ? $m[2] . ($m[4] ?? '') : '';
+                $depth = isset($m[3]) && $m[3] ? $m[3] . ($m[4] ?? '') : '';
+                $results[] = [$width, $height, $depth, null];
+                continue;
             }
+            if (preg_match('/(\d{1,4})\s*-\s*(\d{1,4})(cm|mm|m)?/iu', $item, $m)) {
+                $label = ($m[3] ?? '');
+                $results[] = [$m[1] . $label, '', '', null];
+                $results[] = [$m[2] . $label, '', '', null];
+                continue;
+            }
+            if (preg_match('/\d+\s*adet/i', $item)) {
+                $custom[] = $item;
+                continue;
+            }
+            if (preg_match('/^(set|tek(ebat)?|standart|standard|2\'li|3\'lü|dörtlü|ikili|üçlü)/iu', $item)) {
+                $custom[] = $item;
+                continue;
+            }
+            $normalLabel = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $item));
+            if (array_key_exists($normalLabel, $labelMap) && $labelMap[$normalLabel]) {
+                $results[] = ['', '', '', $labelMap[$normalLabel]];
+                continue;
+            }
+            if (in_array(strtoupper($item), $sizeLabels)) {
+                $results[] = ['', '', '', strtoupper($item)];
+                continue;
+            }
+            if (preg_match('/^([a-zA-Z]+)[\:\- ]+([\d.xX]+(\s?cm|\s?mm|\s?m)*)$/iu', $item, $m)) {
+                $lbl = strtoupper($m[1]);
+                $val = trim($m[2]);
+                $results[] = [$val, '', '', $labelMap[$lbl] ?? $lbl];
+                continue;
+            }
+            $custom[] = $item;
         }
-        return $results;
+        echo "Detected sizes:\n";
+        foreach ($results as $r) {
+            echo json_encode($r, JSON_UNESCAPED_UNICODE) . "\n";
+        }
+        echo "\nCustom (Kalanlar):\n";
+        foreach ($custom as $c) {
+            echo $c . "\n";
+        }
+        return [
+            'sizes' => $results,
+            'custom' => $custom
+        ];
     }
+
 
 
 }
