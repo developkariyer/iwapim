@@ -49,9 +49,9 @@ class ExportCommand extends AbstractCommand
             echo "offset = $offset\n";
             $offset += $limit;
         }
-        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/exportProduct.json';
-        file_put_contents($filePath, json_encode($allProducts, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-        echo "Exported to: " . $filePath . "\n";
+//        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/exportProduct.json';
+//        file_put_contents($filePath, json_encode($allProducts, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+//        echo "Exported to: " . $filePath . "\n";
 
 //        $limit = 50;
 //        $offset = 0;
@@ -253,6 +253,7 @@ class ExportCommand extends AbstractCommand
 //        return $results;
 //    }
 
+
     private function parseSizeListForTableFormat(&$product)
     {
         $variationSizeList = $product['variationSizeList'] ?? '';
@@ -261,10 +262,11 @@ class ExportCommand extends AbstractCommand
         }
         $results = [];
         $customItems = [];
+        $selectableOptions = [];
         $defaultLabels = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', 'XS', 'XXS'];
         $labelMap = [
-            'SMALL'   => 'S',    'MEDIUM' => 'M',    'LARGE' => 'L',
-            'XLARGE'  => 'XL',   'XSMALL' => 'XS',   'XXSMALL' => 'XXS'
+            'SMALL'   => 'S', 'MEDIUM' => 'M', 'LARGE' => 'L',
+            'XLARGE'  => 'XL', 'XSMALL' => 'XS', 'XXSMALL' => 'XXS'
         ];
         $labelIndex = 0;
         $parts = preg_split('/[\r\n,;]+/', trim($variationSizeList));
@@ -286,23 +288,35 @@ class ExportCommand extends AbstractCommand
             if (preg_match('/^([a-zA-Z0-9]+)[\s:-]+(.+)$/iu', $item, $m)) {
                 $label = strtoupper(trim($m[1]));
                 $dimensionPart = trim($m[2]);
+                $normalizedLabel = $labelMap[$label] ?? $label;
+                $selectableOptions[] = $normalizedLabel;
                 preg_match_all('/(\d+(?:\.\d+)?)/', $dimensionPart, $matches);
                 if (!empty($matches[1])) {
                     $dms = array_map('floatval', $matches[1]);
-                    $dms[] = $labelMap[$label] ?? $label;
+                    $dms[] = $normalizedLabel;
                     $results[] = $dms;
+                } else {
+                    $results[] = [$normalizedLabel];
                 }
                 continue;
             }
             if (preg_match('/^(.+?)\s*\((.+)\)$/iu', $item, $m)) {
                 $dimensionPart = trim($m[1]);
                 $label = strtoupper(trim($m[2]));
+                $selectableOptions[] = $label;
                 preg_match_all('/(\d+(?:\.\d+)?)/', $dimensionPart, $matches);
                 if (!empty($matches[1])) {
                     $dms = array_map('floatval', $matches[1]);
                     $dms[] = $label;
                     $results[] = $dms;
+                } else {
+                    $results[] = [$label];
                 }
+                continue;
+            }
+            if (preg_match('/^\d+\s*(adet|\'li|\'lü)$/i', $item)) {
+                $results[] = [$item];
+                $selectableOptions[] = $item;
                 continue;
             }
             preg_match_all('/(\d+(?:\.\d+)?)/', $item, $matches);
@@ -318,23 +332,23 @@ class ExportCommand extends AbstractCommand
             $normalLabel = strtoupper(preg_replace('/[^A-Za-z]/', '', $item));
             if (in_array($upperItem, $defaultLabels)) {
                 $results[] = [$upperItem];
+                $selectableOptions[] = $upperItem;
                 continue;
             }
             if (isset($labelMap[$normalLabel])) {
-                $results[] = [$labelMap[$normalLabel]];
+                $label = $labelMap[$normalLabel];
+                $results[] = [$label];
+                $selectableOptions[] = $label;
                 continue;
             }
             $customItems[] = $item;
         }
         if (!empty($customItems)) {
             $customValuesForTable = [];
-            foreach ($customItems as $custom) {
+            foreach (array_unique($customItems) as $custom) {
                 $customValuesForTable[] = ['value' => $custom];
             }
-            $product['customTable'] = array_merge(
-                [['value' => 'Custom']],
-                $customValuesForTable
-            );
+            $product['customTable'] = array_merge([['value' => 'Custom']], $customValuesForTable);
         }
         if (!empty($product['variants']) && !empty($selectableOptions)) {
             $normalizedSelectableOptions = [];
@@ -358,7 +372,6 @@ class ExportCommand extends AbstractCommand
             }
             unset($variant);
         }
-//        print_r($results);
         return $results;
     }
 
