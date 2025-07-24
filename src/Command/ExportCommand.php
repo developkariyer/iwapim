@@ -337,9 +337,10 @@ class ExportCommand extends AbstractCommand
         if (!empty($customItems)) {
             echo $productId . " Custom Items: ";
             print_r($customItems);
-            echo "\n Size List: \n";
+            echo "\n Variation Size List String: \n";
             print_r($variationSizeList);
-            echo "\n";
+            echo "\n Size Table: \n";
+            print_r($results);
         }
         return $results;
     }
