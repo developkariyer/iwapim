@@ -111,6 +111,7 @@ class ExportCommand extends AbstractCommand
             if (empty($customFieldTableData)) {
                 continue;
             }
+            echo "Custom Field Table Data: \n";
             print_r($customFieldTableData);
             foreach ($product['variants'] as &$variant) {
                 $variationSize = $variant['variationSize'];
