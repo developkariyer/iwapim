@@ -251,7 +251,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             getDropshipPurchaseOrders(
                 limit: 500,
                 hasResponse: true,
-                sortOrder: DESC
+                sortOrder: ASC
             ) {
                 poNumber,
                 poDate,
