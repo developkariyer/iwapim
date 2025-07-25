@@ -93,6 +93,7 @@ class ExportCommand extends AbstractCommand
                 $result = $this->parseSizeListForTableFormat($product['variationSizeList'], $product['id']);
                 $product['sizeTable'] = $result['sizes'] ?? [] ;
                 $product['customFieldTable'] = $result['custom'] ?? [];
+                $this->updateVariantSize($product, $result['mappings']);
                 $allProducts[] = $product;
             }
             echo "offset = $offset\n";
@@ -102,6 +103,18 @@ class ExportCommand extends AbstractCommand
         $filePath = PIMCORE_PROJECT_ROOT . '/tmp/exportProduct.json';
         file_put_contents($filePath, json_encode($allProducts, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
         echo "Exported to: " . $filePath . "\n";
+    }
+
+    private function updateVariantSize(&$product, $sizeMap)
+    {
+        foreach ($product['variants'] as &$variant) {
+            $variationSize = $variant['variationSize'];
+            if (empty($variationSize)) {
+                continue;
+            }
+            $size = $sizeMap[$variationSize] ?? null;
+            $variant['variationSize'] = $size;
+        }
     }
 
     private function setVariantCustomData($data)
@@ -307,6 +320,7 @@ class ExportCommand extends AbstractCommand
         }
         $results = [];
         $customItems = [];
+        $originalToLabelMap = [];
         $defaultLabels = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL', '11XL', '12XL'];
         $stringLabels = [
             'Small' => 'S',
@@ -326,16 +340,18 @@ class ExportCommand extends AbstractCommand
         $parsedStandardLabels = [];
         foreach ($parts as $part) {
             $part = trim($part);
+            if ($part === '') continue;
             if (isset($stringLabels[$part])) {
-                $results[] = [$stringLabels[$part]];
+                $label = $stringLabels[$part];
+                $results[] = [$label];
+                $originalToLabelMap[$part] = $label;
                 continue;
             }
-            if ($part === '') continue;
             if (preg_match('/(\d+(?:[.,]\d+)?)[xX](\d+(?:[.,]\d+)?)/', $part, $matches)) {
                 $a = (float) str_replace(',', '.', $matches[1]);
                 $b = (float) str_replace(',', '.', $matches[2]);
                 $key = [$a, $b];
-                $parsedDimensionValues[] = $key;
+                $parsedDimensionValues[] = [$key, $part];
                 continue;
             }
             if (preg_match('/(\d+(?:[.,]\d+)?)[xX](\d+(?:[.,]\d+)?)[xX](\d+(?:[.,]\d+)?)/', $part, $matches)) {
@@ -343,66 +359,63 @@ class ExportCommand extends AbstractCommand
                 $b = (float) str_replace(',', '.', $matches[2]);
                 $c = (float) str_replace(',', '.', $matches[3]);
                 $key = [$a, $b, $c];
-                $parsedDimensionValues[] = $key;
+                $parsedDimensionValues[] = [$key, $part];
                 continue;
             }
             if (preg_match('/(\d+(?:[.,]\d+)?)\s*(mm|cm|m)/i', $part, $matches)) {
                 $value = (float) str_replace(',', '.', $matches[1]);
-                $parsedNumericValues[] = $value;
+                $parsedNumericValues[] = [$value, $part];
                 continue;
             }
             if (in_array(strtoupper($part), $defaultLabels)) {
-                $parsedSimpleLabels[] = [strtoupper($part)];
+                $label = strtoupper($part);
+                $parsedSimpleLabels[] = [$label];
+                $originalToLabelMap[$part] = $label;
                 continue;
             }
             if (preg_match('/tek\s?ebat|standart/i', $part)) {
-                $parsedStandardLabels[] = ['S'];
+                $label = 'S';
+                $parsedStandardLabels[] = [$label];
+                $originalToLabelMap[$part] = $label;
                 continue;
             }
             $customItems[] = $part;
         }
         usort($parsedDimensionValues, function($a, $b) {
-            return $a <=> $b;
+            return $a[0] <=> $b[0];
         });
-        foreach ($parsedDimensionValues as $dims) {
+        foreach ($parsedDimensionValues as $item) {
+            $dims = $item[0];
+            $originalPart = $item[1];
             $label = $defaultLabels[$defaultLabelIndex++] ?? end($defaultLabels);
             $results[] = array_merge($dims, [$label]);
+            $originalToLabelMap[$originalPart] = $label;
         }
         sort($parsedNumericValues);
-        foreach ($parsedNumericValues as $val) {
+        foreach ($parsedNumericValues as $item) {
+            $val = $item[0];
+            $originalPart = $item[1];
             $label = $defaultLabels[$defaultLabelIndex++] ?? end($defaultLabels);
             $results[] = [$val, $label];
+            $originalToLabelMap[$originalPart] = $label;
         }
+
         foreach ($parsedSimpleLabels as $labelArray) {
             $results[] = $labelArray;
         }
         foreach ($parsedStandardLabels as $labelArray) {
             $results[] = $labelArray;
         }
-        //print_r($results);
-//        if (!empty($customItems)) {
-//            echo $productId . " Custom Items: ";
-//            print_r($customItems);
-//            echo "\n Variation Size List String: \n";
-//            print_r($variationSizeList);
-//            echo "\n Size Table: \n";
-//            print_r($results);
-//        }
-        if (!empty($customItems)) {
-            echo "Before unshift:\n";
-            print_r($customItems);
 
+        if (!empty($customItems)) {
             if ($customItems[0] !== 'Custom') {
-                echo "Adding 'Custom' to beginning\n";
                 array_unshift($customItems, 'Custom');
             }
-
-            echo "After unshift:\n";
-            print_r($customItems);
         }
         return [
             'sizes' => $results,
-            'custom' => $customItems
+            'custom' => $customItems,
+            'mappings' => $originalToLabelMap,
         ];
     }
 }
