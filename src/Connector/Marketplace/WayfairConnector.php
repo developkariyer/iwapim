@@ -122,8 +122,8 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         }
         //$this->prepareToken();
         //$this->queryOpenOrdersSandbox();
-        //$this->getDropshipOrdersSandbox();
-        $this->acceptDropshipOrdersSandbox('TEST_75743408', '3SIRAAK94CMBLACK');
+        $this->getDropshipOrdersSandbox();
+        //$this->acceptDropshipOrdersSandbox('TEST_75743408', '3SIRAAK94CMBLACK');
 
 //        try {
 //            $sqlLastUpdatedAt = "
@@ -251,7 +251,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         query getDropshipPurchaseOrders {
             getDropshipPurchaseOrders(
                 limit: 500,
-                hasResponse: false,
+                hasResponse: true,
                 sortOrder: DESC
             ) {
                 poNumber,
