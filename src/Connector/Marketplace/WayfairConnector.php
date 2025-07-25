@@ -122,7 +122,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         }
         //$this->prepareToken();
         //$this->queryOpenOrdersSandbox();
-        $this->testEndpoint();
+        $this->getDropshipOrdersSandbox();
 
 //        try {
 //            $sqlLastUpdatedAt = "
@@ -244,47 +244,46 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         print_r($response->getContent());
     }
 
-    public function queryOpenOrdersSandbox()
+    public function getDropshipOrdersSandbox()
     {
         $query = <<<GRAPHQL
-            query getDropshipPurchaseOrders {
-                getDropshipPurchaseOrders(
-                    limit: 5,
-                    hasResponse: false,
-                    sortOrder: ASC
-                ) {
-                    poNumber,
-                    poDate,
-                    estimatedShipDate,
-                    customerName,
-                    customerAddress1,
-                    customerAddress2,
-                    customerCity,
-                    customerState,
-                    customerPostalCode,
-                    orderType,
-                    shippingInfo {
-                        shipSpeed,
-                        carrierCode
-                    },
-                    packingSlipUrl,
-                    warehouse {
-                        id,
-                        name
-                    },
-                    products {
-                        partNumber,
-                        quantity,
-                        price,
-                        isCancelled,
-                        event {
-                            startDate,
-                            endDate
-                        }
+        query getDropshipPurchaseOrders {
+            getDropshipPurchaseOrders(
+                limit: 500,
+                hasResponse: false,
+                sortOrder: DESC
+            ) {
+                poNumber,
+                poDate,
+                estimatedShipDate,
+                customerName,
+                customerAddress1,
+                customerAddress2,
+                customerCity,
+                customerState,
+                customerPostalCode,
+                orderType,
+                shippingInfo {
+                    shipSpeed,
+                    carrierCode
+                },
+                packingSlipUrl,
+                warehouse {
+                    id,
+                    name
+                },
+                products {
+                    partNumber,
+                    quantity,
+                    price,
+                    event {
+                        startDate,
+                        endDate
                     }
                 }
             }
-            GRAPHQL;
+        }
+        GRAPHQL;
         $response = $this->httpClient->request('POST',static::$apiUrl['url'], [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessTokenProd(),
@@ -292,11 +291,11 @@ class WayfairConnector extends MarketplaceConnectorAbstract
             ],
             'json' => ['query' => $query]
         ]);
-        if ($response->getStatusCode() !== 200) {
-            throw new Exception('Failed to get orders: ' . $response->getContent(false));
-        }
-        print_r($response->toArray());
 
+        if ($response->getStatusCode() !== 200) {
+            throw new \Exception('Failed to get orders: ' . $response->getContent(false));
+        }
+        print_r($response->getContent());
     }
 
     public function downloadReturns(): void
