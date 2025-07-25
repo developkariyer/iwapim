@@ -116,10 +116,12 @@ class ExportCommand extends AbstractCommand
             foreach ($product['variants'] as &$variant) {
                 $variationSize = $variant['variationSize'];
                 if (array_key_exists($variationSize, $customFieldTableData)) {
+                    echo "Found: " . $variationSize . "\n";
                     $variant['customField'] = $variationSize;
                     $variant['variationSize'] = '';
                     echo "Variant custom field: " . $variant['customField'] . "\n";
                 }
+                echo "Not found: " . $variationSize . "\n";
             }
             $product['variants'] = $product['variants'];
         }
