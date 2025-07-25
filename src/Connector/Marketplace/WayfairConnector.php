@@ -123,7 +123,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         //$this->prepareToken();
         //$this->queryOpenOrdersSandbox();
         //$this->getDropshipOrdersSandbox();
-        $this->acceptDropshipOrdersSandbox();
+        $this->acceptDropshipOrdersSandbox('TEST_83478209', '3SIRAAK94CMGOLD');
 
 //        try {
 //            $sqlLastUpdatedAt = "
@@ -299,7 +299,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         print_r($response->getContent());
     }
 
-    public function acceptDropshipOrdersSandbox()
+    public function acceptDropshipOrdersSandbox($poNumber, $partNumber)
     {
         $query = <<<GRAPHQL
         mutation acceptOrder(\$poNumber: String!, \$shipSpeed: ShipSpeed!, \$lineItems: [AcceptedLineItemInput!]!) {
@@ -320,11 +320,11 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         }
         GRAPHQL;
         $variables = [
-            'poNumber' => 'TEST_62248013',
+            'poNumber' => $poNumber,
             'shipSpeed' => 'GROUND',
             'lineItems' => [
                 [
-                    'partNumber' => '3SIRAAK94CMGOLD',
+                    'partNumber' => $partNumber,
                     'quantity' => 1,
                     'unitPrice' => 9.99,
                     'estimatedShipDate' => '2025-07-26 05:01:13.000000 +00:00',
