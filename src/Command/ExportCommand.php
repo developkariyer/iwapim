@@ -388,7 +388,7 @@ class ExportCommand extends AbstractCommand
 //            echo "\n Size Table: \n";
 //            print_r($results);
 //        }
-        if (!empty($customItems) && $customItems[0] === 'Custom') {
+        if (!empty($customItems) && $customItems[0] !== 'Custom') {
             array_unshift($customItems, 'Custom');
         }
         return [
@@ -396,6 +396,4 @@ class ExportCommand extends AbstractCommand
             'custom' => $customItems
         ];
     }
-
-
 }
