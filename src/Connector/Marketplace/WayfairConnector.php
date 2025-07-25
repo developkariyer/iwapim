@@ -17,7 +17,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
     private static array $apiUrl = [
         'oauth' => 'https://sso.auth.wayfair.com/oauth/token',
         'catalog' => 'https://api.wayfair.com/v1/supplier-catalog-api/graphql',
-        'url' => 'https://api.wayfair.com/v1/graphql',
+        'url' => 'https://sandbox.api.wayfair.com/v1/graphql',
         'returnOrder' => 'https://api.wayfair.io/v1/supplier-order-api/graphql'
     ];
     public static string $marketplaceType = 'Wayfair';
@@ -31,7 +31,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
      */
     public function prepareToken(): void
     {
-        if ($this->marketplace->getKey() == 'WayfairUK') {
+        if ($this->marketplace->getKey() == 'Wayfair') {
             return;
         }
         try {
@@ -44,7 +44,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                     'grant_type' => 'client_credentials',
                     'client_id' => $this->marketplace->getWayfairClientIdProd(),
                     'client_secret' => $this->marketplace->getWayfairSecretKeyProd(),
-                    'audience' => 'https://api.wayfair.com/'
+                    'audience' => 'https://sandbox.api.wayfair.com/'
                 ]
             ]);
             if ($response->getStatusCode() !== 200) {
@@ -117,116 +117,116 @@ class WayfairConnector extends MarketplaceConnectorAbstract
      */
     public function downloadOrders(): void
     {
-        if ($this->marketplace->getKey() == 'WayfairUK') {
+        if ($this->marketplace->getKey() == 'Wayfair') {
             return;
         }
-//        $this->prepareToken();
-//        $this->queryOpenOrdersSandbox();
-
-        try {
-            $sqlLastUpdatedAt = "
-                    SELECT DATE_FORMAT(
-                        GREATEST(
-                            IFNULL(
-                                MAX(STR_TO_DATE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.poDate')), '%Y-%m-%d')),
-                                STR_TO_DATE(:default_date, '%Y-%m-%dT%H:%i:%sZ')
-                            ),
-                            STR_TO_DATE(:default_date, '%Y-%m-%dT%H:%i:%sZ')
-                        ),
-                        '%Y-%m-%dT00:00:00Z'
-                    ) AS lastUpdatedAt
-                    FROM iwa_marketplace_orders
-                    WHERE marketplace_id = :marketplace_id;
-                ";
-
-            $result = Utility::fetchFromSql($sqlLastUpdatedAt, [
-                'marketplace_id' => $this->marketplace->getId(),
-                'default_date' => '2024-05-01T00:00:00Z'
-            ]);
-            $lastUpdatedAt = $result[0]['lastUpdatedAt'];
-        } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage() . "\n";
-        }
-        echo "Last update: " . $lastUpdatedAt . "\n";
-
         $this->prepareToken();
-        $db = Db::get();
-        $limit = 200;
-        do {
-            $query = <<<GRAPHQL
-            query getDropshipPurchaseOrders {
-                getDropshipPurchaseOrders(
-                    limit: $limit,
-                    sortOrder: ASC,
-                    fromDate: "$lastUpdatedAt"
-                ) {
-                    poNumber,
-                    poDate,
-                    estimatedShipDate,
-                    customerName,
-                    customerAddress1,
-                    customerAddress2,
-                    customerCity,
-                    customerState,
-                    customerPostalCode,
-                    orderType,
-                    shippingInfo {
-                        shipSpeed,
-                        carrierCode
-                    },
-                    packingSlipUrl,
-                    warehouse {
-                        id,
-                        name
-                    },
-                    products {
-                        partNumber,
-                        quantity,
-                        price,
-                        isCancelled,
-                        event {
-                            startDate,
-                            endDate
-                        }
-                    }
-                }
-            }
-            GRAPHQL;
-            $response = $this->httpClient->request('POST',static::$apiUrl['url'], [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessTokenProd(),
-                    'Content-Type' => 'application/json'
-                ],
-                'json' => ['query' => $query]
-            ]);
-            if ($response->getStatusCode() !== 200) {
-                throw new Exception('Failed to get orders: ' . $response->getContent(false));
-            }
-            try {
-                $data = $response->toArray();
-                $orders = $data['data']['getDropshipPurchaseOrders'];
-                $ordersCount = count($orders);
-                $lastDate = $orders[$ordersCount - 1]['poDate'];
-                $db->beginTransaction();
-                foreach ($orders as $order) {
-                    $db->executeStatement(
-                        "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
-                        [
-                            $this->marketplace->getId(),
-                            $order['poNumber'],
-                            json_encode($order)
-                        ]
-                    );
-                }
-                $db->commit();
-            } catch (Exception $e) {
-                $db->rollBack();
-                echo "Error: " . $e->getMessage() . "\n";
-            }
-            echo "From date: $lastUpdatedAt\n";
-            echo "Orders downloaded: $ordersCount\n";
-            $lastUpdatedAt = $lastDate;
-        }while($ordersCount === $limit);
+        $this->queryOpenOrdersSandbox();
+
+//        try {
+//            $sqlLastUpdatedAt = "
+//                    SELECT DATE_FORMAT(
+//                        GREATEST(
+//                            IFNULL(
+//                                MAX(STR_TO_DATE(JSON_UNQUOTE(JSON_EXTRACT(json, '$.poDate')), '%Y-%m-%d')),
+//                                STR_TO_DATE(:default_date, '%Y-%m-%dT%H:%i:%sZ')
+//                            ),
+//                            STR_TO_DATE(:default_date, '%Y-%m-%dT%H:%i:%sZ')
+//                        ),
+//                        '%Y-%m-%dT00:00:00Z'
+//                    ) AS lastUpdatedAt
+//                    FROM iwa_marketplace_orders
+//                    WHERE marketplace_id = :marketplace_id;
+//                ";
+//
+//            $result = Utility::fetchFromSql($sqlLastUpdatedAt, [
+//                'marketplace_id' => $this->marketplace->getId(),
+//                'default_date' => '2024-05-01T00:00:00Z'
+//            ]);
+//            $lastUpdatedAt = $result[0]['lastUpdatedAt'];
+//        } catch (\Exception $e) {
+//            echo "Error: " . $e->getMessage() . "\n";
+//        }
+//        echo "Last update: " . $lastUpdatedAt . "\n";
+//
+//        $this->prepareToken();
+//        $db = Db::get();
+//        $limit = 200;
+//        do {
+//            $query = <<<GRAPHQL
+//            query getDropshipPurchaseOrders {
+//                getDropshipPurchaseOrders(
+//                    limit: $limit,
+//                    sortOrder: ASC,
+//                    fromDate: "$lastUpdatedAt"
+//                ) {
+//                    poNumber,
+//                    poDate,
+//                    estimatedShipDate,
+//                    customerName,
+//                    customerAddress1,
+//                    customerAddress2,
+//                    customerCity,
+//                    customerState,
+//                    customerPostalCode,
+//                    orderType,
+//                    shippingInfo {
+//                        shipSpeed,
+//                        carrierCode
+//                    },
+//                    packingSlipUrl,
+//                    warehouse {
+//                        id,
+//                        name
+//                    },
+//                    products {
+//                        partNumber,
+//                        quantity,
+//                        price,
+//                        isCancelled,
+//                        event {
+//                            startDate,
+//                            endDate
+//                        }
+//                    }
+//                }
+//            }
+//            GRAPHQL;
+//            $response = $this->httpClient->request('POST',static::$apiUrl['url'], [
+//                'headers' => [
+//                    'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessTokenProd(),
+//                    'Content-Type' => 'application/json'
+//                ],
+//                'json' => ['query' => $query]
+//            ]);
+//            if ($response->getStatusCode() !== 200) {
+//                throw new Exception('Failed to get orders: ' . $response->getContent(false));
+//            }
+//            try {
+//                $data = $response->toArray();
+//                $orders = $data['data']['getDropshipPurchaseOrders'];
+//                $ordersCount = count($orders);
+//                $lastDate = $orders[$ordersCount - 1]['poDate'];
+//                $db->beginTransaction();
+//                foreach ($orders as $order) {
+//                    $db->executeStatement(
+//                        "INSERT INTO iwa_marketplace_orders (marketplace_id, order_id, json) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE json = VALUES(json)",
+//                        [
+//                            $this->marketplace->getId(),
+//                            $order['poNumber'],
+//                            json_encode($order)
+//                        ]
+//                    );
+//                }
+//                $db->commit();
+//            } catch (Exception $e) {
+//                $db->rollBack();
+//                echo "Error: " . $e->getMessage() . "\n";
+//            }
+//            echo "From date: $lastUpdatedAt\n";
+//            echo "Orders downloaded: $ordersCount\n";
+//            $lastUpdatedAt = $lastDate;
+//        }while($ordersCount === $limit);
     }
 
     public function queryOpenOrdersSandbox()
