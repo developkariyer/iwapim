@@ -99,9 +99,9 @@ class ExportCommand extends AbstractCommand
             $offset += $limit;
         }
         $allProducts = $this->setVariantCustomData($allProducts);
-        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/exportProduct.json';
-        file_put_contents($filePath, json_encode($allProducts, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-        echo "Exported to: " . $filePath . "\n";
+//        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/exportProduct.json';
+//        file_put_contents($filePath, json_encode($allProducts, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+//        echo "Exported to: " . $filePath . "\n";
     }
 
     private function setVariantCustomData($data)
@@ -116,8 +116,10 @@ class ExportCommand extends AbstractCommand
                 if (array_key_exists($variationSize, $customFieldTableData)) {
                     $variant['customField'] = $variationSize;
                     $variant['variationSize'] = '';
+                    echo "Variant custom field: " . $variant['customField'] . "\n";
                 }
             }
+            $product['variants'] = $product['variants'];
         }
         return $data;
     }
