@@ -388,8 +388,17 @@ class ExportCommand extends AbstractCommand
 //            echo "\n Size Table: \n";
 //            print_r($results);
 //        }
-        if (!empty($customItems) && $customItems[0] !== 'Custom') {
-            array_unshift($customItems, 'Custom');
+        if (!empty($customItems)) {
+            echo "Before unshift:\n";
+            print_r($customItems);
+
+            if ($customItems[0] !== 'Custom') {
+                echo "Adding 'Custom' to beginning\n";
+                array_unshift($customItems, 'Custom');
+            }
+
+            echo "After unshift:\n";
+            print_r($customItems);
         }
         return [
             'sizes' => $results,
