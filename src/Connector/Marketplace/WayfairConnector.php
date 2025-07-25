@@ -122,8 +122,9 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         }
         //$this->prepareToken();
         //$this->queryOpenOrdersSandbox();
-        $this->getDropshipOrdersSandbox();
+        //$this->getDropshipOrdersSandbox();
         //$this->acceptDropshipOrdersSandbox('TEST_75743408', '3SIRAAK94CMBLACK');
+        $this->sendShipmentSandbox(233890, 'TEST_75743408', '3SIRAAK94CMBLACK');
 
 //        try {
 //            $sqlLastUpdatedAt = "
@@ -328,6 +329,84 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                     'quantity' => 1,
                     'unitPrice' => 9.99,
                     'estimatedShipDate' => '2025-07-26 05:01:13.000000 +00:00',
+                ]
+            ],
+        ];
+        $response = $this->httpClient->request('POST',static::$apiUrl['url'], [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessTokenProd(),
+                'Content-Type' => 'application/json'
+            ],
+            'json' => [
+                'query' => $query,
+                'variables' => $variables
+            ]
+        ]);
+
+        if ($response->getStatusCode() !== 200) {
+            throw new \Exception('Failed to get orders: ' . $response->getContent(false));
+        }
+        print_r($response->getContent());
+    }
+
+    public function sendShipmentSandbox($supplierId, $poNumber, $partNumber, )
+    {
+        $query = <<<GRAPHQL
+        mutation shipment(\$notice: ShipNoticeInput!) {
+            purchaseOrders {
+                shipment(notice: \$notice) {
+                    handle,
+                    submittedAt,
+                    errors {
+                        key,
+                        message
+                    }
+                }
+            }
+        }
+        GRAPHQL;
+        $variables = [
+            'notice' => [
+                'poNumber' => $poNumber,
+                'supplierId' => $supplierId,
+                'packageCount' => 1,
+                'weight' => 184,
+                'volume' => 22986.958176,
+                'carrierCode' => 'FDEG',
+                'shipSpeed' => 'GROUND',
+                'trackingNumber' => '210123456789',
+                'shipDate' => '2024-12-03 08:53:33.000000 +00:00',
+                'sourceAddress' => [
+                    'name' => 'John Smith',
+                    'streetAddress1' => '123 Test Street',
+                    'streetAddress2' => '# 2',
+                    'city' => 'Boston',
+                    'state' => 'MA',
+                    'postalCode' => '02116',
+                    'country' => 'US',
+                ],
+                'destinationAddress' => [
+                    'name' => 'John Smith',
+                    'streetAddress1' => '123 Test Street',
+                    'streetAddress2' => '# 2',
+                    'city' => 'Boston',
+                    'state' => 'MA',
+                    'postalCode' => '02116',
+                    'country' => 'USA',
+                ],
+                'largeParcelShipments' => [
+                    [
+                        'partNumber' => $partNumber,
+                        'packages' => [
+                            [
+                                'code' => [
+                                    'type' => 'TRACKING_NUMBER',
+                                    'value' => '210123456781',
+                                ],
+                                'weight' => 150,
+                            ],
+                        ],
+                    ]
                 ]
             ],
         ];
