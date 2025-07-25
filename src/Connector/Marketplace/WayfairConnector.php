@@ -120,7 +120,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         if ($this->marketplace->getKey() == 'Wayfair') {
             return;
         }
-        //$this->prepareToken();
+        $this->prepareToken();
         //$this->queryOpenOrdersSandbox();
         $this->testEndpoint();
 
