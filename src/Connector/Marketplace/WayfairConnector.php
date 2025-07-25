@@ -122,7 +122,8 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         }
         //$this->prepareToken();
         //$this->queryOpenOrdersSandbox();
-        $this->getDropshipOrdersSandbox();
+        //$this->getDropshipOrdersSandbox();
+        $this->acceptDropshipOrdersSandbox();
 
 //        try {
 //            $sqlLastUpdatedAt = "
@@ -290,6 +291,55 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 'Content-Type' => 'application/json'
             ],
             'json' => ['query' => $query]
+        ]);
+
+        if ($response->getStatusCode() !== 200) {
+            throw new \Exception('Failed to get orders: ' . $response->getContent(false));
+        }
+        print_r($response->getContent());
+    }
+
+    public function acceptDropshipOrdersSandbox()
+    {
+        $query = <<<GRAPHQL
+        mutation acceptOrder(\$poNumber: String!, \$shipSpeed: ShipSpeed!, \$lineItems: [AcceptedLineItemInput!]!) {
+            purchaseOrders {
+                accept(
+                    poNumber: \$poNumber,
+                    shipSpeed: \$shipSpeed,
+                    lineItems: \$lineItems
+                ) {
+                    handle,
+                    submittedAt,
+                    errors {
+                        key,
+                        message
+                    }
+                }
+            }
+        }
+        GRAPHQL;
+        $variables = [
+            'poNumber' => 'TEST_51571201',
+            'shipSpeed' => 'GROUND',
+            'lineItems' => [
+                [
+                    'partNumber' => '4KULKUFI120IGOB',
+                    'quantity' => 1,
+                    'unitPrice' => 9.99,
+                    'estimatedShipDate' => '2025-07-26 05:01:13.000000 +00:00',
+                ]
+            ],
+        ];
+        $response = $this->httpClient->request('POST',static::$apiUrl['orders'], [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessTokenProd(),
+                'Content-Type' => 'application/json'
+            ],
+            'json' => [
+                'query' => $query,
+                'variables' => $variables
+            ]
         ]);
 
         if ($response->getStatusCode() !== 200) {
