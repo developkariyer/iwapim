@@ -144,7 +144,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
 
             $result = Utility::fetchFromSql($sqlLastUpdatedAt, [
                 'marketplace_id' => $this->marketplace->getId(),
-                'default_date' => '2024-05-01T00:00:00Z'
+                'default_date' => '2024-01-01T00:00:00Z'
             ]);
             $lastUpdatedAt = $result[0]['lastUpdatedAt'];
         } catch (\Exception $e) {
