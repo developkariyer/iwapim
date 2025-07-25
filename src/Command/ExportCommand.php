@@ -111,6 +111,7 @@ class ExportCommand extends AbstractCommand
             if (empty($customFieldTableData)) {
                 continue;
             }
+            print_r($customFieldTableData);
             foreach ($product['variants'] as &$variant) {
                 $variationSize = $variant['variationSize'];
                 if (array_key_exists($variationSize, $customFieldTableData)) {
@@ -381,14 +382,14 @@ class ExportCommand extends AbstractCommand
             $results[] = $labelArray;
         }
         //print_r($results);
-        if (!empty($customItems)) {
-            echo $productId . " Custom Items: ";
-            print_r($customItems);
-            echo "\n Variation Size List String: \n";
-            print_r($variationSizeList);
-            echo "\n Size Table: \n";
-            print_r($results);
-        }
+//        if (!empty($customItems)) {
+//            echo $productId . " Custom Items: ";
+//            print_r($customItems);
+//            echo "\n Variation Size List String: \n";
+//            print_r($variationSizeList);
+//            echo "\n Size Table: \n";
+//            print_r($results);
+//        }
         return [
             'sizes' => $results,
             'custom' => $customItems
