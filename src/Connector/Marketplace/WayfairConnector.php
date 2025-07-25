@@ -120,7 +120,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         if ($this->marketplace->getKey() == 'Wayfair') {
             return;
         }
-        $this->prepareToken();
+        //$this->prepareToken();
         //$this->queryOpenOrdersSandbox();
         $this->testEndpoint();
 
@@ -234,7 +234,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
     {
         $response = $this->httpClient->request('GET', 'https://sandbox.api.wayfair.com/v1/demo/clock',[
             'headers' => [
-                'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessToken(),
+                'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessTokenProd(),
                 'Content-Type' => 'application/json'
             ]
         ]);
