@@ -331,7 +331,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 ]
             ],
         ];
-        $response = $this->httpClient->request('POST',static::$apiUrl['orders'], [
+        $response = $this->httpClient->request('POST',static::$apiUrl['url'], [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->marketplace->getWayfairAccessTokenProd(),
                 'Content-Type' => 'application/json'
