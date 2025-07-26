@@ -93,6 +93,7 @@ class ExportCommand extends AbstractCommand
                 $result = $this->parseSizeListForTableFormat($product['variationSizeList'], $product['id']);
                 $product['sizeTable'] = $result['sizes'] ?? [] ;
                 $product['customFieldTable'] = $result['custom'] ?? [];
+                print_r($result['mappings']);
                 $this->updateVariantSize($product, $result['mappings']);
                 $allProducts[] = $product;
             }
