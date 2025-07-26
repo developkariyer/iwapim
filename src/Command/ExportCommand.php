@@ -93,7 +93,9 @@ class ExportCommand extends AbstractCommand
                 $result = $this->parseSizeListForTableFormat($product['variationSizeList'], $product['id']);
                 $product['sizeTable'] = $result['sizes'] ?? [] ;
                 $product['customFieldTable'] = $result['custom'] ?? [];
-                print_r($result['mappings']);
+                //print_r($result['mappings']);
+                $this->setVariantCustomData($product);
+
                 $this->updateVariantSize($product, $result['mappings']);
                 $allProducts[] = $product;
             }
@@ -118,23 +120,20 @@ class ExportCommand extends AbstractCommand
         }
     }
 
-    private function setVariantCustomData($data)
+    private function setVariantCustomData(&$product)
     {
-        foreach ($data as &$product) {
-            $customFieldTableData = $product['customFieldTable'];
-            if (empty($customFieldTableData)) {
-                continue;
-            }
-            foreach ($product['variants'] as &$variant) {
-                $variationSize = $variant['variationSize'];
-                if (in_array($variationSize, $customFieldTableData)) {
-                    $variant['customField'] = $variationSize;
-                    $variant['variationSize'] = '';
-                }
-            }
-            $product['variants'] = $product['variants'];
+        $customFieldTableData = $product['customFieldTable'];
+        if (empty($customFieldTableData)) {
+            return;
         }
-        return $data;
+        foreach ($product['variants'] as &$variant) {
+            $variationSize = $variant['variationSize'];
+            if (in_array($variationSize, $customFieldTableData)) {
+                $variant['customField'] = $variationSize;
+                $variant['variationSize'] = '';
+            }
+        }
+        $product['variants'] = $product['variants'];
     }
 
     private function prepareProductData($limit, $offset)
