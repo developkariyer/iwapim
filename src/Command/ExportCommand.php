@@ -122,7 +122,7 @@ class ExportCommand extends AbstractCommand
 
     private function setVariantCustomData(&$product)
     {
-        $customFieldTableData = $product['customFieldTable'];
+        $customFieldTableData = $product['customFieldTable'] ?? [];
         if (empty($customFieldTableData)) {
             return;
         }
