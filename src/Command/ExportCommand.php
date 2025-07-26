@@ -133,7 +133,6 @@ class ExportCommand extends AbstractCommand
                 $variant['variationSize'] = '';
             }
         }
-        $product['variants'] = $product['variants'];
     }
 
     private function prepareProductData($limit, $offset)
