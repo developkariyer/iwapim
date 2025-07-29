@@ -120,10 +120,10 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         if ($this->marketplace->getKey() == 'Wayfair' || $this->marketplace->getKey() == 'WayfairUK') {
             return;
         }
-        $this->prepareToken();
+       //$this->prepareToken();
         //$this->queryOpenOrdersSandbox();
         //$this->getDropshipOrdersSandbox();
-        $this->acceptDropshipOrdersSandbox('TEST_32610546', 'ASHPKG014543CLAREOUTDOORSET');
+        $this->acceptDropshipOrdersSandbox('TEST_14384288', 'ASH_P008-827_ROCKINGCHAIR');
         //$this->sendShipmentSandbox(233890, 'TEST_51571201', '4KULKUFI120IGOB');
 
 //        try {
