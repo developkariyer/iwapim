@@ -375,7 +375,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 'carrierCode' => 'FDEG',
                 'shipSpeed' => 'GROUND',
                 'trackingNumber' => '210123456789',
-                'shipDate' => '2025-07-31 06:46:31.000000 +00:00',
+                'shipDate' => '2025-07-30 06:46:31.000000 +00:00',
                 'sourceAddress' => [
                     'name' => 'John Smith',
                     'streetAddress1' => '123 Test Street',
