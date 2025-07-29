@@ -93,13 +93,16 @@ class ExportCommand extends AbstractCommand
                 $result = $this->parseSizeListForTableFormat($product['variationSizeList'], $product['id']);
                 $product['sizeTable'] = $result['sizes'] ?? [] ;
                 $product['customFieldTable'] = $result['custom'] ?? [];
+                //print_r($result['mappings']);
+                $this->setVariantCustomData($product);
+
                 $this->updateVariantSize($product, $result['mappings']);
                 $allProducts[] = $product;
             }
             echo "offset = $offset\n";
             $offset += $limit;
         }
-        $allProducts = $this->setVariantCustomData($allProducts);
+        //$allProducts = $this->setVariantCustomData($allProducts);
         $filePath = PIMCORE_PROJECT_ROOT . '/tmp/exportProduct.json';
         file_put_contents($filePath, json_encode($allProducts, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
         echo "Exported to: " . $filePath . "\n";
@@ -117,23 +120,19 @@ class ExportCommand extends AbstractCommand
         }
     }
 
-    private function setVariantCustomData($data)
+    private function setVariantCustomData(&$product)
     {
-        foreach ($data as &$product) {
-            $customFieldTableData = $product['customFieldTable'];
-            if (empty($customFieldTableData)) {
-                continue;
-            }
-            foreach ($product['variants'] as &$variant) {
-                $variationSize = $variant['variationSize'];
-                if (in_array($variationSize, $customFieldTableData)) {
-                    $variant['customField'] = $variationSize;
-                    $variant['variationSize'] = '';
-                }
-            }
-            $product['variants'] = $product['variants'];
+        $customFieldTableData = $product['customFieldTable'] ?? [];
+        if (empty($customFieldTableData)) {
+            return;
         }
-        return $data;
+        foreach ($product['variants'] as &$variant) {
+            $variationSize = $variant['variationSize'];
+            if (in_array($variationSize, $customFieldTableData)) {
+                $variant['customField'] = $variationSize;
+                $variant['variationSize'] = '';
+            }
+        }
     }
 
     private function prepareProductData($limit, $offset)
