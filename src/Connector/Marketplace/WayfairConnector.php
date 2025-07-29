@@ -122,8 +122,8 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         }
         $this->prepareToken();
         //$this->queryOpenOrdersSandbox();
-        $this->getDropshipOrdersSandbox();
-        //$this->acceptDropshipOrdersSandbox('TEST_75743408', '3SIRAAK94CMBLACK');
+        //$this->getDropshipOrdersSandbox();
+        $this->acceptDropshipOrdersSandbox('TEST_32610546', 'ASHPKG014543CLAREOUTDOORSET');
         //$this->sendShipmentSandbox(233890, 'TEST_51571201', '4KULKUFI120IGOB');
 
 //        try {
