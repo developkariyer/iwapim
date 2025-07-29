@@ -122,9 +122,9 @@ class WayfairConnector extends MarketplaceConnectorAbstract
         }
        //$this->prepareToken();
         //$this->queryOpenOrdersSandbox();
-        $this->getDropshipOrdersSandbox();
+        //$this->getDropshipOrdersSandbox();
         //$this->acceptDropshipOrdersSandbox('TEST_11620177', 'ASH_P384_MOUNTVALLEYDINING');
-        //$this->sendShipmentSandbox(233890, 'TEST_51571201', '4KULKUFI120IGOB');
+        $this->sendShipmentSandbox(275550, 'TEST_32610546', 'ASHPKG014543CLAREOUTDOORSET');
 
 //        try {
 //            $sqlLastUpdatedAt = "
@@ -375,7 +375,7 @@ class WayfairConnector extends MarketplaceConnectorAbstract
                 'carrierCode' => 'FDEG',
                 'shipSpeed' => 'GROUND',
                 'trackingNumber' => '210123456789',
-                'shipDate' => '2025-07-26 05:01:13.000000 +00:00',
+                'shipDate' => '2025-07-31 06:46:31.000000 +00:00',
                 'sourceAddress' => [
                     'name' => 'John Smith',
                     'streetAddress1' => '123 Test Street',
