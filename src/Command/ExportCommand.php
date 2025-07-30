@@ -345,7 +345,8 @@ class ExportCommand extends AbstractCommand
         $results = [];
         $customItems = [];
         $originalToLabelMap = [];
-        $defaultLabels = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL', '11XL', '12XL'];
+        $defaultLabels = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL', '11XL', '12XL', '13XL', '14XL', '15XL', '16XL',
+            '17XL', '18XL', '19XL', '20XL', '21XL', '22XL', '23XL', '24XL', '25XL'];
         $stringLabels = [
             'Small' => 'S',
             'Medium' => 'M',
