@@ -89,6 +89,7 @@ class ExportCommand extends AbstractCommand
             if (empty($export)) {
                 break;
             }
+            $txtOutput = '';
             foreach ($export as &$product) {
                 $result = $this->parseSizeListForTableFormat($product['variationSizeList'], $product['id']);
                 $product['sizeTable'] = $result['sizes'] ?? [] ;
@@ -98,14 +99,24 @@ class ExportCommand extends AbstractCommand
 
                 $this->updateVariantSize($product, $result['mappings']);
                 $allProducts[] = $product;
+
+                $txtOutput .= "Ürün ID: {$product['id']}\n";
+                foreach ($result['mappings'] as $original => $label) {
+                    $txtOutput .= "$original => $label\n";
+                }
+                $txtOutput .= "\n";
             }
             echo "offset = $offset\n";
             $offset += $limit;
         }
         //$allProducts = $this->setVariantCustomData($allProducts);
-        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/exportProduct.json';
-        file_put_contents($filePath, json_encode($allProducts, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-        echo "Exported to: " . $filePath . "\n";
+//        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/exportProduct.json';
+//        file_put_contents($filePath, json_encode($allProducts, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+//        echo "Exported to: " . $filePath . "\n";
+
+        $txtFilePath = PIMCORE_PROJECT_ROOT . '/tmp/size_mappings.txt';
+        file_put_contents($txtFilePath, $txtOutput);
+        echo "Size mapping exported to: " . $txtFilePath . "\n";
     }
 
     private function updateVariantSize(&$product, $sizeMap)
@@ -353,7 +364,7 @@ class ExportCommand extends AbstractCommand
                 $parsedDimensionValues[] = [$key, $part];
                 continue;
             }
-            if (preg_match('/(\d+(?:[.,]\d+)?)[xX](\d+(?:[.,]\d+)?)[xX](\d+(?:[.,]\d+)?)/', $part, $matches)) {
+            if (preg_match('/(\d+(?:[.,]\d+)?)[xX](\d+(?:[.,]\d+)?)[xX](\d+(?:[.,]\d+)?)(?:\s*(mm|cm|m))?/i', $part, $matches)) {
                 $a = (float) str_replace(',', '.', $matches[1]);
                 $b = (float) str_replace(',', '.', $matches[2]);
                 $c = (float) str_replace(',', '.', $matches[3]);
