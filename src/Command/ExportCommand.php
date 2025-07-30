@@ -371,18 +371,18 @@ class ExportCommand extends AbstractCommand
                 $originalToLabelMap[$part] = $label;
                 continue;
             }
-            if (preg_match('/(\d+(?:[.,]\d+)?)[xX](\d+(?:[.,]\d+)?)/', $part, $matches)) {
-                $a = (float) str_replace(',', '.', $matches[1]);
-                $b = (float) str_replace(',', '.', $matches[2]);
-                $key = [$a, $b];
-                $parsedDimensionValues[] = [$key, $part];
-                continue;
-            }
             if (preg_match('/^(\d+(?:[.,]\d+)?)[xX](\d+(?:[.,]\d+)?)[xX](\d+(?:[.,]\d+)?)(?:\s*(?:mm|cm|m))?$/i', $part, $matches)) {
                 $a = (float) str_replace(',', '.', $matches[1]);
                 $b = (float) str_replace(',', '.', $matches[2]);
                 $c = (float) str_replace(',', '.', $matches[3]);
                 $key = [$a, $b, $c];
+                $parsedDimensionValues[] = [$key, $part];
+                continue;
+            }
+            if (preg_match('/(\d+(?:[.,]\d+)?)[xX](\d+(?:[.,]\d+)?)/', $part, $matches)) {
+                $a = (float) str_replace(',', '.', $matches[1]);
+                $b = (float) str_replace(',', '.', $matches[2]);
+                $key = [$a, $b];
                 $parsedDimensionValues[] = [$key, $part];
                 continue;
             }
