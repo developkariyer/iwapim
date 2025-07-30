@@ -101,10 +101,18 @@ class ExportCommand extends AbstractCommand
                 $allProducts[] = $product;
 
                 $txtOutput .= "Ürün ID: {$product['id']}\n";
+                $txtOutput .= "Orijinal SizeList:\n{$product['variationSizeList']}\n";
+                $txtOutput .= "Eşleşen Boyutlar (Mapping):\n";
                 foreach ($result['mappings'] as $original => $label) {
                     $txtOutput .= "$original => $label\n";
                 }
-                $txtOutput .= "\n";
+                if (!empty($result['custom'])) {
+                    $txtOutput .= "Custom Alanına Düşenler:\n";
+                    foreach ($result['custom'] as $customValue) {
+                        $txtOutput .= "- $customValue\n";
+                    }
+                }
+                $txtOutput .= str_repeat('-', 40) . "\n\n";
             }
             echo "offset = $offset\n";
             $offset += $limit;
