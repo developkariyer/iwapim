@@ -84,12 +84,12 @@ class ExportCommand extends AbstractCommand
         $limit = 50;
         $offset = 0;
         $allProducts = [];
+        $txtOutput = '';
         while (true) {
             $export = $this->prepareProductData($limit, $offset);
             if (empty($export)) {
                 break;
             }
-            $txtOutput = '';
             foreach ($export as &$product) {
                 $result = $this->parseSizeListForTableFormat($product['variationSizeList'], $product['id']);
                 $product['sizeTable'] = $result['sizes'] ?? [] ;
