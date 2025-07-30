@@ -106,6 +106,12 @@ class ExportCommand extends AbstractCommand
                 foreach ($result['mappings'] as $original => $label) {
                     $txtOutput .= "$original => $label\n";
                 }
+                if (!empty($result['sizes'])) {
+                    $txtOutput .= "Size Table:\n";
+                    foreach ($result['sizes'] as $sizeRow) {
+                        $txtOutput .= "- " . json_encode($sizeRow, JSON_UNESCAPED_UNICODE) . "\n";
+                    }
+                }
                 if (!empty($result['custom'])) {
                     $txtOutput .= "Custom Alanına Düşenler:\n";
                     foreach ($result['custom'] as $customValue) {
