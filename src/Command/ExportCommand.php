@@ -398,8 +398,8 @@ class ExportCommand extends AbstractCommand
                 continue;
             }
             if (preg_match('/tek\s?ebat|standart/i', $part)) {
-                $label = 'S';
-                $parsedStandardLabels[] = [$label];
+                $label = $defaultLabels[$defaultLabelIndex++] ?? end($defaultLabels);
+                $results[] = [$label];
                 $originalToLabelMap[$part] = $label;
                 continue;
             }
