@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Pimcore\Model\DataObject\Product\Listing as ProductListing;
+use Pimcore\Model\DataObject\GroupProduct\Listing as GroupProductListing;
 use App\Utils\Utility;
 
 #[AsCommand(
@@ -21,7 +22,8 @@ class ExportCommand extends AbstractCommand
 {
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->processExportProduct();
+        $this->exportGroupListing();
+        //$this->processExportProduct();
 //        $export = $this->checkData();
 //        foreach ($export as &$product) {
 //            if (!$product['isDirty']) {
@@ -30,6 +32,19 @@ class ExportCommand extends AbstractCommand
 //        }
 //        echo json_encode($export, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         return Command::SUCCESS;
+    }
+
+    public function exportGroupListing()
+    {
+        $groupProductListingObject = new GroupProductListing();
+        $groupProductListingObject->setLimit(100);
+        $groupProducts = $groupProductListingObject->load();
+        foreach ($groupProducts as $groupProduct) {
+            $products = $groupProduct->getProducts();
+            foreach ($products as $product) {
+                echo $product->getIwasku() . "\n";
+            }
+        }
     }
 
     public function exportAllProductsToJson()
