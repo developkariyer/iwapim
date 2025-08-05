@@ -43,7 +43,7 @@ class ExportCommand extends AbstractCommand
         foreach ($groupProducts as $groupProduct) {
             $products = $groupProduct->getProducts();
             foreach ($products as $product) {
-                $result[$groupProduct->getKey()] = $product->getIwasku();
+                $result[$groupProduct->getKey()][] = $product->getIwasku();
             }
         }
         print_r($result);
