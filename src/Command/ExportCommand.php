@@ -46,7 +46,9 @@ class ExportCommand extends AbstractCommand
                 $result[$groupProduct->getKey()][] = $product->getIwasku();
             }
         }
-        print_r($result);
+        $filePath = PIMCORE_PROJECT_ROOT . '/tmp/groupProduct.json';
+        file_put_contents($filePath, json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        echo "Exported to: " . $filePath . "\n";
     }
 
     public function exportAllProductsToJson()
