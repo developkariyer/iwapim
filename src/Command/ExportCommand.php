@@ -40,6 +40,7 @@ class ExportCommand extends AbstractCommand
         $groupProductListingObject->setLimit(100);
         $groupProducts = $groupProductListingObject->load();
         foreach ($groupProducts as $groupProduct) {
+            echo $groupProduct->getKey() . "\n";
             $products = $groupProduct->getProducts();
             foreach ($products as $product) {
                 echo $product->getIwasku() . "\n";
