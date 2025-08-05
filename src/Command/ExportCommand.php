@@ -39,13 +39,14 @@ class ExportCommand extends AbstractCommand
         $groupProductListingObject = new GroupProductListing();
         $groupProductListingObject->setLimit(100);
         $groupProducts = $groupProductListingObject->load();
+        $result = [];
         foreach ($groupProducts as $groupProduct) {
-            echo $groupProduct->getKey() . "\n";
             $products = $groupProduct->getProducts();
             foreach ($products as $product) {
-                echo $product->getIwasku() . "\n";
+                $result[$groupProduct->getKey()] = $product->getIwasku();
             }
         }
+        print_r($result);
     }
 
     public function exportAllProductsToJson()
