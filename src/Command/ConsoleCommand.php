@@ -1070,7 +1070,7 @@ B0B4KF1Q21";
 
         $listingObject = new VariantProduct\Listing();
         $pageSize = 50;
-        $offset = 0;
+        $offset = 10000;
         $listingObject->setLimit($pageSize);
         $index = $offset;
         $newline = false;
@@ -1098,7 +1098,7 @@ B0B4KF1Q21";
                     $sku = $amazonListing->getSku();
                     $country = $amazonListing->getMarketplaceId();
                     if ($currentEan === $ean) {
-                        echo "  Skipping $country => $sku...\n";
+                        echo "  Skipping $country => $sku ($ean correct)...\n";
                         continue;
                     }
                     echo "  Processing $country => $sku...\n";
