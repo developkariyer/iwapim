@@ -1077,6 +1077,7 @@ B0B4KF1Q21";
             $index++;
             $listingObject->setOffset($offset);
             $variantProducts = $listingObject->load();
+            echo "$offset\n";
             $offset += $pageSize;
             foreach ($variantProducts as $variantProduct) {
                 $asin = $variantProduct->getUniqueMarketplaceId();
@@ -1109,7 +1110,7 @@ B0B4KF1Q21";
                         try {
                             $amazonConnector->utilsHelper->patchSetEan($sku, $ean, $country);
                             $success = true;
-                        } catch (\Exception $e) {
+                        } catch (Exception $e) {
                             $attempt++;
                             echo "    Attempt $attempt failed.\n";
                             if ($attempt >= $maxRetries) {
