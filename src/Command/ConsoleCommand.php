@@ -1116,6 +1116,9 @@ B0B4KF1Q21";
                         try {
                             $amazonConnector->utilsHelper->patchSetEan($sku, $ean, $country);
                             $success = true;
+                        } catch (\Saloon\Exceptions\Request\Statuses\ForbiddenException) {
+                            echo "    Unauthorized EAN [$ean]\n";
+                            break;
                         } catch (Exception $e) {
                             $attempt++;
                             echo "    Attempt $attempt failed.\n";
