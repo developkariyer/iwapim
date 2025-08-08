@@ -1073,11 +1073,13 @@ B0B4KF1Q21";
         $offset = 0;
         $listingObject->setLimit($pageSize);
         $index = $offset;
+        $newline = false;
         while (true) {
             $index++;
             $listingObject->setOffset($offset);
             $variantProducts = $listingObject->load();
-            echo "$offset\n";
+            echo "$offset   \r";
+            $newline = true;
             $offset += $pageSize;
             foreach ($variantProducts as $variantProduct) {
                 $asin = $variantProduct->getUniqueMarketplaceId();
@@ -1086,6 +1088,10 @@ B0B4KF1Q21";
                 }
                 $amazonListings = $variantProduct->getAmazonMarketplace();
                 $ean = $targetList[$asin];
+                if ($newline) {
+                    echo "\n";
+                    $newline = false;
+                }
                 echo "Processing $asin ($ean)...\n";
                 foreach ($amazonListings as $amazonListing) {
                     $currentEan = $amazonListing->getEan();
