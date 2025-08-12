@@ -63,7 +63,7 @@ ON DUPLICATE KEY UPDATE
      tracking_company = VALUES(tracking_company),
      fulfillments_status_control = VALUES(fulfillments_status_control),
      referring_site = VALUES(referring_site),
-     landing_site = VALUES(landing_site)
+     landing_site = VALUES(landing_site),
      customer_first_name = VALUES(customer_first_name),
      customer_last_name = VALUES(customer_last_name),
      customer_email = VALUES(customer_email);
