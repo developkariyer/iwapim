@@ -476,18 +476,19 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
             }
         GRAPHQL;
 
-        try {
-            $sqlLastUpdatedAt = "
-                SELECT COALESCE(MAX(json_extract(json, '$.updatedAt')), '2000-01-01T00:00:00Z') AS lastUpdatedAt
-                FROM iwa_marketplace_orders
-                WHERE marketplace_id = :marketplace_id;";
-            $result = Utility::fetchFromSql($sqlLastUpdatedAt, [
-                'marketplace_id' => $this->marketplace->getId()
-            ]);
-            $lastUpdatedAt = $result[0]['lastUpdatedAt'];
-        } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage() . "\n";
-        }
+//        try {
+//            $sqlLastUpdatedAt = "
+//                SELECT COALESCE(MAX(json_extract(json, '$.updatedAt')), '2000-01-01T00:00:00Z') AS lastUpdatedAt
+//                FROM iwa_marketplace_orders
+//                WHERE marketplace_id = :marketplace_id;";
+//            $result = Utility::fetchFromSql($sqlLastUpdatedAt, [
+//                'marketplace_id' => $this->marketplace->getId()
+//            ]);
+//            $lastUpdatedAt = $result[0]['lastUpdatedAt'];
+//        } catch (\Exception $e) {
+//            echo "Error: " . $e->getMessage() . "\n";
+//        }
+        $lastUpdatedAt = '2000-01-01T00:00:00Z';
         echo  "Last updated at: $lastUpdatedAt\n";
         $filter = 'updated_at:>=' . (string) $lastUpdatedAt;
         $query = [
