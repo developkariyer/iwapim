@@ -245,12 +245,10 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
                         closedAt
                         confirmed
                         poNumber
+                        email
                         customer {
                             firstName
                             lastName
-                            defaultEmailAddress {
-                                emailAddress
-                            }
                         }
                         returns (first:50) {
                             nodes {
