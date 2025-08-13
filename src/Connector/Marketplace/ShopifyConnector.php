@@ -487,6 +487,9 @@ class ShopifyConnector  extends MarketplaceConnectorAbstract
 //        } catch (\Exception $e) {
 //            echo "Error: " . $e->getMessage() . "\n";
 //        }
+        if ($this->marketplace->getKey() === 'ShopifyIslamicEn') {
+            return;
+        }
         $lastUpdatedAt = '2021-09-01T00:00:00Z';
         echo  "Last updated at: $lastUpdatedAt\n";
         $filter = 'updated_at:>=' . (string) $lastUpdatedAt;
