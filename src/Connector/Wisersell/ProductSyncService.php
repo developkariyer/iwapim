@@ -463,20 +463,24 @@ class ProductSyncService
                     echo "Subproduct Mismatch: ".count($wisersellProduct['subproducts'])." != ".count($pimProduct->getBundleProducts()).", {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
                     $updateWisersellProduct = true;
                 }
-                if ($wisersellProduct['weight'] != $pimProduct->getInheritedField('packageWeight')) {
-                    echo "Weight Mismatch: {$wisersellProduct['weight']} != {$pimProduct->getInheritedField('packageWeight')}, {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
+                $pimWeight = $pimProduct->getInheritedField('packageWeight');
+                if (!empty($pimWeight) && $wisersellProduct['weight'] != $pimWeight) {
+                    echo "Weight Mismatch: Wisersell({$wisersellProduct['weight']}) != PIM({$pimWeight}), {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
                     $updateWisersellProduct = true;
                 }
-                if ($wisersellProduct['width'] != $pimProduct->getInheritedField('packageDimension1')) {
-                    echo "Width Mismatch: {$wisersellProduct['width']} != {$pimProduct->getInheritedField('packageDimension1')}, {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
+                $pimWidth = $pimProduct->getInheritedField('packageDimension1');
+                if (!empty($pimWidth) && $wisersellProduct['width'] != $pimWidth) {
+                    echo "Width Mismatch: Wisersell({$wisersellProduct['width']}) != PIM({$pimWidth}), {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
                     $updateWisersellProduct = true;
                 }
-                if ($wisersellProduct['length'] != $pimProduct->getInheritedField('packageDimension2')) {
-                    echo "Length Mismatch: {$wisersellProduct['length']} != {$pimProduct->getInheritedField('packageDimension2')}, {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
+                $pimLength = $pimProduct->getInheritedField('packageDimension2');
+                if (!empty($pimLength) && $wisersellProduct['length'] != $pimLength) {
+                    echo "Length Mismatch: Wisersell({$wisersellProduct['length']}) != PIM({$pimLength}), {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
                     $updateWisersellProduct = true;
                 }
-                if ($wisersellProduct['height'] != $pimProduct->getInheritedField('packageDimension3')) {
-                    echo "Height Mismatch: {$wisersellProduct['height']} != {$pimProduct->getInheritedField('packageDimension3')}, {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
+                $pimHeight = $pimProduct->getInheritedField('packageDimension3');
+                if (!empty($pimHeight) && $wisersellProduct['height'] != $pimHeight) {
+                    echo "Height Mismatch: Wisersell({$wisersellProduct['height']}) != PIM({$pimHeight}), {$wisersellProduct['id']}, {$pimProduct->getIwasku()}, ({$pimProduct->getId()})\n";
                     $updateWisersellProduct = true;
                 }/*
                 if (!is_array($wisersellProduct['arrsku']) || !in_array($pimProduct->getIwasku(), $wisersellProduct['arrsku'])) {
